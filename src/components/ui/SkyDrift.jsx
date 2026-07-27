@@ -20,7 +20,7 @@ function buildClouds(count, seed) {
       size: 30 + rand() * 46,
       duration: 38 + rand() * 30,
       delay: -(rand() * 60),
-      opacity: 0.1 + rand() * 0.14,
+      opacity: 0.16 + rand() * 0.18,
     });
   }
   return clouds;
@@ -40,13 +40,16 @@ export default function SkyDrift({ count = 7, className = '' }) {
           className="drift-item"
           style={{
             top: `${c.top}%`,
-            color: '#C97A34',
             animationDuration: `${c.duration}s`,
             animationDelay: `${c.delay}s`,
-            opacity: c.opacity,
           }}
         >
-          {c.tech ? <TechCloud size={c.size} /> : <SoftCloud size={c.size} />}
+          <div
+            className="pointer-events-auto cursor-default transition-transform duration-300 ease-out will-change-transform hover:scale-125"
+            style={{ color: '#8FC4F0', opacity: c.opacity }}
+          >
+            {c.tech ? <TechCloud size={c.size} /> : <SoftCloud size={c.size} />}
+          </div>
         </div>
       ))}
     </div>
