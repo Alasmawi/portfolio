@@ -1,0 +1,127 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply text-text-primary font-sans antialiased;
+    background:
+      radial-gradient(
+        ellipse 1200px 660px at 50% -10%,
+        rgba(34, 211, 238, 0.34),
+        rgba(34, 211, 238, 0) 65%
+      ),
+      radial-gradient(
+        ellipse 780px 440px at 84% 0%,
+        rgba(242, 169, 59, 0.18),
+        rgba(242, 169, 59, 0) 62%
+      ),
+      radial-gradient(
+        ellipse 620px 380px at 10% 4%,
+        rgba(45, 212, 191, 0.18),
+        rgba(45, 212, 191, 0) 60%
+      ),
+      linear-gradient(
+        to bottom,
+        #0e7490 0%,
+        #0c6178 8%,
+        #0a4f62 17%,
+        #084050 27%,
+        #06323f 40%,
+        #052732 52%,
+        #041d26 64%,
+        #03141b 76%,
+        #020d12 88%,
+        #010304 100%
+      );
+    background-attachment: local;
+  }
+
+  ::selection {
+    background: rgba(242, 169, 59, 0.3);
+    color: #e6edf3;
+  }
+
+  :focus-visible {
+    outline: 2px solid #f2a93b;
+    outline-offset: 2px;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #0b0f14;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #1c2530;
+    border-radius: 6px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #2c3644;
+  }
+}
+
+@layer components {
+  .mono-label {
+    @apply font-mono text-xs tracking-wider text-amber uppercase;
+  }
+
+  .card-border {
+    @apply border border-base-border bg-base-surface/60;
+  }
+}
+
+@keyframes cloud-rain {
+  from {
+    transform: translateY(-12vh);
+  }
+  to {
+    transform: translateY(112vh);
+  }
+}
+
+.rain-item {
+  position: absolute;
+  top: 0;
+  animation-name: cloud-rain;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rain-item {
+    animation: none;
+    display: none;
+  }
+}
+
+@keyframes cloud-drift {
+  from {
+    transform: translateX(-20%);
+  }
+  to {
+    transform: translateX(120vw);
+  }
+}
+
+.drift-item {
+  position: absolute;
+  left: 0;
+  animation-name: cloud-drift;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .drift-item {
+    animation: none;
+    display: none;
+  }
+}
