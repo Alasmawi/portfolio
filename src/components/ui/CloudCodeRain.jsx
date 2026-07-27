@@ -1,4 +1,14 @@
 import { useMemo } from 'react';
+import {
+  Binary,
+  Boxes,
+  Cpu,
+  Database,
+  GitBranch,
+  Radio,
+  Server,
+  Wifi,
+} from 'lucide-react';
 import { TechCloud, SoftCloud } from './CloudShapes';
 
 const SYMBOLS = [
@@ -22,6 +32,10 @@ const SYMBOLS = [
   'ssh',
 ];
 
+const TECH_GLYPHS = ['Go', 'Py', 'JS', 'AWS', 'ESP32', 'MQTT', 'SQL', 'C++'];
+
+const TECH_ICONS = [Cpu, Database, GitBranch, Server, Boxes, Radio, Wifi, Binary];
+
 const COLORS = ['#8B98A5', '#4FA3C4', '#F2A93B', '#5B6773'];
 
 function seededRandom(seed) {
@@ -37,23 +51,36 @@ function buildItems(count) {
   const items = [];
   for (let i = 0; i < count; i++) {
     const roll = rand();
-    const type = roll < 0.28 ? 'tech' : roll < 0.5 ? 'soft' : 'code';
+    const type =
+      roll < 0.22 ? 'tech' : roll < 0.4 ? 'soft' : roll < 0.56 ? 'icon' : roll < 0.72 ? 'glyph' : 'code';
     items.push({
       id: i,
       type,
       content: SYMBOLS[Math.floor(rand() * SYMBOLS.length)],
+      glyph: TECH_GLYPHS[Math.floor(rand() * TECH_GLYPHS.length)],
+      Icon: TECH_ICONS[Math.floor(rand() * TECH_ICONS.length)],
       left: rand() * 100,
-      size: type === 'code' ? 11 + rand() * 6 : 22 + rand() * 34,
+      size:
+        type === 'code' || type === 'glyph'
+          ? 11 + rand() * 6
+          : type === 'icon'
+            ? 16 + rand() * 10
+            : 22 + rand() * 34,
       duration: 22 + rand() * 26,
       delay: -(rand() * 40),
-      opacity: type === 'code' ? 0.14 + rand() * 0.14 : 0.05 + rand() * 0.09,
+      opacity:
+        type === 'code' || type === 'glyph'
+          ? 0.14 + rand() * 0.14
+          : type === 'icon'
+            ? 0.12 + rand() * 0.14
+            : 0.05 + rand() * 0.09,
       color: COLORS[Math.floor(rand() * COLORS.length)],
     });
   }
   return items;
 }
 
-export default function CloudCodeRain({ count = 34 }) {
+export default function CloudCodeRain({ count = 40 }) {
   const items = useMemo(() => buildItems(count), [count]);
 
   return (
@@ -75,6 +102,15 @@ export default function CloudCodeRain({ count = 34 }) {
         >
           {item.type === 'tech' && <TechCloud size={item.size} />}
           {item.type === 'soft' && <SoftCloud size={item.size} />}
+          {item.type === 'icon' && <item.Icon size={item.size} strokeWidth={1.6} />}
+          {item.type === 'glyph' && (
+            <span
+              className="whitespace-nowrap rounded border px-1.5 py-0.5 font-mono font-semibold"
+              style={{ fontSize: `${item.size}px`, borderColor: item.color }}
+            >
+              {item.glyph}
+            </span>
+          )}
           {item.type === 'code' && (
             <span
               className="whitespace-nowrap font-mono"
