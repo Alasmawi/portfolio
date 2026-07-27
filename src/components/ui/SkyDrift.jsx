@@ -40,7 +40,7 @@ export default function SkyDrift({ count = 7, className = '' }) {
           className="drift-item"
           style={{
             top: `${c.top}%`,
-            color: '#4FA6B0',
+            color: '#C97A34',
             animationDuration: `${c.duration}s`,
             animationDelay: `${c.delay}s`,
             opacity: c.opacity,
