@@ -103,10 +103,10 @@
 
 @keyframes cloud-drift {
   from {
-    transform: translateX(-20%);
+    transform: translateX(-130%);
   }
   to {
-    transform: translateX(120vw);
+    transform: translateX(calc(100vw + 100%));
   }
 }
 
@@ -116,6 +116,7 @@
   animation-name: cloud-drift;
   animation-timing-function: linear;
   animation-iteration-count: infinite;
+  animation-fill-mode: backwards;
   will-change: transform;
 }
 

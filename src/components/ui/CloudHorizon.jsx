@@ -3,16 +3,16 @@ import { SoftCloud, TechCloud } from './CloudShapes';
 import DraggableCloud from './DraggableCloud';
 
 const CLOUDS = [
-  { Comp: SoftCloud, left: '2%', top: '10%', size: 150, opacity: 0.5, color: '#3E6FA3', duration: 26, delay: -4 },
-  { Comp: TechCloud, left: '11%', top: '-6%', size: 110, opacity: 0.42, color: '#5B8FC4', duration: 34, delay: -18 },
-  { Comp: SoftCloud, left: '20%', top: '0%', size: 210, opacity: 0.55, color: '#4C7EB3', duration: 22, delay: -30 },
-  { Comp: SoftCloud, left: '36%', top: '14%', size: 130, opacity: 0.36, color: '#2E5680', duration: 41, delay: -9 },
-  { Comp: TechCloud, left: '45%', top: '-8%', size: 130, opacity: 0.4, color: '#8FC4F0', duration: 29, delay: -22 },
-  { Comp: SoftCloud, left: '55%', top: '2%', size: 220, opacity: 0.58, color: '#5B8FC4', duration: 37, delay: -35 },
-  { Comp: SoftCloud, left: '70%', top: '16%', size: 140, opacity: 0.38, color: '#2E5680', duration: 24, delay: -12 },
-  { Comp: TechCloud, left: '78%', top: '-4%', size: 120, opacity: 0.42, color: '#B7DCFA', duration: 45, delay: -26 },
-  { Comp: SoftCloud, left: '87%', top: '4%', size: 190, opacity: 0.54, color: '#3E6FA3', duration: 31, delay: -6 },
-  { Comp: SoftCloud, left: '96%', top: '18%', size: 130, opacity: 0.36, color: '#4C7EB3', duration: 39, delay: -16 },
+  { Comp: SoftCloud, top: '10%', size: 150, opacity: 0.5, color: '#3E6FA3', duration: 26, delay: 2 },
+  { Comp: TechCloud, top: '-6%', size: 110, opacity: 0.42, color: '#5B8FC4', duration: 34, delay: 10 },
+  { Comp: SoftCloud, top: '0%', size: 210, opacity: 0.55, color: '#4C7EB3', duration: 22, delay: 18 },
+  { Comp: SoftCloud, top: '14%', size: 130, opacity: 0.36, color: '#2E5680', duration: 41, delay: 26 },
+  { Comp: TechCloud, top: '-8%', size: 130, opacity: 0.4, color: '#8FC4F0', duration: 29, delay: 34 },
+  { Comp: SoftCloud, top: '2%', size: 220, opacity: 0.58, color: '#5B8FC4', duration: 37, delay: 6 },
+  { Comp: SoftCloud, top: '16%', size: 140, opacity: 0.38, color: '#2E5680', duration: 24, delay: 14 },
+  { Comp: TechCloud, top: '-4%', size: 120, opacity: 0.42, color: '#B7DCFA', duration: 45, delay: 22 },
+  { Comp: SoftCloud, top: '4%', size: 190, opacity: 0.54, color: '#3E6FA3', duration: 31, delay: 30 },
+  { Comp: SoftCloud, top: '18%', size: 130, opacity: 0.36, color: '#4C7EB3', duration: 39, delay: 38 },
 ];
 
 export default function CloudHorizon() {
@@ -35,7 +35,6 @@ export default function CloudHorizon() {
           size={c.size}
           color={c.color}
           opacity={c.opacity}
-          left={c.left}
           top={c.top}
           duration={c.duration}
           delay={c.delay}

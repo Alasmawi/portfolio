@@ -20,7 +20,7 @@ function buildClouds(count, seed) {
       top: rand() * 20,
       size: 30 + rand() * 46,
       duration: 22 + rand() * 26,
-      delay: -(rand() * 48),
+      delay: rand() * 44,
       opacity: 0.16 + rand() * 0.18,
     });
   }
