@@ -35,11 +35,13 @@ export default function About() {
           <Reveal delay={0.1} className="md:col-span-7">
             <p className="text-lg leading-relaxed text-text-muted sm:text-xl">
               I'm a Computer Science graduate specializing in{' '}
-              <span className="text-text-primary">Cloud Computing</span>,
-              hands-on with AWS, Go, Python, and React, and comfortable working
-              down to the metal with embedded hardware like ESP32 and MQTT. I
-              like building end-to-end systems — from a sensor reading in the
-              field to the dashboard someone actually checks.
+              <span className="text-text-primary">Cloud Computing</span> —
+              comfortable with AWS, Go, Python, and React, and just as
+              comfortable down at the hardware level with ESP32 and MQTT.
+              What I actually enjoy is the end-to-end part: wiring up a
+              sensor, writing the backend that makes sense of what it
+              reports, and building the dashboard someone actually opens to
+              check on it.
             </p>
           </Reveal>
 

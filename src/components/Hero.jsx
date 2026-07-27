@@ -58,8 +58,7 @@ export default function Hero() {
             transition={{ duration: 0.6, delay: 0.3 }}
             className="mt-6 max-w-xl text-base leading-relaxed text-text-muted sm:text-lg"
           >
-            I design and ship cloud-native and IoT systems — from sensor firmware
-            to AI-assisted dashboards — using AWS, Go, and Python.
+            Backend engineer working in cloud and IoT. Mostly AWS, Go, and Python.
           </motion.p>
 
           <motion.div

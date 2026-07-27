@@ -48,8 +48,8 @@ export default function Contact() {
               Let's build something.
             </h2>
             <p className="mt-4 max-w-md text-base leading-relaxed text-text-muted">
-              Open to cloud, IoT, and backend roles based in Manama or remote.
-              Reach out directly — no forms, no gatekeeping.
+              Looking for cloud, IoT, or backend roles, based in Manama or
+              remote. Email or LinkedIn both work — I read everything myself.
             </p>
             <div className="mt-6">
               <StatusBadge />
