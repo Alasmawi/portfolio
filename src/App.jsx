@@ -8,6 +8,7 @@ import Education from './components/Education';
 import Contact from './components/Contact';
 import CloudCodeRain from './components/ui/CloudCodeRain';
 
+
 export default function App() {
   return (
     <>
