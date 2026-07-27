@@ -1,5 +1,6 @@
-import { useMemo } from 'react';
+import { useMemo, useRef } from 'react';
 import { TechCloud, SoftCloud } from './CloudShapes';
+import DraggableCloud from './DraggableCloud';
 
 function seededRandom(seed) {
   let s = seed;
@@ -18,8 +19,8 @@ function buildClouds(count, seed) {
       tech: rand() < 0.45,
       top: rand() * 20,
       size: 30 + rand() * 46,
-      duration: 38 + rand() * 30,
-      delay: -(rand() * 60),
+      duration: 22 + rand() * 26,
+      delay: -(rand() * 48),
       opacity: 0.16 + rand() * 0.18,
     });
   }
@@ -28,29 +29,26 @@ function buildClouds(count, seed) {
 
 export default function SkyDrift({ count = 7, className = '' }) {
   const clouds = useMemo(() => buildClouds(count, 7), [count]);
+  const containerRef = useRef(null);
 
   return (
     <div
+      ref={containerRef}
       className={`pointer-events-none absolute inset-x-0 top-0 h-[34%] overflow-hidden ${className}`}
       aria-hidden="true"
     >
       {clouds.map((c) => (
-        <div
+        <DraggableCloud
           key={c.id}
-          className="drift-item"
-          style={{
-            top: `${c.top}%`,
-            animationDuration: `${c.duration}s`,
-            animationDelay: `${c.delay}s`,
-          }}
-        >
-          <div
-            className="pointer-events-auto cursor-default transition-transform duration-300 ease-out will-change-transform hover:scale-125"
-            style={{ color: '#8FC4F0', opacity: c.opacity }}
-          >
-            {c.tech ? <TechCloud size={c.size} /> : <SoftCloud size={c.size} />}
-          </div>
-        </div>
+          Comp={c.tech ? TechCloud : SoftCloud}
+          size={c.size}
+          color="#8FC4F0"
+          opacity={c.opacity}
+          top={`${c.top}%`}
+          duration={c.duration}
+          delay={c.delay}
+          containerRef={containerRef}
+        />
       ))}
     </div>
   );
