@@ -1,3 +1,5 @@
+import { Terminal } from 'lucide-react';
+
 const TOKEN_RE =
   /((?<!:)\/\/.*$|^\s*#(?!!).*$)|("(?:[^"\\]|\\.)*"|`(?:[^`\\]|\\.)*`)|\b(func|package|import|struct|return|if|err|nil|type|const|var|range|for|defer|go|chan|select|case|switch|default|curl|GET|POST|PUT|DELETE|X-Header)\b|\b(\d+)\b/gm;
 
@@ -31,11 +33,17 @@ export default function CodeSnippet({ filename = 'snippet', code, className = ''
 
   return (
     <div className={`border border-base-border bg-base-surface/70 ${className}`}>
-      <div className="flex items-center gap-2 border-b border-base-border px-4 py-2">
-        <span className="h-2 w-2 rounded-full bg-base-border" />
-        <span className="h-2 w-2 rounded-full bg-base-border" />
-        <span className="h-2 w-2 rounded-full bg-base-border" />
-        <span className="ml-2 font-mono text-[11px] text-text-dim">{filename}</span>
+      <div className="flex items-center justify-between border-b border-base-border bg-base-surface/80 px-4 py-2">
+        <div className="flex items-center gap-2">
+          <Terminal size={12} className="text-amber" />
+          <span className="font-mono text-[11px] text-text-dim">{filename}</span>
+        </div>
+        <span className="flex items-center gap-1.5">
+          <span className="h-1.5 w-1.5 animate-pulse-slow rounded-full bg-ok" />
+          <span className="font-mono text-[10px] uppercase tracking-wider text-text-dim">
+            live
+          </span>
+        </span>
       </div>
       <pre className="overflow-x-auto p-4 font-mono text-xs leading-relaxed sm:text-[13px]">
         {lines.map((line, i) => (
