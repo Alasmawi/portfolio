@@ -36,6 +36,19 @@ const GROUPS = [
   },
 ];
 
+function GroupHeader({ name, accent }) {
+  return (
+    <div className="mb-3 flex items-center justify-between">
+      <h3 className="font-mono text-xs uppercase tracking-wider text-text-primary">
+        {name}
+      </h3>
+      <span
+        className={`h-1.5 w-1.5 rounded-full ${accent === 'amber' ? 'bg-amber' : 'bg-steel'}`}
+      />
+    </div>
+  );
+}
+
 export default function Skills() {
   return (
     <section id="skills" className="border-b border-base-border py-24 md:py-32">
@@ -48,14 +61,9 @@ export default function Skills() {
         />
 
         <Reveal className="mb-5">
-          <div className="border border-amber/25 bg-base-surface/50 p-5">
-            <div className="mb-4 flex items-center justify-between">
-              <h3 className="font-mono text-xs uppercase tracking-wider text-text-primary">
-                Cloud &amp; AI
-              </h3>
-              <span className="h-1.5 w-1.5 rounded-full bg-amber" />
-            </div>
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <div className="border border-amber/25 bg-base-surface/50 p-4 sm:p-5">
+            <GroupHeader name="Cloud & AI" accent="amber" />
+            <div className="grid grid-cols-2 gap-2.5 sm:gap-3 lg:grid-cols-4">
               {CLOUD_ITEMS.map((item) => (
                 <div
                   key={item.label}
@@ -71,21 +79,36 @@ export default function Skills() {
           </div>
         </Reveal>
 
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        {/* Mobile: one merged card, dividers instead of repeated borders */}
+        <Reveal delay={0.06} className="sm:hidden">
+          <div className="border border-base-border bg-base-surface/40">
+            {GROUPS.map((group, i) => (
+              <div
+                key={group.name}
+                className={`p-4 ${i !== 0 ? 'border-t border-base-border/70' : ''}`}
+              >
+                <GroupHeader name={group.name} accent={group.accent} />
+                <div className="flex flex-wrap gap-2">
+                  {group.items.map((item) => (
+                    <span
+                      key={item}
+                      className="rounded border border-base-border bg-base-surface/60 px-2.5 py-1.5 font-mono text-xs text-text-muted"
+                    >
+                      {item}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </Reveal>
+
+        {/* Tablet+: grid of individual cards */}
+        <div className="hidden gap-5 sm:grid sm:grid-cols-2 lg:grid-cols-4">
           {GROUPS.map((group, i) => (
             <Reveal key={group.name} delay={i * 0.06}>
               <div className="h-full border border-base-border bg-base-surface/40 p-5">
-                <div className="mb-4 flex items-center justify-between">
-                  <h3 className="font-mono text-xs uppercase tracking-wider text-text-primary">
-                    {group.name}
-                  </h3>
-                  <span
-                    className={`h-1.5 w-1.5 rounded-full ${
-                      group.accent === 'amber' ? 'bg-amber' : 'bg-steel'
-                    }`}
-                  />
-                </div>
-
+                <GroupHeader name={group.name} accent={group.accent} />
                 <div className="flex flex-wrap gap-2">
                   {group.items.map((item) => (
                     <span
