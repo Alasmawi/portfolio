@@ -24,14 +24,25 @@ export default function Hero() {
 
       <div className="relative mx-auto grid w-full max-w-6xl grid-cols-1 gap-10 px-6 md:grid-cols-12 md:gap-8">
         <div className="md:col-span-8">
-          <motion.p
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="mb-6 font-mono text-xs uppercase tracking-wider text-amber"
-          >
-            [ whoami ]
-          </motion.p>
+          <div className="mb-6 flex items-start justify-between gap-4">
+            <motion.p
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="font-mono text-xs uppercase tracking-wider text-amber"
+            >
+              [ whoami ]
+            </motion.p>
+
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.6, delay: 0.15 }}
+              className="w-[92px] shrink-0 sm:w-[104px] md:hidden"
+            >
+              <HeadshotSlot compact />
+            </motion.div>
+          </div>
 
           <motion.h1
             initial={{ opacity: 0, y: 16 }}

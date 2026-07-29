@@ -1,13 +1,21 @@
 import { Terminal } from 'lucide-react';
 import pfp from '../../assets/pfp-nobg.webp';
 
-export default function HeadshotSlot() {
+export default function HeadshotSlot({ compact = false, className = '' }) {
   return (
-    <div className="group w-full max-w-[220px] self-end border border-base-border/70 bg-base-surface/20">
-      <div className="flex items-center justify-between border-b border-base-border/70 px-2.5 py-1.5">
+    <div
+      className={`group w-full self-end border border-base-border/70 bg-base-surface/20 ${compact ? '' : 'max-w-[220px]'} ${className}`}
+    >
+      <div
+        className={`flex items-center justify-between border-b border-base-border/70 ${compact ? 'px-1.5 py-1' : 'px-2.5 py-1.5'}`}
+      >
         <div className="flex items-center gap-1.5">
-          <Terminal size={11} className="text-amber" />
-          <span className="font-mono text-[10px] text-text-dim">operator.jpg</span>
+          <Terminal size={compact ? 9 : 11} className="text-amber" />
+          {!compact && (
+            <span className="font-mono text-[10px] text-text-dim">
+              operator.jpg
+            </span>
+          )}
         </div>
         <span className="h-1.5 w-1.5 animate-pulse-slow rounded-full bg-ok" />
       </div>
