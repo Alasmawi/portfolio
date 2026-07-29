@@ -19,9 +19,10 @@ export const PROJECTS = [
       'An end-to-end IoT + cloud platform for police K9 monitoring: real-time health and environmental sensors, AI-powered anomaly detection via Amazon Bedrock, a centralized dashboard, and kennel/handler management — built during the AWS Cloud Innovation Center internship for the Bahrain Ministry of Interior.',
     tags: ['AWS IoT Core', 'Amazon Bedrock', 'Lambda', 'DynamoDB', 'ESP32', 'React'],
     githubUrl: null,
-    liveUrl: null,
+    liveUrl: 'https://pavlov-k9.com/',
     gif: null,
     showArchitecture: true,
+    showHardware: true,
   },
   {
     id: 'brain-book',

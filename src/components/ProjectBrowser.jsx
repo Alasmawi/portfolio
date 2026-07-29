@@ -4,6 +4,7 @@ import { ExternalLink, Film, Lock, PlayCircle, Star } from 'lucide-react';
 import Reveal from './ui/Reveal';
 import SectionHeader from './ui/SectionHeader';
 import ArchitectureDiagram from './ui/ArchitectureDiagram';
+import K9Hardware from './ui/K9Hardware';
 import { GithubMark } from './ui/BrandIcons';
 import { LANGUAGE_COLORS, PROJECTS } from '../data/projects';
 
@@ -177,6 +178,19 @@ export default function ProjectBrowser() {
                           internship project
                         </span>
                       )}
+                      {project.liveUrl && (
+                        <a
+                          href={project.liveUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          aria-label={`${project.name} live site`}
+                          className="flex items-center gap-2 rounded border border-base-border px-3 py-2 font-mono text-xs text-text-muted transition-all hover:border-steel hover:text-steel"
+                        >
+                          <PlayCircle size={14} />
+                          <span>live</span>
+                          <ExternalLink size={11} />
+                        </a>
+                      )}
                     </div>
                   </div>
 
@@ -194,6 +208,12 @@ export default function ProjectBrowser() {
                       </span>
                     ))}
                   </div>
+
+                  {project.showHardware && (
+                    <div className="mt-6">
+                      <K9Hardware />
+                    </div>
+                  )}
                 </motion.div>
               </AnimatePresence>
             </div>
