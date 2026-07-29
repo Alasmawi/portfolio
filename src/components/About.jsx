@@ -15,7 +15,7 @@ type Engineer struct {
 func New() *Engineer {
 	return &Engineer{
 		Name:     "Abdulla Alasmawi",
-		Location: "Manama, Bahrain",
+		Location: "Bahrain",
 		Focus: []string{
 			"Cloud", "IoT", "Backend",
 		},

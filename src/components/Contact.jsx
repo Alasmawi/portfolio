@@ -5,9 +5,9 @@ import StatusBadge from './ui/StatusBadge';
 import CodeSnippet from './ui/CodeSnippet';
 
 const REACH_CODE = `# reach out
-curl -X POST https://alasmawi.dev/contact \\
-  -H "Content-Type: application/json" \\
-  -d '{"from": "you", "subject": "let's talk"}'`;
+curl -X POST \\
+  alasmawi.dev/contact \\
+  -d '{"msg":"lets talk"}'`;
 
 const LINKS = [
   {

@@ -45,10 +45,13 @@ export default function CodeSnippet({ filename = 'snippet', code, className = ''
           </span>
         </span>
       </div>
-      <pre className="overflow-x-auto p-4 font-mono text-xs leading-relaxed sm:text-[13px]">
+      <pre
+        className="overflow-x-auto p-3 font-mono text-xs leading-relaxed sm:p-4 sm:text-[13px]"
+        style={{ tabSize: 2, MozTabSize: 2 }}
+      >
         {lines.map((line, i) => (
-          <div key={i} className="flex gap-4">
-            <span className="w-4 shrink-0 select-none text-right text-text-dim/60">
+          <div key={i} className="flex gap-3 sm:gap-4">
+            <span className="w-3 shrink-0 select-none text-right text-text-dim/60 sm:w-4">
               {i + 1}
             </span>
             <code>
