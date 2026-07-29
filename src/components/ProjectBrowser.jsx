@@ -3,8 +3,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { ExternalLink, Film, Lock, PlayCircle, Star } from 'lucide-react';
 import Reveal from './ui/Reveal';
 import SectionHeader from './ui/SectionHeader';
-import ArchitectureDiagram from './ui/ArchitectureDiagram';
-import K9Hardware from './ui/K9Hardware';
+import ProjectGallery from './ui/ProjectGallery';
 import { GithubMark } from './ui/BrandIcons';
 import { LANGUAGE_COLORS, PROJECTS } from '../data/projects';
 
@@ -20,8 +19,13 @@ function LanguageDot({ language }) {
 }
 
 function PreviewMedia({ project }) {
-  if (project.showArchitecture) {
-    return <ArchitectureDiagram />;
+  if (project.showArchitecture || project.images?.length) {
+    return (
+      <ProjectGallery
+        showArchitecture={project.showArchitecture}
+        images={project.images}
+      />
+    );
   }
 
   if (project.gif) {
@@ -208,12 +212,6 @@ export default function ProjectBrowser() {
                       </span>
                     ))}
                   </div>
-
-                  {project.showHardware && (
-                    <div className="mt-6">
-                      <K9Hardware />
-                    </div>
-                  )}
                 </motion.div>
               </AnimatePresence>
             </div>

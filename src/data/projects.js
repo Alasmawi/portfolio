@@ -1,5 +1,10 @@
 // Pulled from github.com/Alasmawi and hand-curated — real repos, not placeholders.
 // Add a project by appending one object; the ProjectBrowser reads this list directly.
+import k9SensorNode from '../assets/k9/sensor-node.webp';
+import k9Camera from '../assets/k9/camera.webp';
+import k9FoodScale from '../assets/k9/smart-food-scale.webp';
+import k9Collar from '../assets/k9/collar.webp';
+
 export const LANGUAGE_COLORS = {
   Go: '#4FA3C4',
   Rust: '#DE7B4A',
@@ -22,7 +27,28 @@ export const PROJECTS = [
     liveUrl: 'https://pavlov-k9.com/',
     gif: null,
     showArchitecture: true,
-    showHardware: true,
+    images: [
+      {
+        src: k9SensorNode,
+        tag: 'node-a',
+        alt: 'K-9 Unit sensor enclosure with a live OLED telemetry display',
+      },
+      {
+        src: k9Camera,
+        tag: 'esp32-cam',
+        alt: 'ESP32 bullet camera mounted on a tripod',
+      },
+      {
+        src: k9FoodScale,
+        tag: 'food-cart',
+        alt: '3D-printed smart food scale enclosure with an OLED display',
+      },
+      {
+        src: k9Collar,
+        tag: 'collar · polar-h10',
+        alt: 'K9 collar with a live heart-rate and temperature display',
+      },
+    ],
   },
   {
     id: 'brain-book',
