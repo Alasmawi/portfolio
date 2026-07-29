@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { ExternalLink, Film, Lock, PlayCircle, Star } from 'lucide-react';
 import Reveal from './ui/Reveal';
 import SectionHeader from './ui/SectionHeader';
-import ProjectGallery from './ui/ProjectGallery';
+import CoverflowGallery from './ui/CoverflowGallery';
 import { GithubMark } from './ui/BrandIcons';
 import { LANGUAGE_COLORS, PROJECTS } from '../data/projects';
 
@@ -19,13 +19,8 @@ function LanguageDot({ language }) {
 }
 
 function PreviewMedia({ project }) {
-  if (project.showArchitecture || project.images?.length) {
-    return (
-      <ProjectGallery
-        showArchitecture={project.showArchitecture}
-        images={project.images}
-      />
-    );
+  if (project.items?.length) {
+    return <CoverflowGallery items={project.items} />;
   }
 
   if (project.gif) {

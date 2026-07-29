@@ -5,6 +5,7 @@ import k9Collar from '../assets/k9/collar.webp';
 import k9FoodScale from '../assets/k9/food-scale.webp';
 import k9Pi5Gateway from '../assets/k9/pi5-gateway.webp';
 import k9ReolinkCam from '../assets/k9/reolink-cam.webp';
+import k9ArchitectureDiagram from '../assets/k9/architecture-diagram.gif';
 
 export const LANGUAGE_COLORS = {
   Go: '#4FA3C4',
@@ -27,29 +28,39 @@ export const PROJECTS = [
     githubUrl: null,
     liveUrl: 'https://pavlov-k9.com/',
     gif: null,
-    showArchitecture: true,
-    images: [
+    items: [
       {
+        type: 'gif',
+        src: k9ArchitectureDiagram,
+        tag: 'architecture',
+        alt: 'Animated data-flow diagram: sensor to AWS IoT Core to Lambda and Bedrock to dashboard',
+      },
+      {
+        type: 'image',
         src: k9SensorNode,
         tag: 'node-a',
         alt: 'Node-A kennel environmental sensor unit, ESP32-S3-based, rendered device',
       },
       {
+        type: 'image',
         src: k9Collar,
         tag: 'smart-collar',
         alt: 'Smart K9 collar with a live heart-rate and temperature display',
       },
       {
+        type: 'image',
         src: k9FoodScale,
         tag: 'food-scale',
         alt: '3D-printed smart food scale enclosure with an OLED display',
       },
       {
+        type: 'image',
         src: k9Pi5Gateway,
         tag: 'pi5-gateway',
         alt: 'Raspberry Pi 5 kennel gateway running AWS IoT Greengrass',
       },
       {
+        type: 'image',
         src: k9ReolinkCam,
         tag: 'reolink-cam',
         alt: 'Reolink IP camera, the primary detection source',
