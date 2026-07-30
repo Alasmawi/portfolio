@@ -62,9 +62,9 @@ export default function CoverflowGallery({ items = [] }) {
         loop
         slidesPerView="auto"
         coverflowEffect={{
-          rotate: 20,
+          rotate: 35,
           stretch: 0,
-          depth: 150,
+          depth: 260,
           modifier: 1,
           slideShadows: false,
         }}
