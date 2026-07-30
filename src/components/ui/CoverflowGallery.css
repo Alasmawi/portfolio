@@ -1,6 +1,8 @@
 .k9-coverflow .swiper-slide {
   opacity: 0.45;
-  transition: opacity 0.5s ease;
+  transition-property: opacity, transform;
+  transition-duration: 0.5s;
+  transition-timing-function: ease;
 }
 
 .k9-coverflow .swiper-slide-active {
