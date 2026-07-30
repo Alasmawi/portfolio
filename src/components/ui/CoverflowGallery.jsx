@@ -62,9 +62,9 @@ export default function CoverflowGallery({ items = [] }) {
         loop
         slidesPerView="auto"
         coverflowEffect={{
-          rotate: 25,
+          rotate: 20,
           stretch: 0,
-          depth: 180,
+          depth: 150,
           modifier: 1,
           slideShadows: false,
         }}
@@ -89,15 +89,15 @@ export default function CoverflowGallery({ items = [] }) {
           <SwiperSlide
             key={`${item.type}-${item.tag ?? i}`}
             data-slide-type={item.type}
-            className="!h-[175px] !w-[260px] sm:!h-[255px] sm:!w-[380px] md:!h-[310px] md:!w-[460px]"
+            className="!h-[146px] !w-[260px] sm:!h-[214px] sm:!w-[380px] md:!h-[259px] md:!w-[460px]"
           >
-            <div className="card-inner relative flex h-full w-full items-center justify-center border border-base-border bg-base-surface p-4 sm:p-5">
+            <div className="card-inner relative flex h-full w-full items-center justify-center overflow-hidden border border-base-border bg-base-surface p-2 sm:p-3">
               <img
                 src={item.src}
                 alt={item.alt ?? ''}
                 loading="lazy"
                 draggable={false}
-                className="max-h-full w-auto max-w-full object-contain"
+                className="h-full w-full object-cover"
               />
               {item.tag && (
                 <span className="absolute bottom-3 left-3 rounded border border-base-border/80 bg-base-bg/80 px-2 py-1 font-mono text-[10px] text-text-dim backdrop-blur-sm">
