@@ -5,9 +5,24 @@
 
 .k9-coverflow .swiper-slide-active {
   opacity: 1;
+  z-index: 20;
 }
 
 .k9-coverflow .swiper-slide-prev,
 .k9-coverflow .swiper-slide-next {
   opacity: 0.75;
+}
+
+/* Off-center slides sit tilted and small on the rack; the active one pops
+   forward into focus — scaled up and sharpened — independently of Swiper's
+   own coverflow transform on the parent .swiper-slide element. */
+.k9-coverflow .card-inner {
+  transform: scale(1);
+  filter: blur(1.5px) saturate(0.7);
+  transition: transform 0.9s cubic-bezier(0.65, 0, 0.35, 1), filter 0.7s ease;
+}
+
+.k9-coverflow .swiper-slide-active .card-inner {
+  transform: scale(1.16);
+  filter: blur(0) saturate(1);
 }

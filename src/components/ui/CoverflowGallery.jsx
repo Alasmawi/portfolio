@@ -83,15 +83,15 @@ export default function CoverflowGallery({ items = [] }) {
         }}
         onClick={handleSwiperClick}
         onTransitionEnd={(swiper) => setSlidesEasing(swiper, AMBIENT_EASE)}
-        className="!py-6 sm:!py-10"
+        className="!py-10 sm:!py-14"
       >
         {items.map((item, i) => (
           <SwiperSlide
             key={`${item.type}-${item.tag ?? i}`}
             data-slide-type={item.type}
-            className="!h-[280px] !w-[220px] sm:!h-[340px] sm:!w-[280px] md:!h-[380px] md:!w-[320px]"
+            className="!h-[175px] !w-[260px] sm:!h-[255px] sm:!w-[380px] md:!h-[310px] md:!w-[460px]"
           >
-            <div className="relative flex h-full w-full items-center justify-center overflow-hidden border border-base-border bg-base-surface p-6">
+            <div className="card-inner relative flex h-full w-full items-center justify-center border border-base-border bg-base-surface p-4 sm:p-5">
               <img
                 src={item.src}
                 alt={item.alt ?? ''}

@@ -5,7 +5,7 @@ import k9Collar from '../assets/k9/collar.webp';
 import k9FoodScale from '../assets/k9/food-scale.webp';
 import k9Pi5Gateway from '../assets/k9/pi5-gateway.webp';
 import k9ReolinkCam from '../assets/k9/reolink-cam.webp';
-import k9ArchitectureDiagram from '../assets/k9/architecture-diagram.gif';
+import k9ArchitectureDiagram from '../assets/k9/architecture-diagram.webp';
 
 export const LANGUAGE_COLORS = {
   Go: '#4FA3C4',
@@ -30,7 +30,7 @@ export const PROJECTS = [
     gif: null,
     items: [
       {
-        type: 'gif',
+        type: 'diagram',
         src: k9ArchitectureDiagram,
         tag: 'architecture',
         alt: 'Animated data-flow diagram: sensor to AWS IoT Core to Lambda and Bedrock to dashboard',
