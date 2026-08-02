@@ -1,0 +1,118 @@
+/* Card sizing. Height comes from the 16:9 ratio so the landscape shape can't
+   drift when a width changes. The md tier tracks the viewport because the
+   layout drops the gallery into a narrower col-span-8 cell there. */
+.ring-mask {
+  /* Cards run narrower than the column on purpose. The flanking cards sit at
+     x = ±R·sin(60°), so an oversized card pushes its neighbours out past the
+     frame and the ring collapses into "one card plus two slivers". */
+  --ring-card-w: min(200px, 54vw);
+
+  position: relative;
+  width: 100%;
+  /* Room for the card plus the perspective spill of the cards behind it. */
+  height: calc(var(--ring-card-w) * 9 / 16 + 4.5rem);
+  overflow: hidden;
+  /* Horizontal drags turn the ring; vertical ones still scroll the page. */
+  touch-action: pan-y;
+  cursor: grab;
+  outline: none;
+}
+
+.ring-mask:active {
+  cursor: grabbing;
+}
+
+.ring-mask:focus-visible {
+  outline: 1px solid rgb(242 169 59 / 0.6);
+  outline-offset: 4px;
+}
+
+@media (min-width: 640px) {
+  .ring-mask {
+    --ring-card-w: 320px;
+  }
+}
+
+@media (min-width: 768px) {
+  .ring-mask {
+    --ring-card-w: min(380px, 40vw);
+  }
+}
+
+@media (min-width: 1024px) {
+  .ring-mask {
+    --ring-card-w: 400px;
+  }
+}
+
+.ring {
+  position: absolute;
+  /* The ring is pushed back by its own radius in JS, which lands the front
+     card at z = 0 — so the focused card renders at its true size and only the
+     cards behind it are scaled down by perspective. */
+  top: 50%;
+  left: 50%;
+  width: var(--ring-card-w);
+  height: calc(var(--ring-card-w) * 9 / 16);
+  margin-left: calc(var(--ring-card-w) / -2);
+  margin-top: calc(var(--ring-card-w) * 9 / -32);
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.ring-slot {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  will-change: transform, opacity, filter;
+}
+
+.ring-card {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border: 1px solid #1c2530;
+  background: #0d1117;
+}
+
+/* The product shots are photographed on white; the architecture diagram is
+   drawn on the site's dark surface. Matching the card to the artwork is what
+   makes `contain` letterboxing read as a frame instead of a gap. */
+.ring-card[data-slide-type='image'] {
+  background: #eef1f4;
+  border-color: #c9d1d9;
+}
+
+.ring-card__img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  /* Never crop: the whole figure is always visible, letterboxed if needed. */
+  object-fit: contain;
+}
+
+.ring-card__tag {
+  position: absolute;
+  bottom: 0.5rem;
+  left: 0.5rem;
+  border: 1px solid rgb(28 37 48 / 0.8);
+  border-radius: 0.25rem;
+  background: rgb(11 15 20 / 0.82);
+  padding: 0.2rem 0.45rem;
+  font-family: 'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
+  font-size: 10px;
+  color: #8b98a5;
+  backdrop-filter: blur(4px);
+  pointer-events: none;
+}
+
+.ring-slot.is-front .ring-card {
+  border-color: rgb(242 169 59 / 0.35);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ring-slot {
+    filter: none !important;
+  }
+}

@@ -1,11 +1,15 @@
-import { useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ExternalLink, Film, Lock, PlayCircle, Star } from 'lucide-react';
 import Reveal from './ui/Reveal';
 import SectionHeader from './ui/SectionHeader';
-import CoverflowGallery from './ui/CoverflowGallery';
+import RingGallery from './ui/RingGallery';
 import { GithubMark } from './ui/BrandIcons';
 import { LANGUAGE_COLORS, PROJECTS } from '../data/projects';
+
+// With the section on screen and nobody touching it, walk to the next project
+// so it plays as a gallery. Any interaction restarts the clock.
+const AUTO_ADVANCE_MS = 9000;
 
 function LanguageDot({ language }) {
   if (!language) return null;
@@ -20,7 +24,7 @@ function LanguageDot({ language }) {
 
 function PreviewMedia({ project }) {
   if (project.items?.length) {
-    return <CoverflowGallery items={project.items} />;
+    return <RingGallery items={project.items} />;
   }
 
   if (project.gif) {
@@ -53,8 +57,71 @@ export default function ProjectBrowser() {
   const [selectedId, setSelectedId] = useState(PROJECTS[0].id);
   const project = PROJECTS.find((p) => p.id === selectedId) ?? PROJECTS[0];
 
+  const sectionRef = useRef(null);
+  // Bumped on every interaction; restarting the effect restarts the timer.
+  const [idleNonce, setIdleNonce] = useState(0);
+  const nudgeIdle = useCallback(() => setIdleNonce((n) => n + 1), []);
+
+  const select = useCallback(
+    (id) => {
+      setSelectedId(id);
+      nudgeIdle();
+    },
+    [nudgeIdle]
+  );
+
+  useEffect(() => {
+    const node = sectionRef.current;
+    if (!node) return undefined;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      return undefined;
+    }
+
+    let timer = 0;
+    let inView = false;
+
+    const advance = () => {
+      setSelectedId((current) => {
+        const i = PROJECTS.findIndex((p) => p.id === current);
+        return PROJECTS[(i + 1) % PROJECTS.length].id;
+      });
+    };
+
+    const arm = () => {
+      clearTimeout(timer);
+      if (inView && !document.hidden) {
+        timer = setTimeout(advance, AUTO_ADVANCE_MS);
+      }
+    };
+
+    const io = new IntersectionObserver(
+      ([e]) => {
+        // Only cycle while a decent slice of the section is actually on screen.
+        inView = e.isIntersecting;
+        arm();
+      },
+      { threshold: 0.35 }
+    );
+    io.observe(node);
+
+    document.addEventListener('visibilitychange', arm);
+    arm();
+
+    return () => {
+      clearTimeout(timer);
+      io.disconnect();
+      document.removeEventListener('visibilitychange', arm);
+    };
+  }, [idleNonce, selectedId]);
+
   return (
-    <section id="projects" className="border-b border-base-border py-24 md:py-32">
+    <section
+      id="projects"
+      ref={sectionRef}
+      className="border-b border-base-border py-24 md:py-32"
+      onPointerDownCapture={nudgeIdle}
+      onKeyDownCapture={nudgeIdle}
+    >
       <div className="mx-auto max-w-6xl px-6">
         <SectionHeader
           index="03"
@@ -71,7 +138,7 @@ export default function ProjectBrowser() {
                 <button
                   key={p.id}
                   type="button"
-                  onClick={() => setSelectedId(p.id)}
+                  onClick={() => select(p.id)}
                   className={`flex shrink-0 items-center gap-2 whitespace-nowrap rounded border px-3 py-2 font-mono text-xs transition-colors ${
                     p.id === selectedId
                       ? 'border-amber/50 bg-amber/10 text-amber'
@@ -94,7 +161,7 @@ export default function ProjectBrowser() {
                   <li key={p.id}>
                     <button
                       type="button"
-                      onClick={() => setSelectedId(p.id)}
+                      onClick={() => select(p.id)}
                       className={`flex w-full items-center gap-2 border-l-2 px-4 py-3 text-left transition-colors ${
                         p.id === selectedId
                           ? 'border-l-amber bg-amber/[0.06] text-text-primary'

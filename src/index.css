@@ -5,6 +5,42 @@
 @layer base {
   html {
     scroll-behavior: smooth;
+    /* Land on section boundaries instead of stopping half way between two.
+       Deliberately `proximity`, not `mandatory`: five of the seven sections
+       are taller than a laptop viewport, and mandatory would keep yanking the
+       reader back to the top of a section before they reached its end. */
+    scroll-snap-type: y mandatory;
+  }
+
+  main > section {
+    position: relative;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+    /* Clears the fixed 57px nav so a snapped heading isn't tucked under it. */
+    scroll-margin-top: 57px;
+  }
+
+  /* A section taller than the viewport has content between its start snap
+     point and the next section's, which mandatory snapping would never come
+     to rest on. Sections in that state get a second snap point pinned to
+     their bottom edge, so they page in two steps instead of stranding a band
+     of content. Flagged from App.jsx, since CSS can't compare the two heights. */
+  main > section[data-snap-tall]::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 1px;
+    height: 1px;
+    scroll-snap-align: end;
+    pointer-events: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+      scroll-snap-type: none;
+    }
   }
 
   body {
