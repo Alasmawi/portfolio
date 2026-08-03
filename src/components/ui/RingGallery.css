@@ -68,21 +68,51 @@
   will-change: transform, opacity, filter;
 }
 
+/* Framing: a hard 1px outer edge, a mat of card-coloured space, and a hairline
+   right around the image well — so the artwork reads as mounted rather than
+   bleeding to the card's edge. */
 .ring-card {
+  --mat: 7px;
+
   position: relative;
   width: 100%;
   height: 100%;
+  padding: var(--mat);
   overflow: hidden;
-  border: 1px solid #1c2530;
-  background: #0d1117;
+  border: 1px solid #223041;
+  /* A shade off the artwork behind it, so the mat is legible as a mat and the
+     contained image's true extent stays visible. */
+  background: #151d28;
+  box-shadow:
+    inset 0 0 0 1px rgb(255 255 255 / 0.03),
+    0 10px 26px rgb(0 0 0 / 0.45);
+}
+
+@media (min-width: 768px) {
+  .ring-card {
+    --mat: 10px;
+  }
+}
+
+/* Hairline around the image well. */
+.ring-card::after {
+  content: '';
+  position: absolute;
+  inset: calc(var(--mat) - 1px);
+  border: 1px solid rgb(255 255 255 / 0.07);
+  pointer-events: none;
 }
 
 /* The product shots are photographed on white; the architecture diagram is
    drawn on the site's dark surface. Matching the card to the artwork is what
    makes `contain` letterboxing read as a frame instead of a gap. */
 .ring-card[data-slide-type='image'] {
-  background: #eef1f4;
-  border-color: #c9d1d9;
+  background: #dbe2e9;
+  border-color: #9fb0bf;
+}
+
+.ring-card[data-slide-type='image']::after {
+  border-color: rgb(11 15 20 / 0.2);
 }
 
 .ring-card__img {
@@ -95,8 +125,9 @@
 
 .ring-card__tag {
   position: absolute;
-  bottom: 0.5rem;
-  left: 0.5rem;
+  /* sits just inside the image well rather than floating over the mat */
+  bottom: calc(var(--mat) + 4px);
+  left: calc(var(--mat) + 4px);
   border: 1px solid rgb(28 37 48 / 0.8);
   border-radius: 0.25rem;
   background: rgb(11 15 20 / 0.82);
@@ -109,7 +140,30 @@
 }
 
 .ring-slot.is-front .ring-card {
-  border-color: rgb(242 169 59 / 0.35);
+  border-color: rgb(242 169 59 / 0.45);
+}
+
+/* Corner brackets on the focused card only — drawn on the slot, which doesn't
+   clip, so they can sit just outside the card's edge. Same hard-cornered
+   language as the hero ridge. */
+.ring-slot.is-front::after {
+  --b: #f2a93b;
+  --len: 16px;
+
+  content: '';
+  position: absolute;
+  inset: -7px;
+  pointer-events: none;
+  background:
+    linear-gradient(var(--b), var(--b)) 0 0 / var(--len) 1px no-repeat,
+    linear-gradient(var(--b), var(--b)) 0 0 / 1px var(--len) no-repeat,
+    linear-gradient(var(--b), var(--b)) 100% 0 / var(--len) 1px no-repeat,
+    linear-gradient(var(--b), var(--b)) 100% 0 / 1px var(--len) no-repeat,
+    linear-gradient(var(--b), var(--b)) 0 100% / var(--len) 1px no-repeat,
+    linear-gradient(var(--b), var(--b)) 0 100% / 1px var(--len) no-repeat,
+    linear-gradient(var(--b), var(--b)) 100% 100% / var(--len) 1px no-repeat,
+    linear-gradient(var(--b), var(--b)) 100% 100% / 1px var(--len) no-repeat;
+  opacity: 0.75;
 }
 
 @media (prefers-reduced-motion: reduce) {

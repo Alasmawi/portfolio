@@ -10,10 +10,11 @@ const SNAP_MS = 1100;
 const RESUME_AFTER_MS = 2600;
 const TAP_SLOP_PX = 6;
 
-// Gap between neighbouring cards on the ring, as a multiple of the radius the
-// cards would need just to touch edge-to-edge. Kept close to 1: every extra
-// bit of radius throws the flanking cards further out towards the frame edge.
-const RING_GAP = 1.05;
+// Gap between neighbouring cards on the ring, as a multiple of the radius at
+// which they would touch edge-to-edge. At 1.0 the cards meet at the corners
+// and clip through each other as they turn; 1.22 leaves a clear ~22%-of-a-card
+// gap. Pushing it much higher throws the flanking cards past the frame edge.
+const RING_GAP = 1.22;
 const PERSPECTIVE = 1100;
 // A slight look-down on the ring, so the cards read as sitting on a turntable
 // rather than sliding along a flat line.
