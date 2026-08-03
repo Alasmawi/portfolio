@@ -79,7 +79,7 @@ export default function Skills() {
           <div className="flex flex-wrap items-end justify-between gap-4">
             <p className="max-w-md text-sm leading-relaxed text-text-muted">
               {active === 'network'
-                ? 'One connected stack, grouped by domain. Hover a node for its own colour and what it links to.'
+                ? 'One connected stack, grouped by domain. Hover a node to see what it connects to.'
                 : 'The same stack as the network view, grouped by domain.'}
             </p>
             <ViewToggle view={active} onChange={setView} />

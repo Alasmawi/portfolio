@@ -1,11 +1,5 @@
 import { createContext, useCallback, useContext, useMemo, useState } from 'react';
-import {
-  ReactFlow,
-  Controls,
-  Handle,
-  Position,
-  getStraightPath,
-} from '@xyflow/react';
+import { ReactFlow, Controls, Handle, Position } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import './SkillGraph.css';
 import { buildAdjacency, buildSkillGraph, NODE_SIZE } from './skillGraphLayout';
@@ -71,8 +65,8 @@ function SkillHub({ id, data }) {
       style={{ width: NODE_SIZE.hub.w, height: NODE_SIZE.hub.h, '--c': data.color }}
     >
       <Handles />
-      <span className="sg-hub__dot" />
-      {data.label}
+      <span className="sg-hub__mark" />
+      <span className="sg-hub__label">{data.label}</span>
     </div>
   );
 }
@@ -103,23 +97,46 @@ function SkillNode({ id, data }) {
   );
 }
 
+// A gentle arc rather than a straight chord. Thirty straight lines converging
+// on one point reads as a spiderweb; bowing them apart lets the eye follow one.
+function arc(sx, sy, tx, ty, bow) {
+  const mx = (sx + tx) / 2;
+  const my = (sy + ty) / 2;
+  const dx = tx - sx;
+  const dy = ty - sy;
+  return `M${sx},${sy} Q${mx - dy * bow},${my + dx * bow} ${tx},${ty}`;
+}
+
 function SkillEdge({ source, target, sourceX, sourceY, targetX, targetY, data }) {
   const { hovered, color } = useContext(HoverContext);
-  const [path] = getStraightPath({ sourceX, sourceY, targetX, targetY });
   const kind = data?.kind;
   const touching = hovered && (source === hovered || target === hovered);
-  const dim = hovered && !touching;
-  const base = kind === 'cross' ? '#3a4a5c' : (data?.color ?? '#2b3949');
+
+  // Cross-links are the relationships, not the structure. Drawing all 31 at
+  // rest was most of the clutter, so they only appear for the node you're on.
+  if (kind === 'cross' && !touching) return null;
+  if (kind !== 'cross' && hovered && !touching) {
+    return (
+      <path
+        className="react-flow__edge-path"
+        d={arc(sourceX, sourceY, targetX, targetY, 0.08)}
+        fill="none"
+        stroke={data?.color ?? '#2b3949'}
+        strokeWidth={1}
+        opacity={0.07}
+      />
+    );
+  }
 
   return (
     <path
-      className="react-flow__edge-path sg-edge"
-      d={path}
+      className="react-flow__edge-path"
+      d={arc(sourceX, sourceY, targetX, targetY, kind === 'cross' ? 0.16 : 0.08)}
       fill="none"
-      stroke={touching ? color : base}
-      strokeWidth={touching ? 1.7 : kind === 'spine' ? 1.1 : 1}
-      strokeDasharray={kind === 'cross' && !touching ? '3 4' : undefined}
-      opacity={dim ? 0.09 : touching ? 1 : kind === 'cross' ? 0.3 : 0.45}
+      stroke={touching ? color : (data?.color ?? '#2b3949')}
+      strokeWidth={touching ? 1.5 : kind === 'spine' ? 1 : 0.9}
+      strokeDasharray={kind === 'cross' ? '2 3' : undefined}
+      opacity={touching ? 0.95 : kind === 'spine' ? 0.3 : 0.22}
     />
   );
 }

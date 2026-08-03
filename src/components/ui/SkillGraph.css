@@ -74,61 +74,67 @@
 
 /* ---------- group hub ---------- */
 
+/* Group hubs are a diamond and a ruled label, not a filled chip — enough to
+   anchor a cluster without adding another box to the canvas. */
 .sg-hub {
   display: flex;
   align-items: center;
-  gap: 7px;
-  padding: 0 10px;
-  border: 1px solid color-mix(in srgb, var(--c) 55%, transparent);
-  background: color-mix(in srgb, var(--c) 12%, #0b0f14);
+  justify-content: center;
+  gap: 8px;
   font-family: 'JetBrains Mono', ui-monospace, monospace;
   font-size: 12px;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: color-mix(in srgb, var(--c) 78%, #e6edf3);
+  color: color-mix(in srgb, var(--c) 72%, #e6edf3);
   white-space: nowrap;
 }
 
-.sg-hub__dot {
-  width: 6px;
-  height: 6px;
+.sg-hub__mark {
+  width: 7px;
+  height: 7px;
   flex: none;
   background: var(--c);
+  transform: rotate(45deg);
+}
+
+.sg-hub__label {
+  padding-bottom: 3px;
+  border-bottom: 1px solid color-mix(in srgb, var(--c) 45%, transparent);
+  background: rgb(11 15 20 / 0.7);
 }
 
 /* ---------- skill ---------- */
 
+/* Skills are a marker plus a label — no border, no filled chip. Thirty boxed
+   rectangles were most of the visual weight; the text alone carries it, and a
+   translucent backdrop keeps the links from cutting through the glyphs. */
 .sg-node {
   display: flex;
   align-items: center;
-  /* Tight: the longest label ("Anomaly Detection") only just clears the box,
-     and sub-pixel rounding under the canvas transform will show an ellipsis
-     if it doesn't. Cheaper than widening every node and shrinking the graph. */
-  gap: 5px;
-  padding: 0 6px;
-  border: 1px solid #223041;
-  background: #0d1117;
+  gap: 6px;
   font-family: 'JetBrains Mono', ui-monospace, monospace;
   font-size: 12px;
   color: #8b98a5;
   white-space: nowrap;
-  transition: border-color 0.16s ease, color 0.16s ease, box-shadow 0.16s ease,
-    background-color 0.16s ease;
+  transition: color 0.16s ease;
   cursor: default;
 }
 
-/* At rest a skill wears its group's colour, so the clusters read as clusters. */
 .sg-node__dot {
-  width: 5px;
-  height: 5px;
+  width: 6px;
+  height: 6px;
   flex: none;
   background: var(--g);
-  transition: background-color 0.16s ease, box-shadow 0.16s ease;
+  transition: background-color 0.16s ease, box-shadow 0.16s ease,
+    transform 0.16s ease;
 }
 
 .sg-node__label {
   overflow: hidden;
+  padding: 1px 4px;
+  background: rgb(11 15 20 / 0.72);
   text-overflow: ellipsis;
+  transition: color 0.16s ease, box-shadow 0.16s ease;
 }
 
 /* Nodes drift on their own axis. This transforms the inner box only — the
@@ -161,38 +167,40 @@
 }
 
 /* On hover it switches to its own brand colour — Go's teal, JavaScript's
-   yellow — and the dot lights up to match. */
-.sg-node:hover {
-  border-color: var(--c);
-  background: color-mix(in srgb, var(--c) 13%, #0d1117);
-  color: color-mix(in srgb, var(--c) 62%, #e6edf3);
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--c) 35%, transparent),
-    0 0 18px color-mix(in srgb, var(--c) 22%, transparent);
+   yellow — and the marker lights up to match. */
+.sg-node:hover,
+.sg-node[data-state='on'] {
+  color: color-mix(in srgb, var(--c) 55%, #ffffff);
 }
 
-.sg-node:hover .sg-node__dot {
+.sg-node:hover .sg-node__label,
+.sg-node[data-state='on'] .sg-node__label {
+  box-shadow: 0 1px 0 0 var(--c);
+}
+
+.sg-node:hover .sg-node__dot,
+.sg-node[data-state='on'] .sg-node__dot {
   background: var(--c);
-  box-shadow: 0 0 8px var(--c);
+  box-shadow: 0 0 9px var(--c);
+  transform: scale(1.35);
 }
 
 /* Neighbours of the hovered node stay lit; everything else recedes. */
 .sg-node[data-state='near'] {
-  border-color: color-mix(in srgb, var(--g) 55%, transparent);
-  color: #c3ccd6;
+  color: #cfd8e2;
 }
 
 .sg-node[data-state='near'] .sg-node__dot {
-  box-shadow: 0 0 6px var(--g);
+  box-shadow: 0 0 7px var(--g);
 }
 
 .sg-hub[data-state='near'] {
-  border-color: var(--c);
-  color: color-mix(in srgb, var(--c) 55%, #e6edf3);
+  color: color-mix(in srgb, var(--c) 45%, #ffffff);
 }
 
 .sg-node[data-state='off'],
 .sg-hub[data-state='off'] {
-  opacity: 0.26;
+  opacity: 0.2;
 }
 
 .sg-core[data-state='off'] {

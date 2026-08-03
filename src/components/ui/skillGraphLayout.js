@@ -7,13 +7,16 @@ import { SKILL_GROUPS, SKILLS, SKILL_LINKS } from '../../data/skills';
 const TAU = Math.PI * 2;
 
 export const NODE_SIZE = {
-  core: { w: 108, h: 108 },
-  hub: { w: 150, h: 30 },
-  // Wide enough for the longest label ("Anomaly Detection") without clipping.
-  skill: { w: 150, h: 28 },
+  core: { w: 96, h: 96 },
+  hub: { w: 150, h: 26 },
+  // No box around a skill any more — this is the text's footprint, used for
+  // spacing only. Sized with real slack over the longest label ("Anomaly
+  // Detection"), which is ~122px: at the exact boundary, sub-pixel rounding
+  // under the canvas transform makes it ellipsise.
+  skill: { w: 152, h: 22 },
 };
 
-const HUB_R = { rx: 250, ry: 105 };
+const HUB_R = { rx: 244, ry: 102 };
 // Skills alternate between two rings so a busy group doesn't crowd one arc.
 // The inner ring's rx is what actually gates spacing: with a uniform angular
 // step of TAU/totalWeight, horizontal clearance at the top of the ellipse is
@@ -25,8 +28,8 @@ const RINGS = 2;
 // and first outer node sit at the *same* angle — so the gap between the rings
 // has to clear a whole node width (plus drift) on its own, not just look tidy.
 const SKILL_R = [
-  { rx: 470, ry: 197 },
-  { rx: 670, ry: 280 },
+  { rx: 480, ry: 201 },
+  { rx: 675, ry: 282 },
 ];
 
 // Deterministic per-node jitter for the drift animation, so the float looks
