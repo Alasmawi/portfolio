@@ -8,14 +8,12 @@ const TAU = Math.PI * 2;
 
 export const NODE_SIZE = {
   core: { w: 108, h: 108 },
-  hub: { w: 206, h: 32 },
-  // Wide enough for the longest label ("Prompt Engineering") without clipping.
-  // Type and box are deliberately oversized: fitView scales the whole graph
-  // down to ~0.75, so 13px here lands near 10px on screen.
-  skill: { w: 168, h: 28 },
+  hub: { w: 150, h: 30 },
+  // Wide enough for the longest label ("Anomaly Detection") without clipping.
+  skill: { w: 150, h: 28 },
 };
 
-const HUB_R = { rx: 322, ry: 135 };
+const HUB_R = { rx: 250, ry: 105 };
 // Skills alternate between two rings so a busy group doesn't crowd one arc.
 // The inner ring's rx is what actually gates spacing: with a uniform angular
 // step of TAU/totalWeight, horizontal clearance at the top of the ellipse is
@@ -23,10 +21,20 @@ const HUB_R = { rx: 322, ry: 135 };
 const RINGS = 2;
 // Flattened to roughly the canvas's own aspect, so fitView isn't forced to
 // zoom out to accommodate height the container doesn't have.
+// When a group's two rings hold the same number of members, its first inner
+// and first outer node sit at the *same* angle — so the gap between the rings
+// has to clear a whole node width (plus drift) on its own, not just look tidy.
 const SKILL_R = [
-  { rx: 600, ry: 251 },
-  { rx: 780, ry: 326 },
+  { rx: 470, ry: 197 },
+  { rx: 670, ry: 280 },
 ];
+
+// Deterministic per-node jitter for the drift animation, so the float looks
+// organic without any of it being random at runtime.
+const noise = (i, salt) => {
+  const x = Math.sin(i * 12.9898 + salt * 78.233) * 43758.5453;
+  return x - Math.floor(x);
+};
 
 const onEllipse = (angle, { rx, ry }) => ({
   x: Math.cos(angle) * rx,
@@ -104,7 +112,14 @@ export function buildSkillGraph() {
           color: skill.color ?? group.color,
           groupColor: group.color,
           groupLabel: group.label,
-          branded: Boolean(skill.color),
+          // Drift is applied to the inner box, not the React Flow position, so
+          // it costs nothing and never invalidates the graph's layout.
+          float: {
+            dx: +(2 + noise(nodes.length, 1) * 3).toFixed(1),
+            dy: +(2 + noise(nodes.length, 2) * 3).toFixed(1),
+            dur: +(8 + noise(nodes.length, 3) * 7).toFixed(1),
+            delay: +(-noise(nodes.length, 4) * 12).toFixed(1),
+          },
         },
         draggable: false,
       });

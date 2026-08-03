@@ -1,8 +1,27 @@
-import { useCallback, useMemo, useState } from 'react';
-import { ReactFlow, Controls, Handle, Position } from '@xyflow/react';
+import { createContext, useCallback, useContext, useMemo, useState } from 'react';
+import {
+  ReactFlow,
+  Controls,
+  Handle,
+  Position,
+  getStraightPath,
+} from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import './SkillGraph.css';
 import { buildAdjacency, buildSkillGraph, NODE_SIZE } from './skillGraphLayout';
+
+// Hover state travels by context, never through the `nodes` / `edges` props.
+// Handing React Flow rebuilt node objects drops the dimensions it measured for
+// them, so it re-measures the whole graph on every hover — which is what made
+// the canvas flicker. Keeping both arrays referentially frozen avoids that
+// entirely; only the components that care re-render.
+const HoverContext = createContext({ hovered: null, adjacency: new Map(), color: null });
+
+const stateFor = (id, hovered, adjacency) => {
+  if (!hovered) return undefined;
+  if (id === hovered) return 'on';
+  return adjacency.get(hovered)?.has(id) ? 'near' : 'off';
+};
 
 // Edges attach at node centres, so the network radiates cleanly instead of
 // hanging off the corners of each box.
@@ -28,11 +47,12 @@ function Handles() {
   );
 }
 
-function SkillCore({ data }) {
+function SkillCore({ id, data }) {
+  const { hovered, adjacency } = useContext(HoverContext);
   return (
     <div
       className="sg-core"
-      data-state={data.state}
+      data-state={stateFor(id, hovered, adjacency)}
       style={{ width: NODE_SIZE.core.w, height: NODE_SIZE.core.h }}
     >
       <Handles />
@@ -42,11 +62,12 @@ function SkillCore({ data }) {
   );
 }
 
-function SkillHub({ data }) {
+function SkillHub({ id, data }) {
+  const { hovered, adjacency } = useContext(HoverContext);
   return (
     <div
       className="sg-hub"
-      data-state={data.state}
+      data-state={stateFor(id, hovered, adjacency)}
       style={{ width: NODE_SIZE.hub.w, height: NODE_SIZE.hub.h, '--c': data.color }}
     >
       <Handles />
@@ -56,16 +77,22 @@ function SkillHub({ data }) {
   );
 }
 
-function SkillNode({ data }) {
+function SkillNode({ id, data }) {
+  const { hovered, adjacency } = useContext(HoverContext);
+  const f = data.float;
   return (
     <div
       className="sg-node"
-      data-state={data.state}
+      data-state={stateFor(id, hovered, adjacency)}
       style={{
         width: NODE_SIZE.skill.w,
         height: NODE_SIZE.skill.h,
         '--c': data.color,
         '--g': data.groupColor,
+        '--fx': `${f.dx}px`,
+        '--fy': `${f.dy}px`,
+        '--fdur': `${f.dur}s`,
+        '--fdelay': `${f.delay}s`,
       }}
       title={`${data.label} — ${data.groupLabel}`}
     >
@@ -76,76 +103,77 @@ function SkillNode({ data }) {
   );
 }
 
+function SkillEdge({ source, target, sourceX, sourceY, targetX, targetY, data }) {
+  const { hovered, color } = useContext(HoverContext);
+  const [path] = getStraightPath({ sourceX, sourceY, targetX, targetY });
+  const kind = data?.kind;
+  const touching = hovered && (source === hovered || target === hovered);
+  const dim = hovered && !touching;
+  const base = kind === 'cross' ? '#3a4a5c' : (data?.color ?? '#2b3949');
+
+  return (
+    <path
+      className="react-flow__edge-path sg-edge"
+      d={path}
+      fill="none"
+      stroke={touching ? color : base}
+      strokeWidth={touching ? 1.7 : kind === 'spine' ? 1.1 : 1}
+      strokeDasharray={kind === 'cross' && !touching ? '3 4' : undefined}
+      opacity={dim ? 0.09 : touching ? 1 : kind === 'cross' ? 0.3 : 0.45}
+    />
+  );
+}
+
 const NODE_TYPES = { skillCore: SkillCore, skillHub: SkillHub, skillNode: SkillNode };
+const EDGE_TYPES = { skill: SkillEdge };
 
 export default function SkillGraph() {
-  const { nodes: baseNodes, edges: baseEdges } = useMemo(() => buildSkillGraph(), []);
-  const adjacency = useMemo(() => buildAdjacency(baseEdges), [baseEdges]);
+  // Built once. Never replaced — see the note on HoverContext.
+  const { nodes, edges } = useMemo(() => {
+    const g = buildSkillGraph();
+    return { nodes: g.nodes, edges: g.edges.map((e) => ({ ...e, type: 'skill' })) };
+  }, []);
+  const adjacency = useMemo(() => buildAdjacency(edges), [edges]);
   const [hovered, setHovered] = useState(null);
+
+  const ctx = useMemo(() => ({
+    hovered,
+    adjacency,
+    color: hovered
+      ? (nodes.find((n) => n.id === hovered)?.data?.color ?? '#e6edf3')
+      : null,
+  }), [hovered, adjacency, nodes]);
 
   const onNodeMouseEnter = useCallback((_, node) => setHovered(node.id), []);
   const onNodeMouseLeave = useCallback(() => setHovered(null), []);
 
-  const nodes = useMemo(() => {
-    if (!hovered) return baseNodes;
-    const near = adjacency.get(hovered) ?? new Set();
-    return baseNodes.map((n) => {
-      const state = n.id === hovered ? 'on' : near.has(n.id) ? 'near' : 'off';
-      return { ...n, data: { ...n.data, state } };
-    });
-  }, [baseNodes, adjacency, hovered]);
-
-  // Highlight in the hovered node's own colour. A fixed accent would be
-  // ambiguous — the Cloud group is already amber.
-  const hoverColor = useMemo(() => {
-    if (!hovered) return null;
-    const n = baseNodes.find((x) => x.id === hovered);
-    return n?.data?.color ?? '#e6edf3';
-  }, [baseNodes, hovered]);
-
-  const edges = useMemo(() => baseEdges.map((e) => {
-    const kind = e.data?.kind;
-    const touching = hovered && (e.source === hovered || e.target === hovered);
-    const dim = hovered && !touching;
-    const base = kind === 'cross' ? '#3a4a5c' : (e.data?.color ?? '#2b3949');
-
-    return {
-      ...e,
-      // Lift a hovered node's own edges above the rest of the mesh.
-      zIndex: touching ? 10 : 0,
-      style: {
-        stroke: touching ? hoverColor : base,
-        strokeWidth: touching ? 1.7 : kind === 'spine' ? 1.1 : 1,
-        strokeDasharray: kind === 'cross' && !touching ? '3 4' : undefined,
-        opacity: dim ? 0.1 : touching ? 1 : kind === 'cross' ? 0.3 : 0.45,
-      },
-    };
-  }), [baseEdges, hovered, hoverColor]);
-
   return (
     <div className="sg-frame">
-      <ReactFlow
-        nodes={nodes}
-        edges={edges}
-        nodeTypes={NODE_TYPES}
-        onNodeMouseEnter={onNodeMouseEnter}
-        onNodeMouseLeave={onNodeMouseLeave}
-        fitView
-        fitViewOptions={{ padding: 0.06 }}
-        minZoom={0.3}
-        maxZoom={2}
-        /* The page uses mandatory scroll-snap — the canvas must never swallow
-           a wheel gesture. Zooming is via the on-canvas controls or pinch. */
-        zoomOnScroll={false}
-        zoomOnDoubleClick={false}
-        preventScrolling={false}
-        panOnScroll={false}
-        nodesConnectable={false}
-        elementsSelectable={false}
-        proOptions={{ hideAttribution: false }}
-      >
-        <Controls showInteractive={false} position="bottom-right" />
-      </ReactFlow>
+      <HoverContext.Provider value={ctx}>
+        <ReactFlow
+          nodes={nodes}
+          edges={edges}
+          nodeTypes={NODE_TYPES}
+          edgeTypes={EDGE_TYPES}
+          onNodeMouseEnter={onNodeMouseEnter}
+          onNodeMouseLeave={onNodeMouseLeave}
+          fitView
+          fitViewOptions={{ padding: 0.06 }}
+          minZoom={0.15}
+          maxZoom={2}
+          /* The page uses mandatory scroll-snap — the canvas must never swallow
+             a wheel gesture. Zooming is via the on-canvas controls or pinch. */
+          zoomOnScroll={false}
+          zoomOnDoubleClick={false}
+          preventScrolling={false}
+          panOnScroll={false}
+          nodesConnectable={false}
+          elementsSelectable={false}
+          proOptions={{ hideAttribution: false }}
+        >
+          <Controls showInteractive={false} position="bottom-right" />
+        </ReactFlow>
+      </HoverContext.Provider>
     </div>
   );
 }

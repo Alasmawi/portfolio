@@ -101,8 +101,11 @@
 .sg-node {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 0 8px;
+  /* Tight: the longest label ("Anomaly Detection") only just clears the box,
+     and sub-pixel rounding under the canvas transform will show an ellipsis
+     if it doesn't. Cheaper than widening every node and shrinking the graph. */
+  gap: 5px;
+  padding: 0 6px;
   border: 1px solid #223041;
   background: #0d1117;
   font-family: 'JetBrains Mono', ui-monospace, monospace;
@@ -126,6 +129,35 @@
 .sg-node__label {
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+/* Nodes drift on their own axis. This transforms the inner box only — the
+   React Flow position is untouched, so the layout never recomputes and the
+   edges (which meet at node centres, well inside the box) stay attached. */
+@keyframes sg-float {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  25% {
+    transform: translate3d(var(--fx), calc(var(--fy) * -1), 0);
+  }
+  50% {
+    transform: translate3d(calc(var(--fx) * -0.6), var(--fy), 0);
+  }
+  75% {
+    transform: translate3d(calc(var(--fx) * -1), calc(var(--fy) * -0.4), 0);
+  }
+}
+
+.sg-node {
+  animation: sg-float var(--fdur, 10s) ease-in-out var(--fdelay, 0s) infinite;
+}
+
+/* Settle under the cursor so the hover target doesn't wander. */
+.sg-node:hover,
+.sg-node[data-state='on'] {
+  animation-play-state: paused;
 }
 
 /* On hover it switches to its own brand colour — Go's teal, JavaScript's
@@ -171,5 +203,19 @@
   .sg-node,
   .sg-node__dot {
     transition: none;
+    animation: none;
+  }
+}
+
+/* ---------- compact: narrow viewports ---------- */
+
+@media (max-width: 1023px) {
+  .sg-frame {
+    height: clamp(380px, calc(100vh - 300px), 560px);
+  }
+
+  .sg-node,
+  .sg-hub {
+    font-size: 11px;
   }
 }
