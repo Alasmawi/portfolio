@@ -1,10 +1,9 @@
 import { motion } from 'framer-motion';
 import { ArrowDown } from 'lucide-react';
 import { GithubMark, LinkedinMark } from './ui/BrandIcons';
-import CloudHorizon from './ui/CloudHorizon';
 import HeadshotSlot from './ui/HeadshotSlot';
 import NetworkBackground from './ui/NetworkBackground';
-import SkyDrift from './ui/SkyDrift';
+import SharpHorizon from './ui/SharpHorizon';
 import StatusBadge from './ui/StatusBadge';
 import useTypingEffect from '../hooks/useTypingEffect';
 
@@ -18,9 +17,8 @@ export default function Hero() {
       id="hero"
       className="relative flex min-h-screen items-center overflow-hidden border-b border-base-border pt-24"
     >
-      <CloudHorizon />
       <NetworkBackground />
-      <SkyDrift />
+      <SharpHorizon />
 
       <div className="relative mx-auto grid w-full max-w-6xl grid-cols-1 gap-10 px-6 md:grid-cols-12 md:gap-8">
         <div className="md:col-span-8">

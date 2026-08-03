@@ -5,12 +5,13 @@
   /* Cards run narrower than the column on purpose. The flanking cards sit at
      x = ±R·sin(60°), so an oversized card pushes its neighbours out past the
      frame and the ring collapses into "one card plus two slivers". */
-  --ring-card-w: min(200px, 54vw);
+  --ring-card-w: min(230px, 62vw);
 
   position: relative;
   width: 100%;
-  /* Room for the card plus the perspective spill of the cards behind it. */
-  height: calc(var(--ring-card-w) * 9 / 16 + 4.5rem);
+  /* Room for the card, the perspective spill of the cards behind it, and the
+     extra vertical throw from the ring tilt plus each card's inward lean. */
+  height: calc(var(--ring-card-w) * 9 / 16 + 5.5rem);
   overflow: hidden;
   /* Horizontal drags turn the ring; vertical ones still scroll the page. */
   touch-action: pan-y;
@@ -29,19 +30,19 @@
 
 @media (min-width: 640px) {
   .ring-mask {
-    --ring-card-w: 320px;
+    --ring-card-w: 360px;
   }
 }
 
 @media (min-width: 768px) {
   .ring-mask {
-    --ring-card-w: min(380px, 40vw);
+    --ring-card-w: min(430px, 45vw);
   }
 }
 
 @media (min-width: 1024px) {
   .ring-mask {
-    --ring-card-w: 400px;
+    --ring-card-w: 460px;
   }
 }
 

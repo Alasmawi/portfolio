@@ -137,28 +137,29 @@
   }
 }
 
-@keyframes cloud-drift {
-  from {
-    transform: translateX(-130%);
+/* Hero ridge nodes: a hard on/off blink rather than a drift, to keep the
+   header's motion sharp. step-end gives it a switching feel, not a fade. */
+@keyframes sharp-node-blink {
+  0%,
+  62% {
+    opacity: 1;
   }
-  to {
-    transform: translateX(calc(100vw + 100%));
+  63%,
+  74% {
+    opacity: 0.25;
+  }
+  75%,
+  100% {
+    opacity: 1;
   }
 }
 
-.drift-item {
-  position: absolute;
-  left: 0;
-  animation-name: cloud-drift;
-  animation-timing-function: linear;
-  animation-iteration-count: infinite;
-  animation-fill-mode: backwards;
-  will-change: transform;
+.sharp-node {
+  animation: sharp-node-blink 4.2s step-end infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .drift-item {
+  .sharp-node {
     animation: none;
-    display: none;
   }
 }

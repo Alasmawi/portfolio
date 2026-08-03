@@ -18,6 +18,9 @@ const PERSPECTIVE = 1100;
 // A slight look-down on the ring, so the cards read as sitting on a turntable
 // rather than sliding along a flat line.
 const RING_TILT_DEG = 6;
+// Each card also leans its own top edge in towards the ring's axis, which is
+// what makes the cylinder read as a bowl rather than a straight drum.
+const CARD_LEAN_DEG = 15;
 
 const easeInOutCubic = (t) =>
   t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
@@ -34,6 +37,9 @@ export default function RingGallery({ items = [] }) {
   const maskRef = useRef(null);
   const ringRef = useRef(null);
   const slotsRef = useRef([]);
+  // Last depth band written per slot, so filter/z-index only touch the DOM
+  // when they actually change.
+  const paintCache = useRef([]);
 
   // All animation state lives in refs — the ring is written straight to the
   // DOM each frame, so spinning never re-renders React.
@@ -69,10 +75,22 @@ export default function RingGallery({ items = [] }) {
       // Fade to nothing exactly as the card turns edge-on, which is where
       // backface-visibility takes over — otherwise it would pop out.
       const front = Math.max(0, facing);
+
+      // opacity is composited, so it is cheap to write every frame.
       el.style.opacity = String(Math.pow(front, 0.8));
-      el.style.filter = `blur(${(1 - front) * 2.2}px) saturate(${0.55 + 0.45 * front})`;
-      el.style.zIndex = String(Math.round(front * 100));
-      el.classList.toggle('is-front', facing > frontCos);
+
+      // filter is not: each change repaints the whole card. Quantising it into
+      // a few steps keeps the depth cue but drops ~95% of the repaints, which
+      // is what was making the spin stutter.
+      const band = Math.round(front * 8);
+      const cache = paintCache.current;
+      if (cache[i] !== band) {
+        cache[i] = band;
+        const q = band / 8;
+        el.style.filter = `blur(${((1 - q) * 2.2).toFixed(2)}px) saturate(${(0.55 + 0.45 * q).toFixed(2)})`;
+        el.style.zIndex = String(band);
+        el.classList.toggle('is-front', facing > frontCos);
+      }
     });
   }, [step]);
 
@@ -86,7 +104,10 @@ export default function RingGallery({ items = [] }) {
     const r = count > 1 ? (w / 2 / Math.tan(Math.PI / count)) * RING_GAP : 0;
     state.current.radius = r;
     slotsRef.current.forEach((el, i) => {
-      if (el) el.style.transform = `rotateY(${i * step}deg) translateZ(${r}px)`;
+      if (el) {
+        el.style.transform =
+          `rotateY(${i * step}deg) translateZ(${r}px) rotateX(${CARD_LEAN_DEG}deg)`;
+      }
     });
     paint();
   }, [count, paint, step]);

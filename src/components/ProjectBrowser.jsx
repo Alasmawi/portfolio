@@ -8,8 +8,10 @@ import { GithubMark } from './ui/BrandIcons';
 import { LANGUAGE_COLORS, PROJECTS } from '../data/projects';
 
 // With the section on screen and nobody touching it, walk to the next project
-// so it plays as a gallery. Any interaction restarts the clock.
-const AUTO_ADVANCE_MS = 9000;
+// so it plays as a gallery. Any interaction restarts the clock — long enough
+// that it never pulls a project out from under someone still reading it.
+const AUTO_ADVANCE_MS = 30000;
+const IDLE_TICK_MS = 1000;
 
 function LanguageDot({ language }) {
   if (!language) return null;
@@ -58,9 +60,12 @@ export default function ProjectBrowser() {
   const project = PROJECTS.find((p) => p.id === selectedId) ?? PROJECTS[0];
 
   const sectionRef = useRef(null);
-  // Bumped on every interaction; restarting the effect restarts the timer.
-  const [idleNonce, setIdleNonce] = useState(0);
-  const nudgeIdle = useCallback(() => setIdleNonce((n) => n + 1), []);
+  // Activity is tracked in a ref rather than state: pointermove fires
+  // constantly, and restarting a timer must not cost a re-render.
+  const lastActivityRef = useRef(0);
+  const nudgeIdle = useCallback(() => {
+    lastActivityRef.current = Date.now();
+  }, []);
 
   const select = useCallback(
     (id) => {
@@ -77,50 +82,51 @@ export default function ProjectBrowser() {
       return undefined;
     }
 
-    let timer = 0;
     let inView = false;
-
-    const advance = () => {
-      setSelectedId((current) => {
-        const i = PROJECTS.findIndex((p) => p.id === current);
-        return PROJECTS[(i + 1) % PROJECTS.length].id;
-      });
-    };
-
-    const arm = () => {
-      clearTimeout(timer);
-      if (inView && !document.hidden) {
-        timer = setTimeout(advance, AUTO_ADVANCE_MS);
-      }
-    };
+    lastActivityRef.current = Date.now();
 
     const io = new IntersectionObserver(
       ([e]) => {
-        // Only cycle while a decent slice of the section is actually on screen.
+        // Only cycle while a decent slice of the section is actually on screen,
+        // and give a full quiet period from the moment it comes into view.
+        if (e.isIntersecting && !inView) lastActivityRef.current = Date.now();
         inView = e.isIntersecting;
-        arm();
       },
       { threshold: 0.35 }
     );
     io.observe(node);
 
-    document.addEventListener('visibilitychange', arm);
-    arm();
+    const tick = setInterval(() => {
+      if (!inView || document.hidden) {
+        // Time spent off-screen or on another tab shouldn't count as idling.
+        lastActivityRef.current = Date.now();
+        return;
+      }
+      if (Date.now() - lastActivityRef.current < AUTO_ADVANCE_MS) return;
+      lastActivityRef.current = Date.now();
+      setSelectedId((current) => {
+        const i = PROJECTS.findIndex((p) => p.id === current);
+        return PROJECTS[(i + 1) % PROJECTS.length].id;
+      });
+    }, IDLE_TICK_MS);
+
+    // Anything that suggests someone is still there resets the clock.
+    const opts = { passive: true, capture: true };
+    const events = ['pointerdown', 'pointermove', 'wheel', 'touchstart', 'keydown'];
+    events.forEach((ev) => node.addEventListener(ev, nudgeIdle, opts));
 
     return () => {
-      clearTimeout(timer);
+      clearInterval(tick);
       io.disconnect();
-      document.removeEventListener('visibilitychange', arm);
+      events.forEach((ev) => node.removeEventListener(ev, nudgeIdle, opts));
     };
-  }, [idleNonce, selectedId]);
+  }, [nudgeIdle]);
 
   return (
     <section
       id="projects"
       ref={sectionRef}
       className="border-b border-base-border py-24 md:py-32"
-      onPointerDownCapture={nudgeIdle}
-      onKeyDownCapture={nudgeIdle}
     >
       <div className="mx-auto max-w-6xl px-6">
         <SectionHeader
