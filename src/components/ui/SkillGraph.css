@@ -1,0 +1,175 @@
+.sg-frame {
+  position: relative;
+  width: 100%;
+  /* Sized against the viewport rather than fixed. 332px is the measured chrome
+     above the frame once the section snaps into place (nav offset + padding +
+     heading + intro); anything taller pushes nodes below the fold, which
+     defeats the point of an overview. */
+  height: clamp(440px, calc(100vh - 385px), 720px);
+  border: 1px solid #1c2530;
+  background:
+    radial-gradient(ellipse 70% 60% at 50% 45%, rgb(79 163 196 / 0.07), transparent 70%),
+    rgb(13 17 23 / 0.55);
+}
+
+
+/* React Flow paints its own surface; let the section's own background show. */
+.sg-frame .react-flow__renderer,
+.sg-frame .react-flow__pane {
+  background: transparent;
+}
+
+.sg-frame .react-flow__attribution {
+  background: transparent;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 9px;
+}
+
+.sg-frame .react-flow__attribution a {
+  color: #3f4c5a;
+}
+
+.sg-frame .react-flow__controls {
+  box-shadow: none;
+  border: 1px solid #1c2530;
+}
+
+.sg-frame .react-flow__controls-button {
+  border-bottom: 1px solid #1c2530;
+  background: #0d1117;
+  fill: #8b98a5;
+}
+
+.sg-frame .react-flow__controls-button:hover {
+  background: #151d28;
+  fill: #f2a93b;
+}
+
+/* ---------- core ---------- */
+
+.sg-core {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  border: 1px solid rgb(242 169 59 / 0.5);
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 40%, #16202c, #0b0f14);
+  box-shadow: 0 0 0 6px rgb(242 169 59 / 0.05), 0 0 30px rgb(242 169 59 / 0.12);
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+}
+
+.sg-core__label {
+  font-size: 12px;
+  color: #e6edf3;
+}
+
+.sg-core__sub {
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #5b6773;
+}
+
+/* ---------- group hub ---------- */
+
+.sg-hub {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0 10px;
+  border: 1px solid color-mix(in srgb, var(--c) 55%, transparent);
+  background: color-mix(in srgb, var(--c) 12%, #0b0f14);
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--c) 78%, #e6edf3);
+  white-space: nowrap;
+}
+
+.sg-hub__dot {
+  width: 6px;
+  height: 6px;
+  flex: none;
+  background: var(--c);
+}
+
+/* ---------- skill ---------- */
+
+.sg-node {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 8px;
+  border: 1px solid #223041;
+  background: #0d1117;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 12px;
+  color: #8b98a5;
+  white-space: nowrap;
+  transition: border-color 0.16s ease, color 0.16s ease, box-shadow 0.16s ease,
+    background-color 0.16s ease;
+  cursor: default;
+}
+
+/* At rest a skill wears its group's colour, so the clusters read as clusters. */
+.sg-node__dot {
+  width: 5px;
+  height: 5px;
+  flex: none;
+  background: var(--g);
+  transition: background-color 0.16s ease, box-shadow 0.16s ease;
+}
+
+.sg-node__label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* On hover it switches to its own brand colour — Go's teal, JavaScript's
+   yellow — and the dot lights up to match. */
+.sg-node:hover {
+  border-color: var(--c);
+  background: color-mix(in srgb, var(--c) 13%, #0d1117);
+  color: color-mix(in srgb, var(--c) 62%, #e6edf3);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--c) 35%, transparent),
+    0 0 18px color-mix(in srgb, var(--c) 22%, transparent);
+}
+
+.sg-node:hover .sg-node__dot {
+  background: var(--c);
+  box-shadow: 0 0 8px var(--c);
+}
+
+/* Neighbours of the hovered node stay lit; everything else recedes. */
+.sg-node[data-state='near'] {
+  border-color: color-mix(in srgb, var(--g) 55%, transparent);
+  color: #c3ccd6;
+}
+
+.sg-node[data-state='near'] .sg-node__dot {
+  box-shadow: 0 0 6px var(--g);
+}
+
+.sg-hub[data-state='near'] {
+  border-color: var(--c);
+  color: color-mix(in srgb, var(--c) 55%, #e6edf3);
+}
+
+.sg-node[data-state='off'],
+.sg-hub[data-state='off'] {
+  opacity: 0.26;
+}
+
+.sg-core[data-state='off'] {
+  opacity: 0.4;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sg-node,
+  .sg-node__dot {
+    transition: none;
+  }
+}
