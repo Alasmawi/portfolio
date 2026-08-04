@@ -17,6 +17,7 @@ import {
 import { Maximize2, Minimize2 } from 'lucide-react';
 import '@xyflow/react/dist/style.css';
 import './SkillGraph.css';
+import chipCore from '../../assets/icons/chip-core.gif';
 import { buildAdjacency, buildSkillGraph, NODE_SIZE } from './skillGraphLayout';
 
 // Hover state travels by context, never through the `nodes` / `edges` props.
@@ -67,11 +68,6 @@ function Handles() {
   );
 }
 
-// A processor die with pins on all four sides — the thing every one of these
-// groups actually feeds. Reads as a core at a glance and keeps the angular
-// language of the group heads.
-const PIN_AT = [24, 36, 48];
-
 function SkillCore({ id, data }) {
   const { hovered, adjacency } = useContext(HoverContext);
   return (
@@ -81,21 +77,7 @@ function SkillCore({ id, data }) {
       style={{ width: NODE_SIZE.core.w, height: NODE_SIZE.core.h }}
     >
       <Handles />
-      <svg className="sg-core__chip" viewBox="0 0 72 72" aria-hidden="true">
-        <g className="sg-core__pins">
-          {PIN_AT.map((p) => (
-            <g key={p}>
-              <line x1={p} y1="5" x2={p} y2="15" />
-              <line x1={p} y1="57" x2={p} y2="67" />
-              <line x1="5" y1={p} x2="15" y2={p} />
-              <line x1="57" y1={p} x2="67" y2={p} />
-            </g>
-          ))}
-        </g>
-        <rect className="sg-core__die" x="15" y="15" width="42" height="42" />
-        <rect className="sg-core__heart" x="28" y="28" width="16" height="16" />
-      </svg>
-      <span className="sg-core__text">{data.label}</span>
+      <img className="sg-core__chip" src={chipCore} alt="" draggable={false} />
     </div>
   );
 }
@@ -158,6 +140,22 @@ function arc(sx, sy, tx, ty, bow) {
   const dx = tx - sx;
   const dy = ty - sy;
   return `M${sx},${sy} Q${mx - dy * bow},${my + dx * bow} ${tx},${ty}`;
+}
+
+// The core art is transparent, so a line drawn to the node's centre would show
+// straight through the chip. Pull both ends back: the source stops at the tips
+// of the chip's own pins, the target just short of the group head's label.
+const CORE_INSET = 62;
+const HEAD_INSET = 16;
+
+function trim(sx, sy, tx, ty, from, to) {
+  const dx = tx - sx;
+  const dy = ty - sy;
+  const len = Math.hypot(dx, dy) || 1;
+  return [
+    sx + (dx / len) * from, sy + (dy / len) * from,
+    tx - (dx / len) * to, ty - (dy / len) * to,
+  ];
 }
 
 function SkillEdge({ source, target, sourceX, sourceY, targetX, targetY, data }) {
