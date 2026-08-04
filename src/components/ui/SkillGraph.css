@@ -45,29 +45,50 @@
   fill: #f2a93b;
 }
 
-/* ---------- core ---------- */
+/* ---------- edges ---------- */
 
-/* The group's tinted field. Sits under everything and is never hit-tested. */
-.sg-cloud {
+/* Dashes travel from each group head inward to the core, so the spine reads as
+   feeding the centre rather than merely joining it. */
+@keyframes sg-flow {
+  to {
+    stroke-dashoffset: 14;
+  }
+}
+
+.sg-flow {
+  stroke-dasharray: 2 12;
+  stroke-linecap: round;
+  animation: sg-flow 1.15s linear infinite;
+}
+
+.sg-cross {
+  stroke-dasharray: 2 4;
+}
+
+/* ---------- rail ---------- */
+
+/* One rail down the left of a group's column, replacing a line per skill. */
+.sg-rail {
+  width: 1px;
   pointer-events: none;
-  border-radius: 50%;
-  /* Kept faint on purpose: seven of these overlap at the edges, and any more
-     saturation turns the middle of the canvas to mud. */
-  background: radial-gradient(
-    ellipse at center,
-    color-mix(in srgb, var(--c) 15%, transparent) 0%,
-    color-mix(in srgb, var(--c) 6%, transparent) 45%,
-    transparent 72%
+  background: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--c) 60%, transparent),
+    color-mix(in srgb, var(--c) 14%, transparent)
   );
-  filter: blur(10px);
   transition: opacity 0.2s ease;
+  animation: sg-float var(--fdur, 10s) ease-in-out var(--fdelay, 0s) infinite;
 }
 
-.sg-cloud[data-state='on'] {
-  opacity: 1.6;
+.sg-rail[data-state='on'] {
+  background: linear-gradient(
+    to bottom,
+    var(--c),
+    color-mix(in srgb, var(--c) 35%, transparent)
+  );
 }
 
-.sg-cloud[data-state='off'] {
+.sg-rail[data-state='off'] {
   opacity: 0.25;
 }
 
@@ -116,24 +137,28 @@
   animation: blink 1.6s step-start infinite;
 }
 
-/* ---------- group hub ---------- */
+/* ---------- group head ---------- */
 
-/* Group hubs are a diamond and a ruled label, not a filled chip — enough to
-   anchor a cluster without adding another box to the canvas. */
-.sg-hub {
+/* A diamond and a ruled label, not a filled chip. Left-aligned so it sits
+   directly over the rail and the column of skills beneath it. */
+.sg-head {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 8px;
+  animation: sg-float var(--fdur, 10s) ease-in-out var(--fdelay, 0s) infinite;
   font-family: 'JetBrains Mono', ui-monospace, monospace;
   font-size: 12px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: color-mix(in srgb, var(--c) 72%, #e6edf3);
   white-space: nowrap;
+  /* The rule spans the whole block, capping every column beneath it. */
+  padding-bottom: 4px;
+  border-bottom: 1px solid color-mix(in srgb, var(--c) 38%, transparent);
 }
 
-.sg-hub__mark {
+.sg-head__mark {
   width: 7px;
   height: 7px;
   flex: none;
@@ -141,9 +166,7 @@
   transform: rotate(45deg);
 }
 
-.sg-hub__label {
-  padding-bottom: 3px;
-  border-bottom: 1px solid color-mix(in srgb, var(--c) 45%, transparent);
+.sg-head__label {
   background: rgb(11 15 20 / 0.7);
 }
 
@@ -238,12 +261,12 @@
   box-shadow: 0 0 7px var(--g);
 }
 
-.sg-hub[data-state='near'] {
+.sg-head[data-state='near'] {
   color: color-mix(in srgb, var(--c) 45%, #ffffff);
 }
 
 .sg-node[data-state='off'],
-.sg-hub[data-state='off'] {
+.sg-head[data-state='off'] {
   opacity: 0.2;
 }
 
@@ -253,10 +276,35 @@
 
 @media (prefers-reduced-motion: reduce) {
   .sg-node,
-  .sg-node__dot {
+  .sg-node__dot,
+  .sg-head,
+  .sg-rail,
+  .sg-flow,
+  .sg-core__caret {
     transition: none;
     animation: none;
   }
+}
+
+/* ---------- full screen ---------- */
+
+/* Set on <body> while the overlay is up — see the note in SkillGraph.jsx. */
+body.sg-has-fullscreen header {
+  z-index: 0;
+}
+
+/* Covers the page, including the fixed nav. Escape or the control exits. */
+.sg-frame--full {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  width: 100vw;
+  height: 100vh;
+  max-height: none;
+  border: 0;
+  background:
+    radial-gradient(ellipse 60% 55% at 50% 45%, rgb(79 163 196 / 0.08), transparent 70%),
+    #080b10;
 }
 
 /* ---------- compact: narrow viewports ---------- */
@@ -267,7 +315,7 @@
   }
 
   .sg-node,
-  .sg-hub {
+  .sg-head {
     font-size: 11px;
   }
 }

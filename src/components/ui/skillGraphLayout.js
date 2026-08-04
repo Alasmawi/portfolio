@@ -1,69 +1,59 @@
 import { SKILL_GROUPS, SKILLS, SKILL_LINKS } from '../../data/skills';
 
-// Radial layout, computed rather than hand-placed, so the data file stays the
-// only thing anyone edits. The ellipse is wider than it is tall to match the
-// canvas: a circular layout would waste horizontal room and overflow vertically.
+// Each group is laid out as a block: its head on top, its skills in an aligned
+// column beneath, tied together by a rail down the left edge. Alignment and the
+// rail are what say "these are under this section" — no tinted field, and no
+// line per skill. Only the seven heads are wired to the centre.
+//
+// Blocks are placed on an ellipse around the core; the ellipse is wider than it
+// is tall to match the canvas.
 
 const TAU = Math.PI * 2;
 
+const ROW_H = 24;
+const HEAD_H = 26;
+const COL_W = 158;
+const RAIL_GAP = 13;
+// A group wider than this many skills wraps into a second column rather than
+// growing a tall block that collides with its neighbours on the ellipse.
+const MAX_ROWS = 5;
+
 export const NODE_SIZE = {
-  core: { w: 96, h: 96 },
-  hub: { w: 150, h: 26 },
-  // No box around a skill any more — this is the text's footprint, used for
-  // spacing only. Sized with real slack over the longest label ("Anomaly
-  // Detection"), which is ~122px: at the exact boundary, sub-pixel rounding
-  // under the canvas transform makes it ellipsise.
-  skill: { w: 152, h: 22 },
+  core: { w: 112, h: 112 },
+  skill: { w: COL_W - 8, h: ROW_H - 2 },
 };
 
-const HUB_R = { rx: 244, ry: 102 };
-// Skills alternate between two rings so a busy group doesn't crowd one arc.
-// The inner ring's rx is what actually gates spacing: with a uniform angular
-// step of TAU/totalWeight, horizontal clearance at the top of the ellipse is
-// rx * step, which has to exceed a node's width.
-const RINGS = 2;
-// Flattened to roughly the canvas's own aspect, so fitView isn't forced to
-// zoom out to accommodate height the container doesn't have.
-// When a group's two rings hold the same number of members, its first inner
-// and first outer node sit at the *same* angle — so the gap between the rings
-// has to clear a whole node width (plus drift) on its own, not just look tidy.
-const SKILL_R = [
-  { rx: 480, ry: 201 },
-  { rx: 675, ry: 282 },
-];
-
-// Deterministic per-node jitter for the drift animation, so the float looks
-// organic without any of it being random at runtime.
-const noise = (i, salt) => {
-  const x = Math.sin(i * 12.9898 + salt * 78.233) * 43758.5453;
-  return x - Math.floor(x);
-};
+const BLOCK_R = { rx: 466, ry: 196 };
 
 const onEllipse = (angle, { rx, ry }) => ({
   x: Math.cos(angle) * rx,
   y: Math.sin(angle) * ry,
 });
 
-// React Flow positions from the top-left corner; the maths above is centre-based.
-const topLeft = ({ x, y }, size) => ({ x: x - size.w / 2, y: y - size.h / 2 });
+// Deterministic per-group jitter for the drift, so it looks organic without
+// being random at runtime.
+const noise = (i, salt) => {
+  const x = Math.sin(i * 12.9898 + salt * 78.233) * 43758.5453;
+  return x - Math.floor(x);
+};
+
+function blockShape(count) {
+  const cols = count > MAX_ROWS ? 2 : 1;
+  const rows = Math.ceil(count / cols);
+  return { cols, rows, w: RAIL_GAP + cols * COL_W, h: HEAD_H + rows * ROW_H };
+}
 
 export function buildSkillGraph() {
   const groups = SKILL_GROUPS;
-
-  // Each group's slice is proportional to how many nodes its busiest ring
-  // holds, and members sit on half-step centres inside it. That makes the
-  // angular step uniform across the whole ring — including across group
-  // boundaries, which is exactly where a fixed gutter lets neighbours collide.
   const membersOf = (id) => SKILLS.filter((s) => s.group === id);
-  const weights = groups.map((g) => Math.max(1, Math.ceil(membersOf(g.id).length / RINGS)));
-  const totalWeight = weights.reduce((a, b) => a + b, 0);
+  const slice = TAU / groups.length;
 
   const nodes = [
     {
       id: 'core',
       type: 'skillCore',
       zIndex: 4,
-      position: topLeft({ x: 0, y: 0 }, NODE_SIZE.core),
+      position: { x: -NODE_SIZE.core.w / 2, y: -NODE_SIZE.core.h / 2 },
       data: { label: '~/stack' },
       draggable: false,
       selectable: false,
@@ -71,62 +61,69 @@ export function buildSkillGraph() {
   ];
   const edges = [];
 
-  let acc = 0;
   groups.forEach((group, gi) => {
-    // start at the top and go clockwise
-    const sliceStart = -TAU / 4 + (acc / totalWeight) * TAU;
-    const slice = (weights[gi] / totalWeight) * TAU;
-    acc += weights[gi];
-    const centre = sliceStart + slice / 2;
-    const hubId = `g:${group.id}`;
+    const members = membersOf(group.id);
+    if (members.length === 0) return;
 
+    const { cols, rows, w, h } = blockShape(members.length);
+    // start at the top and go clockwise
+    const anchor = onEllipse(gi * slice - TAU / 4, BLOCK_R);
+    const left = anchor.x - w / 2;
+    const top = anchor.y - h / 2;
+
+    // Whole blocks drift as a unit, so the columns never fall out of alignment.
+    const float = {
+      dx: +(2 + noise(gi, 1) * 3).toFixed(1),
+      dy: +(2 + noise(gi, 2) * 3).toFixed(1),
+      dur: +(9 + noise(gi, 3) * 7).toFixed(1),
+      delay: +(-noise(gi, 4) * 12).toFixed(1),
+    };
+
+    const headId = `g:${group.id}`;
     nodes.push({
-      id: hubId,
-      type: 'skillHub',
+      id: headId,
+      type: 'skillHead',
       zIndex: 3,
-      position: topLeft(onEllipse(centre, HUB_R), NODE_SIZE.hub),
-      data: { label: group.label, color: group.color, groupId: group.id },
+      position: { x: left, y: top },
+      data: { label: group.label, color: group.color, groupId: group.id, w, float },
       draggable: false,
       selectable: false,
     });
 
+    // One rail per column, so every skill has a tie on its left — a single
+    // rail would orphan the second column of a wrapped group.
+    for (let c = 0; c < cols; c += 1) {
+      const inColumn = Math.min(rows, members.length - c * rows);
+      nodes.push({
+        id: `rail:${group.id}:${c}`,
+        type: 'skillRail',
+        zIndex: 1,
+        position: { x: left + 3 + c * COL_W, y: top + HEAD_H - 4 },
+        data: { color: group.color, groupId: group.id, h: inColumn * ROW_H - 4, float },
+        draggable: false,
+        selectable: false,
+        focusable: false,
+      });
+    }
+
     edges.push({
-      id: `e:core-${hubId}`,
+      id: `e:core-${headId}`,
       source: 'core',
-      target: hubId,
-      type: 'straight',
+      target: headId,
       data: { kind: 'spine', color: group.color },
     });
 
-    const members = membersOf(group.id);
-    // Corners of everything in this group, so a tinted cloud can be drawn
-    // behind it. With no lines from head to skill, the cloud is what says
-    // "these belong together".
-    const bounds = {
-      x0: Infinity, y0: Infinity, x1: -Infinity, y1: -Infinity,
-    };
-    const cover = (centre, size) => {
-      bounds.x0 = Math.min(bounds.x0, centre.x - size.w / 2);
-      bounds.x1 = Math.max(bounds.x1, centre.x + size.w / 2);
-      bounds.y0 = Math.min(bounds.y0, centre.y - size.h / 2);
-      bounds.y1 = Math.max(bounds.y1, centre.y + size.h / 2);
-    };
-    cover(onEllipse(centre, HUB_R), NODE_SIZE.hub);
-
     members.forEach((skill, k) => {
-      const ring = k % RINGS;
-      const idxInRing = Math.floor(k / RINGS);
-      const countInRing = Math.ceil((members.length - ring) / RINGS);
-      // half-step inset keeps the first/last member clear of the boundary
-      const angle = sliceStart + ((idxInRing + 0.5) / countInRing) * slice;
-      const at = onEllipse(angle, SKILL_R[ring]);
-      cover(at, NODE_SIZE.skill);
-
+      const col = Math.floor(k / rows);
+      const row = k % rows;
       nodes.push({
         id: skill.id,
         type: 'skillNode',
         zIndex: 2,
-        position: topLeft(at, NODE_SIZE.skill),
+        position: {
+          x: left + RAIL_GAP + col * COL_W,
+          y: top + HEAD_H + row * ROW_H,
+        },
         data: {
           label: skill.label,
           // Its own brand colour if it has one, otherwise the group's.
@@ -134,44 +131,18 @@ export function buildSkillGraph() {
           groupColor: group.color,
           groupLabel: group.label,
           groupId: group.id,
-          // Drift is applied to the inner box, not the React Flow position, so
-          // it costs nothing and never invalidates the graph's layout.
-          float: {
-            dx: +(2 + noise(nodes.length, 1) * 3).toFixed(1),
-            dy: +(2 + noise(nodes.length, 2) * 3).toFixed(1),
-            dur: +(8 + noise(nodes.length, 3) * 7).toFixed(1),
-            delay: +(-noise(nodes.length, 4) * 12).toFixed(1),
-          },
+          float,
         },
         draggable: false,
       });
 
+      // Kept for hover highlighting only — never rendered. See SkillGraph.jsx.
       edges.push({
-        id: `e:${hubId}-${skill.id}`,
-        source: hubId,
+        id: `e:${headId}-${skill.id}`,
+        source: headId,
         target: skill.id,
-        type: 'straight',
         data: { kind: 'branch', color: group.color },
       });
-    });
-
-    // The cloud, padded out from the group's extent and pushed behind
-    // everything else.
-    const pad = 46;
-    nodes.push({
-      id: `cloud:${group.id}`,
-      type: 'skillCloud',
-      zIndex: 0,
-      position: { x: bounds.x0 - pad, y: bounds.y0 - pad },
-      data: {
-        color: group.color,
-        groupId: group.id,
-        w: bounds.x1 - bounds.x0 + pad * 2,
-        h: bounds.y1 - bounds.y0 + pad * 2,
-      },
-      draggable: false,
-      selectable: false,
-      focusable: false,
     });
   });
 
@@ -179,13 +150,7 @@ export function buildSkillGraph() {
   SKILL_LINKS.forEach(([a, b]) => {
     // A typo in the data shouldn't render a dangling edge.
     if (!known.has(a) || !known.has(b)) return;
-    edges.push({
-      id: `e:x:${a}-${b}`,
-      source: a,
-      target: b,
-      type: 'straight',
-      data: { kind: 'cross' },
-    });
+    edges.push({ id: `e:x:${a}-${b}`, source: a, target: b, data: { kind: 'cross' } });
   });
 
   return { nodes, edges };
