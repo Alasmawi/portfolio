@@ -88,8 +88,46 @@
   }
 }
 
+/* Scroll-driven dim. --scroll-dim runs 0→1 across the first viewport (see
+   useScrollDim), so the sky fades toward the page's own darkness as you leave
+   it rather than simply sliding away. */
+.hero-sky__dim {
+  position: absolute;
+  inset: 0;
+  background: #04070d;
+  opacity: calc(var(--scroll-dim, 0) * 0.82);
+  will-change: opacity;
+}
+
 .hero-title {
   text-shadow: 0 2px 24px rgb(3 8 17 / 0.55);
+}
+
+/* Nav follows the same variable: clear over the clouds, solid once you've
+   descended. Scoped to the cloud hero so the original hero is untouched. */
+[data-hero='v2'] header {
+  background-color: rgb(11 15 20 / calc(0.8 * var(--scroll-dim, 0)));
+  background-image: linear-gradient(
+    to bottom,
+    rgb(4 9 18 / calc(0.55 * (1 - var(--scroll-dim, 0)))),
+    rgb(4 9 18 / 0)
+  );
+  border-bottom-color: rgb(28 37 48 / calc(0.85 * var(--scroll-dim, 0)));
+  -webkit-backdrop-filter: blur(calc(var(--scroll-dim, 0) * 8px));
+  backdrop-filter: blur(calc(var(--scroll-dim, 0) * 8px));
+}
+
+/* With the bar clear, the links sit straight on bright cumulus. A shadow that
+   fades out as the bar solidifies keeps them readable without forcing a dark
+   band back across the top. */
+[data-hero='v2'] header a {
+  text-shadow: 0 1px 10px rgb(3 8 17 / calc(0.9 * (1 - var(--scroll-dim, 0))));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-sky__dim {
+    opacity: calc(var(--scroll-dim, 0) * 0.82);
+  }
 }
 
 /* The ridge flipped to the bottom edge: sky above it, circuitry below. The

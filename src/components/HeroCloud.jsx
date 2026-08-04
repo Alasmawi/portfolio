@@ -1,10 +1,11 @@
 import { motion } from 'framer-motion';
 import { ArrowDown } from 'lucide-react';
 import { GithubMark, LinkedinMark } from './ui/BrandIcons';
-import HeadshotSlot from './ui/HeadshotSlot';
+import HeadshotCloud from './ui/HeadshotCloud';
 import SharpHorizon from './ui/SharpHorizon';
 import StatusBadge from './ui/StatusBadge';
 import useTypingEffect from '../hooks/useTypingEffect';
+import useScrollDim from '../hooks/useScrollDim';
 import hero2000 from '../assets/hero/hero-2000.webp';
 import hero1200 from '../assets/hero/hero-1200.webp';
 import hero700 from '../assets/hero/hero-700.webp';
@@ -19,6 +20,7 @@ const ROLES = ['Cloud Architect', 'IoT Systems', 'Backend Engineer'];
 // it reads as the line where the sky ends and the machine begins.
 export default function HeroCloud() {
   const typed = useTypingEffect(ROLES);
+  useScrollDim();
 
   // No bottom border here, unlike the original hero: the descent should read as
   // continuous, and a 1px rule across it is exactly the seam we're hiding.
@@ -41,6 +43,8 @@ export default function HeroCloud() {
         />
         <div className="hero-sky__scrim" />
         <div className="hero-sky__side" />
+        {/* Driven by --scroll-dim: the sky darkens as you descend out of it. */}
+        <div className="hero-sky__dim" />
       </div>
 
       {/* Sky above, circuit below. Two elements on purpose: the inner one is
@@ -61,7 +65,7 @@ export default function HeroCloud() {
             transition={{ duration: 0.6, delay: 0.1 }}
             className="mb-6 w-[150px] sm:w-[180px] md:hidden"
           >
-            <HeadshotSlot />
+            <HeadshotCloud />
           </motion.div>
 
           <motion.p
@@ -141,7 +145,7 @@ export default function HeroCloud() {
           transition={{ duration: 0.6, delay: 0.8 }}
           className="hidden md:col-span-4 md:flex md:flex-col md:justify-end md:gap-4"
         >
-          <HeadshotSlot />
+          <HeadshotCloud />
 
           {[
             { k: 'location', v: 'Manama, Bahrain' },

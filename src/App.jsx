@@ -47,6 +47,13 @@ export default function App() {
     typeof window !== 'undefined' &&
     new URLSearchParams(window.location.search).get('hero') === 'v2';
 
+  // Lets CSS scope the nav's clear-over-clouds treatment to this hero only.
+  useEffect(() => {
+    if (!cloudHero) return undefined;
+    document.documentElement.dataset.hero = 'v2';
+    return () => { delete document.documentElement.dataset.hero; };
+  }, [cloudHero]);
+
   return (
     <>
       <CloudCodeRain />
