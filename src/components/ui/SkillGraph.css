@@ -94,47 +94,56 @@
 
 /* ---------- core ---------- */
 
-/* Two nested diamonds around a terminal path — the same angular language as
-   the group heads and the hero ridge, rather than a lone circle. */
+/* A processor die: pinned square, dark body, pulsing centre. */
 .sg-core {
-  position: relative;
-  display: grid;
-  place-items: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
   font-family: 'JetBrains Mono', ui-monospace, monospace;
 }
 
-.sg-core__ring {
-  position: absolute;
-  width: 76px;
-  height: 76px;
-  border: 1px solid rgb(242 169 59 / 0.55);
-  background: rgb(11 15 20 / 0.72);
-  transform: rotate(45deg);
-  box-shadow: 0 0 26px rgb(242 169 59 / 0.14);
+.sg-core__chip {
+  width: 74px;
+  height: 74px;
+  overflow: visible;
+  filter: drop-shadow(0 0 16px rgb(242 169 59 / 0.28));
 }
 
-.sg-core__ring--in {
-  width: 52px;
-  height: 52px;
-  border-color: rgb(242 169 59 / 0.22);
-  background: none;
-  box-shadow: none;
+.sg-core__pins line {
+  stroke: #f2a93b;
+  stroke-width: 2;
+  stroke-opacity: 0.75;
+  stroke-linecap: square;
+}
+
+.sg-core__die {
+  fill: #0b0f14;
+  stroke: #f2a93b;
+  stroke-width: 1.5;
+  stroke-opacity: 0.85;
+}
+
+@keyframes sg-core-pulse {
+  0%,
+  100% {
+    fill-opacity: 0.85;
+  }
+  50% {
+    fill-opacity: 0.35;
+  }
+}
+
+.sg-core__heart {
+  fill: #f2a93b;
+  animation: sg-core-pulse 2.6s ease-in-out infinite;
 }
 
 .sg-core__text {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 2px;
-  font-size: 11px;
+  font-size: 10px;
+  letter-spacing: 0.08em;
   color: #f2a93b;
-}
-
-.sg-core__caret {
-  width: 6px;
-  height: 12px;
-  background: #f2a93b;
-  animation: blink 1.6s step-start infinite;
 }
 
 /* ---------- group head ---------- */
@@ -280,7 +289,7 @@
   .sg-head,
   .sg-rail,
   .sg-flow,
-  .sg-core__caret {
+  .sg-core__heart {
     transition: none;
     animation: none;
   }

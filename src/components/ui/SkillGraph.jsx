@@ -67,6 +67,11 @@ function Handles() {
   );
 }
 
+// A processor die with pins on all four sides — the thing every one of these
+// groups actually feeds. Reads as a core at a glance and keeps the angular
+// language of the group heads.
+const PIN_AT = [24, 36, 48];
+
 function SkillCore({ id, data }) {
   const { hovered, adjacency } = useContext(HoverContext);
   return (
@@ -76,12 +81,21 @@ function SkillCore({ id, data }) {
       style={{ width: NODE_SIZE.core.w, height: NODE_SIZE.core.h }}
     >
       <Handles />
-      <span className="sg-core__ring" />
-      <span className="sg-core__ring sg-core__ring--in" />
-      <span className="sg-core__text">
-        {data.label}
-        <span className="sg-core__caret" />
-      </span>
+      <svg className="sg-core__chip" viewBox="0 0 72 72" aria-hidden="true">
+        <g className="sg-core__pins">
+          {PIN_AT.map((p) => (
+            <g key={p}>
+              <line x1={p} y1="5" x2={p} y2="15" />
+              <line x1={p} y1="57" x2={p} y2="67" />
+              <line x1="5" y1={p} x2="15" y2={p} />
+              <line x1="57" y1={p} x2="67" y2={p} />
+            </g>
+          ))}
+        </g>
+        <rect className="sg-core__die" x="15" y="15" width="42" height="42" />
+        <rect className="sg-core__heart" x="28" y="28" width="16" height="16" />
+      </svg>
+      <span className="sg-core__text">{data.label}</span>
     </div>
   );
 }

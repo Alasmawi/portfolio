@@ -12,18 +12,20 @@ const TAU = Math.PI * 2;
 
 const ROW_H = 24;
 const HEAD_H = 26;
-const COL_W = 158;
+// Sized to the longest label in the data ("Raspberry Pi"). Shortening labels
+// narrows every column, which is the cheapest way to buy back zoom.
+const COL_W = 130;
 const RAIL_GAP = 13;
-// A group wider than this many skills wraps into a second column rather than
-// growing a tall block that collides with its neighbours on the ellipse.
+// A group longer than this wraps into a second column rather than growing a
+// tall block that collides with its neighbours on the ellipse.
 const MAX_ROWS = 5;
 
 export const NODE_SIZE = {
-  core: { w: 112, h: 112 },
+  core: { w: 116, h: 108 },
   skill: { w: COL_W - 8, h: ROW_H - 2 },
 };
 
-const BLOCK_R = { rx: 466, ry: 196 };
+const BLOCK_R = { rx: 430, ry: 185 };
 
 const onEllipse = (angle, { rx, ry }) => ({
   x: Math.cos(angle) * rx,
