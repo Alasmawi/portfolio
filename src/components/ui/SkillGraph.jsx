@@ -68,7 +68,7 @@ function Handles() {
   );
 }
 
-function SkillCore({ id, data }) {
+function SkillCore({ id }) {
   const { hovered, adjacency } = useContext(HoverContext);
   return (
     <div
@@ -169,11 +169,15 @@ function SkillEdge({ source, target, sourceX, sourceY, targetX, targetY, data })
   if (kind === 'branch') return null;
   if (kind === 'cross' && !touching) return null;
 
+  const [sx, sy, tx, ty] = kind === 'spine'
+    ? trim(sourceX, sourceY, targetX, targetY, CORE_INSET, HEAD_INSET)
+    : [sourceX, sourceY, targetX, targetY];
+
   const dimmed = hovered && !touching;
   return (
     <path
       className={`react-flow__edge-path ${kind === 'spine' ? 'sg-flow' : 'sg-cross'}`}
-      d={arc(sourceX, sourceY, targetX, targetY, kind === 'cross' ? 0.16 : 0.08)}
+      d={arc(sx, sy, tx, ty, kind === 'cross' ? 0.16 : 0.08)}
       fill="none"
       stroke={touching ? color : (data?.color ?? '#2b3949')}
       strokeWidth={touching ? 1.5 : 1.1}

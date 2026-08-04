@@ -21,7 +21,7 @@ const RAIL_GAP = 13;
 const MAX_ROWS = 5;
 
 export const NODE_SIZE = {
-  core: { w: 116, h: 108 },
+  core: { w: 150, h: 150 },
   skill: { w: COL_W - 8, h: ROW_H - 2 },
 };
 
@@ -56,7 +56,7 @@ export function buildSkillGraph() {
       type: 'skillCore',
       zIndex: 4,
       position: { x: -NODE_SIZE.core.w / 2, y: -NODE_SIZE.core.h / 2 },
-      data: { label: '~/stack' },
+      data: {},
       draggable: false,
       selectable: false,
     },

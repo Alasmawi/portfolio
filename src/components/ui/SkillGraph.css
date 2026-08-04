@@ -48,17 +48,18 @@
 /* ---------- edges ---------- */
 
 /* Dashes travel from each group head inward to the core, so the spine reads as
-   feeding the centre rather than merely joining it. */
+   feeding the centre rather than merely joining it. Paced slowly to sit with
+   the chip's own pulse — a fast march reads as twitchy next to it. */
 @keyframes sg-flow {
   to {
-    stroke-dashoffset: 14;
+    stroke-dashoffset: 16;
   }
 }
 
 .sg-flow {
-  stroke-dasharray: 2 12;
+  stroke-dasharray: 2 14;
   stroke-linecap: round;
-  animation: sg-flow 1.15s linear infinite;
+  animation: sg-flow 1.9s linear infinite;
 }
 
 .sg-cross {
@@ -94,56 +95,18 @@
 
 /* ---------- core ---------- */
 
-/* A processor die: pinned square, dark body, pulsing centre. */
+/* The animated chip. Its own traces already pulse, so the node adds only a
+   faint amber bloom to seat it against the dark canvas. */
 .sg-core {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  display: grid;
+  place-items: center;
 }
 
 .sg-core__chip {
-  width: 74px;
-  height: 74px;
-  overflow: visible;
-  filter: drop-shadow(0 0 16px rgb(242 169 59 / 0.28));
-}
-
-.sg-core__pins line {
-  stroke: #f2a93b;
-  stroke-width: 2;
-  stroke-opacity: 0.75;
-  stroke-linecap: square;
-}
-
-.sg-core__die {
-  fill: #0b0f14;
-  stroke: #f2a93b;
-  stroke-width: 1.5;
-  stroke-opacity: 0.85;
-}
-
-@keyframes sg-core-pulse {
-  0%,
-  100% {
-    fill-opacity: 0.85;
-  }
-  50% {
-    fill-opacity: 0.35;
-  }
-}
-
-.sg-core__heart {
-  fill: #f2a93b;
-  animation: sg-core-pulse 2.6s ease-in-out infinite;
-}
-
-.sg-core__text {
-  font-size: 10px;
-  letter-spacing: 0.08em;
-  color: #f2a93b;
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 0 18px rgb(242 169 59 / 0.22));
+  user-select: none;
 }
 
 /* ---------- group head ---------- */
@@ -289,7 +252,7 @@
   .sg-head,
   .sg-rail,
   .sg-flow,
-  .sg-core__heart {
+  .sg-core__chip {
     transition: none;
     animation: none;
   }
