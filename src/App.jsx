@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import Nav from './components/Nav';
 import Hero from './components/Hero';
+import HeroCloud from './components/HeroCloud';
 import About from './components/About';
 import Experience from './components/Experience';
 import ProjectBrowser from './components/ProjectBrowser';
@@ -40,12 +41,18 @@ function useTallSectionSnapPoints() {
 export default function App() {
   useTallSectionSnapPoints();
 
+  // Hero variants live side by side while the new one is being judged:
+  // ?hero=v2 shows the cloud-photo hero, anything else keeps the current one.
+  const cloudHero =
+    typeof window !== 'undefined' &&
+    new URLSearchParams(window.location.search).get('hero') === 'v2';
+
   return (
     <>
       <CloudCodeRain />
       <Nav />
       <main className="relative z-10">
-        <Hero />
+        {cloudHero ? <HeroCloud /> : <Hero />}
         <About />
         <Experience />
         <ProjectBrowser />
