@@ -62,8 +62,9 @@ export function buildSkillGraph() {
     {
       id: 'core',
       type: 'skillCore',
+      zIndex: 4,
       position: topLeft({ x: 0, y: 0 }, NODE_SIZE.core),
-      data: { label: 'Abdulla' },
+      data: { label: '~/stack' },
       draggable: false,
       selectable: false,
     },
@@ -82,6 +83,7 @@ export function buildSkillGraph() {
     nodes.push({
       id: hubId,
       type: 'skillHub',
+      zIndex: 3,
       position: topLeft(onEllipse(centre, HUB_R), NODE_SIZE.hub),
       data: { label: group.label, color: group.color, groupId: group.id },
       draggable: false,
@@ -97,6 +99,19 @@ export function buildSkillGraph() {
     });
 
     const members = membersOf(group.id);
+    // Corners of everything in this group, so a tinted cloud can be drawn
+    // behind it. With no lines from head to skill, the cloud is what says
+    // "these belong together".
+    const bounds = {
+      x0: Infinity, y0: Infinity, x1: -Infinity, y1: -Infinity,
+    };
+    const cover = (centre, size) => {
+      bounds.x0 = Math.min(bounds.x0, centre.x - size.w / 2);
+      bounds.x1 = Math.max(bounds.x1, centre.x + size.w / 2);
+      bounds.y0 = Math.min(bounds.y0, centre.y - size.h / 2);
+      bounds.y1 = Math.max(bounds.y1, centre.y + size.h / 2);
+    };
+    cover(onEllipse(centre, HUB_R), NODE_SIZE.hub);
 
     members.forEach((skill, k) => {
       const ring = k % RINGS;
@@ -104,17 +119,21 @@ export function buildSkillGraph() {
       const countInRing = Math.ceil((members.length - ring) / RINGS);
       // half-step inset keeps the first/last member clear of the boundary
       const angle = sliceStart + ((idxInRing + 0.5) / countInRing) * slice;
+      const at = onEllipse(angle, SKILL_R[ring]);
+      cover(at, NODE_SIZE.skill);
 
       nodes.push({
         id: skill.id,
         type: 'skillNode',
-        position: topLeft(onEllipse(angle, SKILL_R[ring]), NODE_SIZE.skill),
+        zIndex: 2,
+        position: topLeft(at, NODE_SIZE.skill),
         data: {
           label: skill.label,
           // Its own brand colour if it has one, otherwise the group's.
           color: skill.color ?? group.color,
           groupColor: group.color,
           groupLabel: group.label,
+          groupId: group.id,
           // Drift is applied to the inner box, not the React Flow position, so
           // it costs nothing and never invalidates the graph's layout.
           float: {
@@ -134,6 +153,25 @@ export function buildSkillGraph() {
         type: 'straight',
         data: { kind: 'branch', color: group.color },
       });
+    });
+
+    // The cloud, padded out from the group's extent and pushed behind
+    // everything else.
+    const pad = 46;
+    nodes.push({
+      id: `cloud:${group.id}`,
+      type: 'skillCloud',
+      zIndex: 0,
+      position: { x: bounds.x0 - pad, y: bounds.y0 - pad },
+      data: {
+        color: group.color,
+        groupId: group.id,
+        w: bounds.x1 - bounds.x0 + pad * 2,
+        h: bounds.y1 - bounds.y0 + pad * 2,
+      },
+      draggable: false,
+      selectable: false,
+      focusable: false,
     });
   });
 

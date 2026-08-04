@@ -47,29 +47,73 @@
 
 /* ---------- core ---------- */
 
-.sg-core {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 2px;
-  border: 1px solid rgb(242 169 59 / 0.5);
+/* The group's tinted field. Sits under everything and is never hit-tested. */
+.sg-cloud {
+  pointer-events: none;
   border-radius: 50%;
-  background: radial-gradient(circle at 50% 40%, #16202c, #0b0f14);
-  box-shadow: 0 0 0 6px rgb(242 169 59 / 0.05), 0 0 30px rgb(242 169 59 / 0.12);
+  /* Kept faint on purpose: seven of these overlap at the edges, and any more
+     saturation turns the middle of the canvas to mud. */
+  background: radial-gradient(
+    ellipse at center,
+    color-mix(in srgb, var(--c) 15%, transparent) 0%,
+    color-mix(in srgb, var(--c) 6%, transparent) 45%,
+    transparent 72%
+  );
+  filter: blur(10px);
+  transition: opacity 0.2s ease;
+}
+
+.sg-cloud[data-state='on'] {
+  opacity: 1.6;
+}
+
+.sg-cloud[data-state='off'] {
+  opacity: 0.25;
+}
+
+/* ---------- core ---------- */
+
+/* Two nested diamonds around a terminal path — the same angular language as
+   the group heads and the hero ridge, rather than a lone circle. */
+.sg-core {
+  position: relative;
+  display: grid;
+  place-items: center;
   font-family: 'JetBrains Mono', ui-monospace, monospace;
 }
 
-.sg-core__label {
-  font-size: 12px;
-  color: #e6edf3;
+.sg-core__ring {
+  position: absolute;
+  width: 76px;
+  height: 76px;
+  border: 1px solid rgb(242 169 59 / 0.55);
+  background: rgb(11 15 20 / 0.72);
+  transform: rotate(45deg);
+  box-shadow: 0 0 26px rgb(242 169 59 / 0.14);
 }
 
-.sg-core__sub {
-  font-size: 9px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: #5b6773;
+.sg-core__ring--in {
+  width: 52px;
+  height: 52px;
+  border-color: rgb(242 169 59 / 0.22);
+  background: none;
+  box-shadow: none;
+}
+
+.sg-core__text {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 11px;
+  color: #f2a93b;
+}
+
+.sg-core__caret {
+  width: 6px;
+  height: 12px;
+  background: #f2a93b;
+  animation: blink 1.6s step-start infinite;
 }
 
 /* ---------- group hub ---------- */

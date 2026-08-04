@@ -9,7 +9,12 @@ import { buildAdjacency, buildSkillGraph, NODE_SIZE } from './skillGraphLayout';
 // them, so it re-measures the whole graph on every hover — which is what made
 // the canvas flicker. Keeping both arrays referentially frozen avoids that
 // entirely; only the components that care re-render.
-const HoverContext = createContext({ hovered: null, adjacency: new Map(), color: null });
+const HoverContext = createContext({
+  hovered: null,
+  adjacency: new Map(),
+  color: null,
+  hoveredGroup: null,
+});
 
 const stateFor = (id, hovered, adjacency) => {
   if (!hovered) return undefined;
@@ -41,6 +46,19 @@ function Handles() {
   );
 }
 
+// The tinted field behind a group. Purely decorative and never hit-tested, so
+// it can sit under the labels without stealing their hover.
+function SkillCloud({ data }) {
+  const { hoveredGroup } = useContext(HoverContext);
+  return (
+    <div
+      className="sg-cloud"
+      data-state={hoveredGroup ? (hoveredGroup === data.groupId ? 'on' : 'off') : undefined}
+      style={{ width: data.w, height: data.h, '--c': data.color }}
+    />
+  );
+}
+
 function SkillCore({ id, data }) {
   const { hovered, adjacency } = useContext(HoverContext);
   return (
@@ -50,8 +68,12 @@ function SkillCore({ id, data }) {
       style={{ width: NODE_SIZE.core.w, height: NODE_SIZE.core.h }}
     >
       <Handles />
-      <span className="sg-core__label">{data.label}</span>
-      <span className="sg-core__sub">stack</span>
+      <span className="sg-core__ring" />
+      <span className="sg-core__ring sg-core__ring--in" />
+      <span className="sg-core__text">
+        {data.label}
+        <span className="sg-core__caret" />
+      </span>
     </div>
   );
 }
@@ -141,25 +163,50 @@ function SkillEdge({ source, target, sourceX, sourceY, targetX, targetY, data })
   );
 }
 
-const NODE_TYPES = { skillCore: SkillCore, skillHub: SkillHub, skillNode: SkillNode };
+const NODE_TYPES = {
+  skillCore: SkillCore,
+  skillHub: SkillHub,
+  skillNode: SkillNode,
+  skillCloud: SkillCloud,
+};
 const EDGE_TYPES = { skill: SkillEdge };
 
 export default function SkillGraph() {
   // Built once. Never replaced — see the note on HoverContext.
-  const { nodes, edges } = useMemo(() => {
+  const { nodes, edges, allEdges } = useMemo(() => {
     const g = buildSkillGraph();
-    return { nodes: g.nodes, edges: g.edges.map((e) => ({ ...e, type: 'skill' })) };
+    const typed = g.edges.map((e) => ({ ...e, type: 'skill' }));
+    return {
+      nodes: g.nodes,
+      // Only the group heads are wired to the centre. A skill sits under its
+      // head by colour and position, with no line of its own — thirty spokes
+      // radiating out of seven hubs was the last of the visual noise.
+      edges: typed.filter((e) => e.data?.kind !== 'branch'),
+      // Adjacency still knows about head↔skill, so hovering either one still
+      // lights the other. It just isn't drawn.
+      allEdges: typed,
+    };
   }, []);
-  const adjacency = useMemo(() => buildAdjacency(edges), [edges]);
+  const adjacency = useMemo(() => buildAdjacency(allEdges), [allEdges]);
+
+  // Fit to the labels only. The clouds are padded well past the outermost
+  // node, and letting them into the calculation just zooms everything out;
+  // their edges are transparent anyway, so clipping them costs nothing.
+  const fitOptions = useMemo(() => ({
+    padding: 0.06,
+    nodes: nodes.filter((n) => n.type !== 'skillCloud').map((n) => ({ id: n.id })),
+  }), [nodes]);
   const [hovered, setHovered] = useState(null);
 
-  const ctx = useMemo(() => ({
-    hovered,
-    adjacency,
-    color: hovered
-      ? (nodes.find((n) => n.id === hovered)?.data?.color ?? '#e6edf3')
-      : null,
-  }), [hovered, adjacency, nodes]);
+  const ctx = useMemo(() => {
+    const node = hovered ? nodes.find((n) => n.id === hovered) : null;
+    return {
+      hovered,
+      adjacency,
+      color: node?.data?.color ?? (hovered ? '#e6edf3' : null),
+      hoveredGroup: node?.data?.groupId ?? null,
+    };
+  }, [hovered, adjacency, nodes]);
 
   const onNodeMouseEnter = useCallback((_, node) => setHovered(node.id), []);
   const onNodeMouseLeave = useCallback(() => setHovered(null), []);
@@ -175,7 +222,7 @@ export default function SkillGraph() {
           onNodeMouseEnter={onNodeMouseEnter}
           onNodeMouseLeave={onNodeMouseLeave}
           fitView
-          fitViewOptions={{ padding: 0.06 }}
+          fitViewOptions={fitOptions}
           minZoom={0.15}
           maxZoom={2}
           /* The page uses mandatory scroll-snap — the canvas must never swallow
