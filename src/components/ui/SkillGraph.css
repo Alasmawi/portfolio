@@ -95,18 +95,33 @@
 
 /* ---------- core ---------- */
 
-/* The animated chip. Its own traces already pulse, so the node adds only a
-   faint amber bloom to seat it against the dark canvas. */
+/* The animated chip. The amber bloom is a gradient on the wrapper, not a
+   filter on the image — see the note below on why the image must stay
+   unfiltered. */
 .sg-core {
   display: grid;
   place-items: center;
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgb(242 169 59 / 0.11) 0%,
+    rgb(242 169 59 / 0.04) 38%,
+    transparent 64%
+  );
 }
 
 .sg-core__chip {
   width: 100%;
   height: 100%;
-  filter: drop-shadow(0 0 18px rgb(242 169 59 / 0.22));
   user-select: none;
+  /* Do not put a `filter` on this image. The GIF is delta-encoded — each frame
+     repaints only a sub-rectangle — and a filter combined with React Flow's
+     transformed viewport makes Chromium compute those invalidation rects
+     against the wrong layer. Stale patches survive as smears trailing the
+     animation. Promoting the image to its own compositing layer keeps the
+     invalidation local; put any glow on .sg-core instead. */
+  will-change: transform;
+  transform: translateZ(0);
+  backface-visibility: hidden;
 }
 
 /* ---------- group head ---------- */
