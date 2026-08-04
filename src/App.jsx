@@ -41,11 +41,11 @@ function useTallSectionSnapPoints() {
 export default function App() {
   useTallSectionSnapPoints();
 
-  // Hero variants live side by side while the new one is being judged:
-  // ?hero=v2 shows the cloud-photo hero, anything else keeps the current one.
+  // Cloud-photo hero is the default. The original is still one URL away with
+  // ?hero=v1 while both are kept around for comparison.
   const cloudHero =
-    typeof window !== 'undefined' &&
-    new URLSearchParams(window.location.search).get('hero') === 'v2';
+    typeof window === 'undefined' ||
+    new URLSearchParams(window.location.search).get('hero') !== 'v1';
 
   // Lets CSS scope the nav's clear-over-clouds treatment to this hero only.
   useEffect(() => {
