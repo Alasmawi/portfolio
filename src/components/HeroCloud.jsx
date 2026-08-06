@@ -18,7 +18,11 @@ const ROLES = ['Cloud Architect', 'IoT Systems', 'Backend Engineer'];
 // own gradient takes over and the seam into #about disappears. The angular
 // ridge that used to sit at the top of the hero is flipped to the bottom, where
 // it reads as the line where the sky ends and the machine begins.
-export default function HeroCloud() {
+// `start` gates the sky's entrance on the loading curtain lifting. Without it
+// the 2.2s settle would run while the overlay still covers the page, and the
+// photo would simply be *there* when the curtain went up. Defaults to true so
+// the component still animates on its own if rendered without a loader.
+export default function HeroCloud({ start = true }) {
   const typed = useTypingEffect(ROLES);
   useScrollDim();
 
@@ -37,7 +41,7 @@ export default function HeroCloud() {
           alt=""
           className="hero-sky__img"
           initial={{ scale: 1.07, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
+          animate={start ? { scale: 1, opacity: 1 } : { scale: 1.07, opacity: 0 }}
           transition={{ duration: 2.2, ease: [0.16, 1, 0.3, 1] }}
           fetchPriority="high"
         />
