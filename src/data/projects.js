@@ -11,6 +11,7 @@ export const LANGUAGE_COLORS = {
   Go: '#4FA3C4',
   Rust: '#DE7B4A',
   JavaScript: '#E8C547',
+  Python: '#7BA05B',
   Shell: '#89A85B',
 };
 
@@ -66,6 +67,30 @@ export const PROJECTS = [
         alt: 'Reolink IP camera, the primary detection source',
       },
     ],
+  },
+  {
+    id: 'guidely',
+    name: 'guidely',
+    tagline: 'answers with their sources attached',
+    language: 'Python',
+    description:
+      'An internal knowledge assistant that answers plain-language questions using only your own documents — and shows its work, citing every passage it used with filename, section, similarity score, and snippet. Documents are parsed, heading-aware chunked, embedded into FAISS, and answered by a local Ollama model or OpenAI.',
+    tags: ['Python', 'FastAPI', 'RAG', 'FAISS', 'Ollama', 'React'],
+    githubUrl: 'https://github.com/Alasmawi/guidely',
+    liveUrl: null,
+    gif: '/gifs/guidely.gif',
+  },
+  {
+    id: 'detecto',
+    name: 'detecto',
+    tagline: 'how many people are in this frame?',
+    language: 'Python',
+    description:
+      'Real-time person detection and counting for monitored spaces. YOLOv8 behind a FastAPI service returns a count, bounding boxes, and per-detection confidences for an uploaded frame or a live webcam stream — then keeps every result queryable, with occupancy statistics, charts, zone alerts, and CSV/Excel export.',
+    tags: ['Python', 'FastAPI', 'YOLOv8', 'OpenCV', 'React', 'SQLite'],
+    githubUrl: 'https://github.com/Alasmawi/detecto',
+    liveUrl: null,
+    gif: '/gifs/detecto.gif',
   },
   {
     id: 'brain-book',
