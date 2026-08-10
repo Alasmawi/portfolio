@@ -1,8 +1,18 @@
 .hs-cloud {
   margin: 0;
-  width: 100%;
-  max-width: 230px;
+  /* Phones: track the viewport instead of sitting at a fixed pixel width, so
+     the portrait scales between a small phone and a large one. */
+  width: clamp(170px, 46vw, 230px);
   align-self: flex-end;
+}
+
+/* From md up the portrait lives in its own grid column, so it goes back to
+   filling that column rather than measuring against the viewport. */
+@media (min-width: 768px) {
+  .hs-cloud {
+    width: 100%;
+    max-width: 230px;
+  }
 }
 
 .hs-cloud__frame {
