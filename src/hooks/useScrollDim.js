@@ -4,9 +4,9 @@ import { useEffect } from 'react';
 // <html>. Everything that reacts to it — the hero dimming, the nav going from
 // clear to solid — does so in CSS, so scrolling never re-renders React.
 //
-// The page uses mandatory scroll-snap, so this doesn't tick continuously under
-// a finger; it animates during the snap glide between hero and about, which is
-// exactly where the change wants to happen.
+// Under proximity snap this does tick continuously while a finger drags, so
+// the work per frame matters: one rAF-coalesced write of a single custom
+// property, no layout reads, no React state.
 export default function useScrollDim() {
   useEffect(() => {
     const root = document.documentElement;

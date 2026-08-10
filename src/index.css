@@ -9,22 +9,27 @@
        Deliberately `proximity`, not `mandatory`: five of the seven sections
        are taller than a laptop viewport, and mandatory would keep yanking the
        reader back to the top of a section before they reached its end. */
-    scroll-snap-type: y mandatory;
+    scroll-snap-type: y proximity;
   }
 
   main > section {
     position: relative;
     scroll-snap-align: start;
-    scroll-snap-stop: always;
+    /* No `scroll-snap-stop: always`. It forbids passing more than one snap
+       point per gesture, so reaching contact from the hero costs seven
+       separate flicks no matter how hard you throw the page. Left off, a
+       deliberate fling carries, and proximity still settles on a boundary
+       whenever the scroll happens to end near one. */
     /* Clears the fixed 57px nav so a snapped heading isn't tucked under it. */
     scroll-margin-top: 57px;
   }
 
-  /* A section taller than the viewport has content between its start snap
-     point and the next section's, which mandatory snapping would never come
-     to rest on. Sections in that state get a second snap point pinned to
-     their bottom edge, so they page in two steps instead of stranding a band
-     of content. Flagged from App.jsx, since CSS can't compare the two heights. */
+  /* A section taller than the viewport gets a second snap point pinned to its
+     bottom edge, so it offers two resting places -- its top and its end --
+     rather than only its top. Under proximity this is an offer, not a rail:
+     the reader can still stop anywhere in between, which is the whole point of
+     reading a long section. Flagged from App.jsx, since CSS can't compare the
+     two heights. */
   main > section[data-snap-tall]::after {
     content: '';
     position: absolute;
