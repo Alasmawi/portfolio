@@ -29,14 +29,23 @@ function PreviewMedia({ project }) {
     return <RingGallery items={project.items} />;
   }
 
-  if (project.gif) {
+  if (project.video) {
     return (
       <div className="flex max-h-[440px] min-h-[220px] w-full items-center justify-center border border-base-border bg-base-surface">
-        <img
-          src={project.gif}
-          alt={`${project.name} demo`}
-          loading="lazy"
+        {/* Same visual as a GIF loop, ~90% less data: autoplaying muted video
+            with no controls reads identically but decodes far cheaper on
+            mid-range phones than an animated GIF. playsInline keeps iOS
+            Safari from hijacking it into fullscreen. */}
+        <video
+          key={project.video}
+          src={project.video}
+          aria-label={`${project.name} demo`}
           className="max-h-[440px] w-auto max-w-full object-contain"
+          autoPlay
+          loop
+          muted
+          playsInline
+          preload="metadata"
         />
       </div>
     );
@@ -54,6 +63,11 @@ function PreviewMedia({ project }) {
     </div>
   );
 }
+
+// Swipe-to-change-project on the preview pane, mobile's main way to browse
+// once you're already looking at one — the tab strip above is still there
+// for jumping straight to a specific project by name.
+const SWIPE_THRESHOLD_PX = 50;
 
 export default function ProjectBrowser() {
   const [selectedId, setSelectedId] = useState(PROJECTS[0].id);
@@ -73,6 +87,38 @@ export default function ProjectBrowser() {
       nudgeIdle();
     },
     [nudgeIdle]
+  );
+
+  const swipeRef = useRef(null);
+
+  const step = useCallback(
+    (delta) => {
+      const i = PROJECTS.findIndex((p) => p.id === selectedId);
+      const next = PROJECTS[(i + delta + PROJECTS.length) % PROJECTS.length];
+      select(next.id);
+    },
+    [selectedId, select]
+  );
+
+  const onSwipeDown = useCallback((e) => {
+    swipeRef.current = { x: e.clientX, y: e.clientY };
+  }, []);
+
+  const onSwipeUp = useCallback(
+    (e) => {
+      const start = swipeRef.current;
+      swipeRef.current = null;
+      if (!start) return;
+      const dx = e.clientX - start.x;
+      const dy = e.clientY - start.y;
+      // Require a clearly horizontal gesture so a vertical scroll/fling
+      // through the preview pane is never mistaken for a project change.
+      if (Math.abs(dx) < SWIPE_THRESHOLD_PX || Math.abs(dx) < Math.abs(dy) * 1.5) {
+        return;
+      }
+      step(dx < 0 ? 1 : -1);
+    },
+    [step]
   );
 
   useEffect(() => {
@@ -198,7 +244,15 @@ export default function ProjectBrowser() {
             </div>
 
             {/* preview pane */}
-            <div className="p-5 md:col-span-8 sm:p-6 lg:col-span-9">
+            <div
+              className="p-5 md:col-span-8 sm:p-6 lg:col-span-9"
+              onPointerDown={onSwipeDown}
+              onPointerUp={onSwipeUp}
+              onPointerCancel={() => {
+                swipeRef.current = null;
+              }}
+              style={{ touchAction: 'pan-y' }}
+            >
               <AnimatePresence mode="wait">
                 <motion.div
                   key={project.id}

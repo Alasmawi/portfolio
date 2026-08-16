@@ -9,6 +9,7 @@ import Skills from './components/Skills';
 import Education from './components/Education';
 import Contact from './components/Contact';
 import CloudCodeRain from './components/ui/CloudCodeRain';
+import MobileTabBar from './components/ui/MobileTabBar';
 import Preloader from './components/ui/Preloader';
 import useAssetsReady from './hooks/useAssetsReady';
 import hero2000 from './assets/hero/hero-2000.webp';
@@ -78,7 +79,7 @@ export default function App() {
       <Preloader ready={ready} progress={progress} />
       <CloudCodeRain />
       <Nav />
-      <main className="relative z-10">
+      <main className="relative z-10 pb-14 md:pb-0">
         {cloudHero ? <HeroCloud start={ready} /> : <Hero />}
         <About />
         <Experience />
@@ -87,6 +88,7 @@ export default function App() {
         <Education />
         <Contact />
       </main>
+      <MobileTabBar />
     </>
   );
 }
