@@ -74,7 +74,7 @@ export const SKILLS = [
 
   // — Tooling —
   { id: 'git', label: 'Git', group: 'tools', color: '#F05032' },
-  { id: 'github', label: 'GitHub', group: 'tools', color: '#E6EDF3' },
+  { id: 'github', label: 'GitHub', group: 'tools', color: '#EAF0F6' },
   { id: 'docker', label: 'Docker', group: 'tools', color: '#2496ED' },
   { id: 'linux', label: 'Linux', group: 'tools', color: '#FCC624' },
 ];

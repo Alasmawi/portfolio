@@ -7,7 +7,7 @@ import SharpHorizon from './ui/SharpHorizon';
 import StatusBadge from './ui/StatusBadge';
 import useTypingEffect from '../hooks/useTypingEffect';
 
-const ROLES = ['Cloud Architect', 'IoT Systems', 'Backend Engineer'];
+const ROLES = ['Cloud Computing', 'AI Systems', 'Full-Stack Development'];
 
 export default function Hero() {
   const typed = useTypingEffect(ROLES);
@@ -67,8 +67,9 @@ export default function Hero() {
             transition={{ duration: 0.6, delay: 0.3 }}
             className="mt-6 max-w-xl text-base leading-relaxed text-text-muted sm:text-lg"
           >
-            Backend engineer working in cloud, IoT, and applied AI. Mostly AWS,
-            Go, and Python.
+            Computer Science graduate building cloud infrastructure, applied
+            AI features, and full-stack systems end to end — mostly AWS, Go,
+            and Python.
           </motion.p>
 
           <motion.div

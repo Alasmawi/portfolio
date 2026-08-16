@@ -42,7 +42,7 @@ export default function NetworkBackground({ className = '' }) {
             y1={NODES[a].y}
             x2={NODES[b].x}
             y2={NODES[b].y}
-            stroke="#4FA3C4"
+            stroke="#2FC2E8"
             strokeWidth="1"
           />
         ))}
@@ -52,7 +52,7 @@ export default function NetworkBackground({ className = '' }) {
             cx={n.x}
             cy={n.y}
             r={i % 3 === 0 ? 4 : 3}
-            fill={i % 4 === 0 ? '#F2A93B' : '#4FA3C4'}
+            fill={i % 4 === 0 ? '#F2A93B' : '#2FC2E8'}
           />
         ))}
       </svg>

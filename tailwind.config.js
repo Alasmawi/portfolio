@@ -5,25 +5,25 @@ export default {
     extend: {
       colors: {
         base: {
-          bg: '#0B0F14',
-          surface: '#0D1117',
-          raised: '#111823',
-          border: '#1C2530',
+          bg: '#0A0E15',
+          surface: '#0D131C',
+          raised: '#131B27',
+          border: '#1E2836',
         },
         text: {
-          primary: '#E6EDF3',
-          muted: '#8B98A5',
-          dim: '#5B6773',
+          primary: '#EAF0F6',
+          muted: '#94A3B3',
+          dim: '#5E6B7A',
         },
         amber: {
           DEFAULT: '#F2A93B',
-          bright: '#FFB454',
+          bright: '#FFC168',
           dim: '#8A6423',
         },
         steel: {
-          DEFAULT: '#4FA3C4',
-          bright: '#6FC3E4',
-          dim: '#2C5A6E',
+          DEFAULT: '#2FC2E8',
+          bright: '#6FE3FF',
+          dim: '#1B5670',
         },
         ok: '#3FB950',
       },
@@ -33,11 +33,11 @@ export default {
       },
       backgroundImage: {
         'dot-grid':
-          'radial-gradient(circle, rgba(230,237,243,0.08) 1px, transparent 1px)',
+          'radial-gradient(circle, rgba(234,240,246,0.08) 1px, transparent 1px)',
       },
       boxShadow: {
         'glow-amber': '0 0 0 1px rgba(242,169,59,0.4), 0 0 24px rgba(242,169,59,0.15)',
-        'glow-steel': '0 0 0 1px rgba(79,163,196,0.4), 0 0 24px rgba(79,163,196,0.15)',
+        'glow-steel': '0 0 0 1px rgba(47,194,232,0.4), 0 0 24px rgba(47,194,232,0.18)',
       },
       animation: {
         blink: 'blink 1.6s step-start infinite',
