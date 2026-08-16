@@ -18,6 +18,7 @@ export const LANGUAGE_COLORS = {
 export const PROJECTS = [
   {
     id: 'k9-pavlov',
+    pillars: ['cloud', 'ai'],
     name: 'K9 Pavlov System',
     tagline: 'senior project · flagship',
     language: null,
@@ -70,6 +71,7 @@ export const PROJECTS = [
   },
   {
     id: 'guidely',
+    pillars: ['ai', 'fullstack'],
     name: 'guidely',
     tagline: 'answers with their sources attached',
     language: 'Python',
@@ -82,6 +84,7 @@ export const PROJECTS = [
   },
   {
     id: 'detecto',
+    pillars: ['ai', 'fullstack'],
     name: 'detecto',
     tagline: 'how many people are in this frame?',
     language: 'Python',
@@ -94,6 +97,7 @@ export const PROJECTS = [
   },
   {
     id: 'brain-book',
+    pillars: ['fullstack'],
     name: 'Brain-Book',
     tagline: 'full-stack social network',
     language: 'Go',
@@ -107,6 +111,7 @@ export const PROJECTS = [
   },
   {
     id: 'localhost',
+    pillars: ['cs'],
     name: 'localhost',
     tagline: 'HTTP/1.1 server from scratch',
     language: 'Rust',
@@ -119,6 +124,7 @@ export const PROJECTS = [
   },
   {
     id: '0-shell',
+    pillars: ['cs'],
     name: '0-shell',
     tagline: 'a shell, no external binaries',
     language: 'Rust',
@@ -131,6 +137,7 @@ export const PROJECTS = [
   },
   {
     id: 'rt',
+    pillars: ['cs'],
     name: 'rt',
     tagline: 'ray tracer from first principles',
     language: 'Rust',
@@ -143,6 +150,7 @@ export const PROJECTS = [
   },
   {
     id: 'smart-road',
+    pillars: ['cs'],
     name: 'smart-road',
     tagline: 'intersections without traffic lights',
     language: 'Rust',
@@ -155,6 +163,7 @@ export const PROJECTS = [
   },
   {
     id: 'multiplayer-fps',
+    pillars: ['fullstack', 'cs'],
     name: 'multiplayer-fps',
     tagline: 'networked first-person shooter',
     language: 'Rust',
@@ -167,6 +176,7 @@ export const PROJECTS = [
   },
   {
     id: 'bomberman-dom',
+    pillars: ['fullstack'],
     name: 'bomberman-dom',
     tagline: 'real-time multiplayer, no game engine',
     language: 'JavaScript',
@@ -179,6 +189,7 @@ export const PROJECTS = [
   },
   {
     id: 'mini-framework',
+    pillars: ['fullstack', 'cs'],
     name: 'mini-framework',
     tagline: '"Domino" — a JS framework, from scratch',
     language: 'JavaScript',
@@ -191,6 +202,7 @@ export const PROJECTS = [
   },
   {
     id: 'real-time-forum',
+    pillars: ['fullstack'],
     name: 'real-time-forum',
     tagline: 'forum with live private chat',
     language: 'Go',
@@ -203,6 +215,7 @@ export const PROJECTS = [
   },
   {
     id: 'net-cat',
+    pillars: ['cs'],
     name: 'Net-Cat',
     tagline: 'TCP chat server, netcat-style',
     language: 'Go',
@@ -215,6 +228,7 @@ export const PROJECTS = [
   },
   {
     id: 'groupie-tracker',
+    pillars: ['fullstack'],
     name: 'groupie-tracker',
     tagline: 'REST API, visualized',
     language: 'Go',

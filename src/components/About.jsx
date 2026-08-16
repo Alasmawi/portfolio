@@ -17,7 +17,7 @@ func New() *Engineer {
 		Name:     "Abdulla Alasmawi",
 		Location: "Bahrain",
 		Focus: []string{
-			"Cloud", "IoT", "Backend",
+			"Cloud", "AI", "Full-Stack",
 		},
 		Stack: []string{
 			"AWS", "Go", "Python",

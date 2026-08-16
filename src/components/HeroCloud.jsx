@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { ArrowDown } from 'lucide-react';
 import { GithubMark, LinkedinMark } from './ui/BrandIcons';
 import HeadshotCloud from './ui/HeadshotCloud';
+import FocusPanel from './ui/FocusPanel';
 import SharpHorizon from './ui/SharpHorizon';
 import StatusBadge from './ui/StatusBadge';
 import useTypingEffect from '../hooks/useTypingEffect';
@@ -11,7 +12,7 @@ import hero1200 from '../assets/hero/hero-1200.webp';
 import hero700 from '../assets/hero/hero-700.webp';
 import './HeroCloud.css';
 
-const ROLES = ['Cloud Architect', 'IoT Systems', 'Backend Engineer'];
+const ROLES = ['Cloud Computing', 'AI Systems', 'Full-Stack Development'];
 
 // Alternate hero: opens above the cloud deck and descends into the dark stack.
 // The photo is masked out toward the bottom rather than covered, so the page's
@@ -106,8 +107,9 @@ export default function HeroCloud({ start = true }) {
             transition={{ duration: 0.6, delay: 0.6 }}
             className="mt-6 max-w-xl text-base leading-relaxed text-text-muted sm:text-lg"
           >
-            Backend engineer working in cloud, IoT, and applied AI. Mostly AWS,
-            Go, and Python.
+            Computer Science graduate building cloud infrastructure, applied
+            AI features, and full-stack systems end to end — mostly AWS, Go,
+            and Python.
           </motion.p>
 
           <motion.div
@@ -141,6 +143,18 @@ export default function HeroCloud({ start = true }) {
               <StatusBadge />
             </div>
           </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.85 }}
+            className="mt-8"
+          >
+            <p className="mb-2.5 font-mono text-[10px] uppercase tracking-widest text-text-dim">
+              [ focus ] — tap to expand
+            </p>
+            <FocusPanel />
+          </motion.div>
         </div>
 
         <motion.div
@@ -153,7 +167,6 @@ export default function HeroCloud({ start = true }) {
 
           {[
             { k: 'location', v: 'Manama, Bahrain' },
-            { k: 'focus', v: 'Cloud / IoT / Backend' },
             { k: 'status', v: 'accepting new roles' },
           ].map((row) => (
             <div
