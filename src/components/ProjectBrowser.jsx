@@ -19,7 +19,7 @@ function LanguageDot({ language }) {
   return (
     <span
       className="inline-block h-2 w-2 shrink-0 rounded-full"
-      style={{ backgroundColor: LANGUAGE_COLORS[language] ?? '#5B6773' }}
+      style={{ backgroundColor: LANGUAGE_COLORS[language] ?? '#5E6B7A' }}
       aria-hidden="true"
     />
   );

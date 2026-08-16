@@ -8,7 +8,7 @@ import k9ReolinkCam from '../assets/k9/reolink-cam.webp';
 import k9ArchitectureDiagram from '../assets/k9/architecture-diagram.webp';
 
 export const LANGUAGE_COLORS = {
-  Go: '#4FA3C4',
+  Go: '#2FC2E8',
   Rust: '#DE7B4A',
   JavaScript: '#E8C547',
   Python: '#7BA05B',

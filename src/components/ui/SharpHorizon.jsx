@@ -43,7 +43,7 @@ export default function SharpHorizon() {
         <polyline
           points={pts(BACK)}
           fill="none"
-          stroke="#4FA3C4"
+          stroke="#2FC2E8"
           strokeOpacity="0.28"
           strokeWidth="1"
         />
@@ -52,7 +52,7 @@ export default function SharpHorizon() {
         <polyline
           points={pts(FRONT)}
           fill="none"
-          stroke="#6FC3E4"
+          stroke="#6FE3FF"
           strokeOpacity="0.5"
           strokeWidth="1.25"
         />
@@ -65,7 +65,7 @@ export default function SharpHorizon() {
             y1={y}
             x2={x}
             y2={VB_H}
-            stroke="#4FA3C4"
+            stroke="#2FC2E8"
             strokeOpacity="0.13"
             strokeWidth="1"
           />
@@ -79,7 +79,7 @@ export default function SharpHorizon() {
             y={y - 2.5}
             width="5"
             height="5"
-            fill={i === 1 || i === 3 ? '#F2A93B' : '#6FC3E4'}
+            fill={i === 1 || i === 3 ? '#F2A93B' : '#6FE3FF'}
             fillOpacity="0.85"
             className="sharp-node"
             style={{ animationDelay: `${i * 0.7}s` }}

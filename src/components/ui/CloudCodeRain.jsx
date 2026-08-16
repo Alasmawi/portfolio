@@ -36,7 +36,7 @@ const TECH_GLYPHS = ['Go', 'Py', 'JS', 'AWS', 'ESP32', 'MQTT', 'SQL', 'C++'];
 
 const TECH_ICONS = [Cpu, Database, GitBranch, Server, Boxes, Radio, Wifi, Binary];
 
-const COLORS = ['#8B98A5', '#4FA3C4', '#F2A93B', '#5B6773'];
+const COLORS = ['#94A3B3', '#2FC2E8', '#F2A93B', '#5E6B7A'];
 
 function seededRandom(seed) {
   let s = seed;
