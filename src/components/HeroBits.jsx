@@ -1,7 +1,7 @@
 import { useRef } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowDown } from 'lucide-react';
-import Threads from './ui/Threads/Threads';
+import CloudDrift from './ui/CloudDrift';
 import { GithubMark, LinkedinMark } from './ui/BrandIcons';
 import HeadshotCloud from './ui/HeadshotCloud';
 import StatusBadge from './ui/StatusBadge';
@@ -61,10 +61,10 @@ export default function HeroBits() {
       id="hero"
       className="relative flex min-h-screen min-h-[100dvh] items-center overflow-hidden bg-base-bg pt-24"
     >
-      {/* Warm gold threads, not blue — the site's own accent color driving
-          the WebGL shader instead of an off-the-shelf demo color. */}
+      {/* Actual cloud shapes drifting slowly, lit warm gold at the edges —
+          not blue, not abstract lines. */}
       <div className="absolute inset-0 z-0" aria-hidden="true">
-        <Threads color={[0.95, 0.66, 0.23]} amplitude={1.4} distance={0.25} enableMouseInteraction />
+        <CloudDrift />
       </div>
       <div className="absolute inset-0 z-0 bg-gradient-to-b from-transparent via-transparent to-base-bg" aria-hidden="true" />
 
@@ -73,22 +73,12 @@ export default function HeroBits() {
         onPointerMove={handlePointerMove}
         onPointerLeave={handlePointerLeave}
         style={{ perspective: '1200px' }}
-        className="relative z-10 mx-auto grid w-full max-w-6xl grid-cols-1 gap-10 px-6 md:grid-cols-12 md:gap-8"
+        className="relative z-10 mx-auto w-full max-w-3xl px-6 text-center"
       >
         <div
           ref={contentRef}
           style={{ transformStyle: 'preserve-3d', transition: 'transform 0.15s ease-out' }}
-          className="md:col-span-8"
         >
-          <motion.div
-            initial={{ opacity: 0, y: 16, scale: 0.97 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className="mb-6 flex justify-end md:hidden"
-          >
-            <HeadshotCloud className="w-[170px] sm:w-[200px]" />
-          </motion.div>
-
           <p className="mb-4 font-mono text-xs uppercase tracking-widest text-amber">
             [ whoami ]
           </p>
@@ -99,7 +89,7 @@ export default function HeroBits() {
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.9 }}
-            className="mt-6 max-w-xl text-base leading-relaxed text-text-muted sm:text-lg"
+            className="mx-auto mt-6 max-w-xl text-base leading-relaxed text-text-muted sm:text-lg"
           >
             I build the cloud infrastructure underneath a product and the
             full-stack systems on top of it — the same person shipping the
@@ -110,7 +100,7 @@ export default function HeroBits() {
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 1.05 }}
-            className="mt-8 flex flex-wrap items-center gap-3"
+            className="mt-8 flex flex-wrap items-center justify-center gap-3"
           >
             <a
               href="https://github.com/Alasmawi"
@@ -130,16 +120,18 @@ export default function HeroBits() {
             </a>
             <StatusBadge />
           </motion.div>
-        </div>
 
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.7, delay: 0.4 }}
-          className="hidden items-center justify-center md:col-span-4 md:flex"
-        >
-          <HeadshotCloud className="w-full max-w-[280px]" />
-        </motion.div>
+          {/* Headshot moved below the copy — reads as a signature under a
+              statement rather than competing with it for attention. */}
+          <motion.div
+            initial={{ opacity: 0, y: 20, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ duration: 0.7, delay: 1.2 }}
+            className="mt-14 flex justify-center"
+          >
+            <HeadshotCloud className="w-[190px] sm:w-[220px]" />
+          </motion.div>
+        </div>
       </div>
 
       <motion.div

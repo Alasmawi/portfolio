@@ -42,7 +42,7 @@ function useTallSectionSnapPoints() {
 }
 
 // Only the headshot is a first-screen asset now — the new hero's
-// background is a WebGL canvas (Threads), not a photo, so there's no
+// background is CSS-only (CloudDrift), not a photo, so there's no
 // large image to block the loader on.
 const CRITICAL_ASSETS = [headshot];
 

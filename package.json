@@ -13,7 +13,6 @@
     "@xyflow/react": "^12.11.2",
     "framer-motion": "^12.42.2",
     "lucide-react": "^1.27.0",
-    "ogl": "^1.0.11",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "swiper": "^14.0.7"
