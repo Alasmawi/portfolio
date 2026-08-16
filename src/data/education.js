@@ -7,7 +7,7 @@ export const EDUCATION = [
     accentColor: '#7A3324',
     dotColor: '#C9A227',
     description:
-      'Specialized cloud computing track, benchmarked against AWS curriculum guidelines. Final-year industrial training with the Bahrain Shura Council\u2019s Networks and Information Security department \u2014 Intune compliance, BitLocker rollout, MFA migration.',
+      'Specialized cloud computing track, benchmarked against AWS curriculum guidelines.',
     coursework: true,
   },
   {
