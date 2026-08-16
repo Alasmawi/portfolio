@@ -2,7 +2,6 @@ import { motion } from 'framer-motion';
 import { ArrowDown } from 'lucide-react';
 import { GithubMark, LinkedinMark } from './ui/BrandIcons';
 import HeadshotCloud from './ui/HeadshotCloud';
-import FocusPanel from './ui/FocusPanel';
 import SharpHorizon from './ui/SharpHorizon';
 import StatusBadge from './ui/StatusBadge';
 import useTypingEffect from '../hooks/useTypingEffect';
@@ -142,15 +141,6 @@ export default function HeroCloud({ start = true }) {
             <div className="ml-0 sm:ml-2">
               <StatusBadge />
             </div>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.85 }}
-            className="mt-8"
-          >
-            <FocusPanel />
           </motion.div>
         </div>
 

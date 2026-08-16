@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ExternalLink, Film, Lock, PlayCircle, Star } from 'lucide-react';
 import Reveal from './ui/Reveal';
@@ -6,7 +6,6 @@ import SectionHeader from './ui/SectionHeader';
 import RingGallery from './ui/RingGallery';
 import { GithubMark } from './ui/BrandIcons';
 import { LANGUAGE_COLORS, PROJECTS } from '../data/projects';
-import { FOCUS_PILLARS } from '../data/focusPillars';
 
 // With the section on screen and nobody touching it, walk to the next project
 // so it plays as a gallery. Any interaction restarts the clock — long enough
@@ -96,30 +95,8 @@ function PreviewMedia({ project }) {
 const SWIPE_THRESHOLD_PX = 50;
 
 export default function ProjectBrowser() {
-  // null = "All". Filtering by focus area is the fleet-dashboard framing:
-  // narrow the list to one pillar the same way you'd filter a service list
-  // by tag, rather than scrolling a flat unfiltered list of 14 repos.
-  const [activePillar, setActivePillar] = useState(null);
-  const visibleProjects = useMemo(
-    () =>
-      activePillar
-        ? PROJECTS.filter((p) => p.pillars?.includes(activePillar))
-        : PROJECTS,
-    [activePillar]
-  );
-
   const [selectedId, setSelectedId] = useState(PROJECTS[0].id);
-  const project =
-    visibleProjects.find((p) => p.id === selectedId) ?? visibleProjects[0];
-
-  // Changing the filter can leave the previous selection outside the new
-  // list — land on the filtered list's first entry instead of showing a
-  // stale preview or an empty pane.
-  useEffect(() => {
-    if (!visibleProjects.some((p) => p.id === selectedId) && visibleProjects[0]) {
-      setSelectedId(visibleProjects[0].id);
-    }
-  }, [visibleProjects, selectedId]);
+  const project = PROJECTS.find((p) => p.id === selectedId) ?? PROJECTS[0];
 
   const sectionRef = useRef(null);
   // Activity is tracked in a ref rather than state: pointermove fires
@@ -141,12 +118,11 @@ export default function ProjectBrowser() {
 
   const step = useCallback(
     (delta) => {
-      const i = visibleProjects.findIndex((p) => p.id === selectedId);
-      const next =
-        visibleProjects[(i + delta + visibleProjects.length) % visibleProjects.length];
+      const i = PROJECTS.findIndex((p) => p.id === selectedId);
+      const next = PROJECTS[(i + delta + PROJECTS.length) % PROJECTS.length];
       if (next) select(next.id);
     },
-    [selectedId, select, visibleProjects]
+    [selectedId, select]
   );
 
   const onSwipeDown = useCallback((e) => {
@@ -200,8 +176,8 @@ export default function ProjectBrowser() {
       if (Date.now() - lastActivityRef.current < AUTO_ADVANCE_MS) return;
       lastActivityRef.current = Date.now();
       setSelectedId((current) => {
-        const i = visibleProjects.findIndex((p) => p.id === current);
-        return visibleProjects[(i + 1) % visibleProjects.length]?.id ?? current;
+        const i = PROJECTS.findIndex((p) => p.id === current);
+        return PROJECTS[(i + 1) % PROJECTS.length].id;
       });
     }, IDLE_TICK_MS);
 
@@ -215,7 +191,7 @@ export default function ProjectBrowser() {
       io.disconnect();
       events.forEach((ev) => node.removeEventListener(ev, nudgeIdle, opts));
     };
-  }, [nudgeIdle, visibleProjects]);
+  }, [nudgeIdle]);
 
   return (
     <section
@@ -232,52 +208,10 @@ export default function ProjectBrowser() {
         />
 
         <Reveal delay={0.1}>
-          {/* Focus-area filter: fleet-view framing — narrow 14 repos down to
-              one pillar instead of scrolling a flat list. Ties directly to
-              the four tiles in the hero's FocusPanel. */}
-          <div
-            className="mb-3 flex flex-wrap gap-2"
-            role="group"
-            aria-label="Filter projects by focus area"
-          >
-            <button
-              type="button"
-              onClick={() => setActivePillar(null)}
-              aria-pressed={activePillar === null}
-              className={`rounded border px-3 py-1.5 font-mono text-[11px] uppercase tracking-wider transition-colors ${
-                activePillar === null
-                  ? 'border-amber/50 bg-amber/10 text-amber'
-                  : 'border-base-border text-text-muted hover:text-text-primary'
-              }`}
-            >
-              all ({PROJECTS.length})
-            </button>
-            {FOCUS_PILLARS.map((pillar) => {
-              const count = PROJECTS.filter((p) => p.pillars?.includes(pillar.id)).length;
-              return (
-                <button
-                  key={pillar.id}
-                  type="button"
-                  onClick={() =>
-                    setActivePillar((cur) => (cur === pillar.id ? null : pillar.id))
-                  }
-                  aria-pressed={activePillar === pillar.id}
-                  className={`rounded border px-3 py-1.5 font-mono text-[11px] uppercase tracking-wider transition-colors ${
-                    activePillar === pillar.id
-                      ? 'border-amber/50 bg-amber/10 text-amber'
-                      : 'border-base-border text-text-muted hover:text-text-primary'
-                  }`}
-                >
-                  {pillar.label} ({count})
-                </button>
-              );
-            })}
-          </div>
-
           <div className="grid grid-cols-1 border border-base-border bg-base-surface/40 md:grid-cols-12">
             {/* mobile: horizontal tab list */}
             <div className="flex gap-2 overflow-x-auto border-b border-base-border p-3 md:hidden">
-              {visibleProjects.map((p) => (
+              {PROJECTS.map((p) => (
                 <button
                   key={p.id}
                   type="button"
@@ -297,10 +231,10 @@ export default function ProjectBrowser() {
             {/* desktop: sidebar file list */}
             <div className="hidden max-h-[560px] overflow-y-auto border-r border-base-border md:col-span-4 md:block lg:col-span-3">
               <p className="border-b border-base-border px-4 py-3 font-mono text-[11px] uppercase tracking-wider text-text-dim">
-                // repositories ({visibleProjects.length})
+                // repositories ({PROJECTS.length})
               </p>
               <ul>
-                {visibleProjects.map((p) => (
+                {PROJECTS.map((p) => (
                   <li key={p.id}>
                     <button
                       type="button"
@@ -374,26 +308,6 @@ export default function ProjectBrowser() {
                       <p className="mt-1 font-mono text-xs text-steel">
                         {project.tagline}
                       </p>
-                      {project.pillars?.length > 0 && (
-                        <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1">
-                          {project.pillars.map((pid) => {
-                            const pillar = FOCUS_PILLARS.find((f) => f.id === pid);
-                            if (!pillar) return null;
-                            return (
-                              <span
-                                key={pid}
-                                className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-wider text-text-dim"
-                              >
-                                <span
-                                  className="h-1.5 w-1.5 rounded-full bg-ok"
-                                  aria-hidden="true"
-                                />
-                                {pillar.label}
-                              </span>
-                            );
-                          })}
-                        </div>
-                      )}
                     </div>
 
                     <div className="flex items-center gap-2">

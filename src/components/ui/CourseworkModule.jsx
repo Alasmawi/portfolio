@@ -1,20 +1,30 @@
+import { motion } from 'framer-motion';
 import ExpandTile from './ExpandTile';
 import { FOCUS_PILLARS } from '../../data/focusPillars';
 import { UOB_COURSEWORK, PILLAR_COLORS } from '../../data/uobCoursework';
 
+const container = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.06 } },
+};
+const card = {
+  hidden: { opacity: 0, y: 6, scale: 0.97 },
+  show: { opacity: 1, y: 0, scale: 1 },
+};
+
 // University-specific, not a generic tag cloud: the default state is a
 // segmented bar (glanceable, visual-first — nothing to read until you
-// choose to), and clicking it reveals an actual transcript-style list
-// with course codes and credit hours instead of a flat cloud of skill
-// pills. Proportions are computed from the courses actually listed below,
-// not the full ~40-course degree — the bar and the list describe the same
-// data, not a summary of something wider that never gets shown.
+// choose to). Expanding doesn't drop into a course-by-course list either —
+// it's four per-pillar stat cards (count first, course names folded into a
+// small caption underneath), so the unit you're scanning is "how much of
+// each area" rather than eleven individual rows. Cards stagger in on
+// reveal rather than the whole block popping in at once.
 export default function CourseworkModule() {
   const total = UOB_COURSEWORK.length;
-  const counts = UOB_COURSEWORK.reduce((acc, c) => {
-    acc[c.pillar] = (acc[c.pillar] ?? 0) + 1;
-    return acc;
-  }, {});
+  const byPillar = FOCUS_PILLARS.map((pillar) => ({
+    ...pillar,
+    courses: UOB_COURSEWORK.filter((c) => c.pillar === pillar.id),
+  })).filter((p) => p.courses.length > 0);
 
   return (
     <ExpandTile
@@ -27,60 +37,50 @@ export default function CourseworkModule() {
             </span>
           </div>
           <div className="flex h-2.5 overflow-hidden rounded-full">
-            {Object.entries(counts).map(([pillar, count]) => (
+            {byPillar.map((pillar) => (
               <div
-                key={pillar}
+                key={pillar.id}
                 style={{
-                  width: `${(count / total) * 100}%`,
-                  backgroundColor: PILLAR_COLORS[pillar],
+                  width: `${(pillar.courses.length / total) * 100}%`,
+                  backgroundColor: PILLAR_COLORS[pillar.id],
                 }}
               />
             ))}
           </div>
-          <div className="mt-2.5 flex flex-wrap gap-x-4 gap-y-1">
-            {FOCUS_PILLARS.map((pillar) =>
-              counts[pillar.id] ? (
-                <span
-                  key={pillar.id}
-                  className="flex items-center gap-1.5 font-mono text-[10px] text-text-dim"
-                >
-                  <span
-                    className="h-1.5 w-1.5 rounded-sm"
-                    style={{ backgroundColor: PILLAR_COLORS[pillar.id] }}
-                    aria-hidden="true"
-                  />
-                  {pillar.label.toLowerCase()}
-                </span>
-              ) : null
-            )}
-          </div>
         </div>
       }
     >
-      <div className="grid grid-cols-2 gap-2 pt-3 sm:grid-cols-3">
-        {UOB_COURSEWORK.map((course) => (
-          <div
-            key={course.title}
-            className="rounded-md border-l-2 bg-base-raised px-2.5 py-2"
-            style={{ borderLeftColor: PILLAR_COLORS[course.pillar] }}
+      <motion.div
+        variants={container}
+        initial="hidden"
+        animate="show"
+        className="grid grid-cols-2 gap-2.5 pt-3"
+      >
+        {byPillar.map((pillar) => (
+          <motion.div
+            key={pillar.id}
+            variants={card}
+            transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+            className="rounded-lg bg-base-raised p-3"
           >
-            <div className="flex items-center justify-between gap-2">
+            <div className="flex items-baseline gap-1.5">
               <span
-                className="font-mono text-[10px]"
-                style={{ color: PILLAR_COLORS[course.pillar] }}
+                className="text-2xl font-semibold"
+                style={{ color: PILLAR_COLORS[pillar.id] }}
               >
-                {course.code}
+                {pillar.courses.length}
               </span>
-              <span className="shrink-0 font-mono text-[9px] text-text-dim">
-                {course.ch}cr
+              <span className="font-mono text-[10px] uppercase tracking-wider text-text-dim">
+                {pillar.courses.length === 1 ? 'course' : 'courses'}
               </span>
             </div>
-            <p className="mt-1 text-[11px] leading-tight text-text-primary">
-              {course.title}
+            <p className="mt-1 text-xs text-text-primary">{pillar.label}</p>
+            <p className="mt-1.5 text-[10px] leading-snug text-text-dim">
+              {pillar.courses.map((c) => c.title).join(', ')}
             </p>
-          </div>
+          </motion.div>
         ))}
-      </div>
+      </motion.div>
     </ExpandTile>
   );
 }

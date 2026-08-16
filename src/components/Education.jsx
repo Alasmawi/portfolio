@@ -32,22 +32,34 @@ export default function Education() {
               not an accordion: switching entries swaps a single detail
               card below rather than each row expanding in place. */}
           <div className="mb-4 flex flex-wrap gap-2" role="tablist" aria-label="Education entries">
-            {EDUCATION.map((e) => (
-              <button
-                key={e.id}
-                type="button"
-                role="tab"
-                aria-selected={selectedId === e.id}
-                onClick={() => setSelectedId(e.id)}
-                className={`rounded border px-3 py-1.5 font-mono text-[11px] uppercase tracking-wider transition-colors ${
-                  selectedId === e.id
-                    ? 'border-amber/50 bg-amber/10 text-amber'
-                    : 'border-base-border text-text-muted hover:text-text-primary'
-                }`}
-              >
-                {e.school}
-              </button>
-            ))}
+            {EDUCATION.map((e) => {
+              const active = selectedId === e.id;
+              return (
+                <button
+                  key={e.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={active}
+                  onClick={() => setSelectedId(e.id)}
+                  style={
+                    active
+                      ? {
+                          borderColor: `${e.dotColor}80`,
+                          backgroundColor: `${e.dotColor}1A`,
+                          color: e.dotColor,
+                        }
+                      : undefined
+                  }
+                  className={`rounded border px-3 py-1.5 font-mono text-[11px] uppercase tracking-wider transition-colors ${
+                    active
+                      ? ''
+                      : 'border-base-border text-text-muted hover:text-text-primary'
+                  }`}
+                >
+                  {e.school}
+                </button>
+              );
+            })}
           </div>
 
           <AnimatePresence mode="wait">
@@ -61,10 +73,13 @@ export default function Education() {
             >
               <div className="flex items-start gap-3">
                 <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-base-raised">
-                  <Icon size={22} className="text-amber" strokeWidth={1.75} />
+                  <Icon size={22} style={{ color: entry.dotColor }} strokeWidth={1.75} />
                 </div>
                 <div className="min-w-0">
-                  <h3 className="text-lg font-semibold text-text-primary">
+                  <h3
+                    className="text-lg font-semibold"
+                    style={{ color: entry.dotColor }}
+                  >
                     {entry.school}
                   </h3>
                   <p className="mt-0.5 font-mono text-xs text-text-dim">
@@ -78,7 +93,7 @@ export default function Education() {
               </p>
 
               {entry.coursework && <CourseworkModule />}
-              {entry.journey && <ProgramJourney />}
+              {entry.journey && <ProgramJourney color={entry.dotColor} />}
             </motion.div>
           </AnimatePresence>
         </Reveal>
