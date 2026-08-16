@@ -57,24 +57,27 @@ export default function CourseworkModule() {
         </div>
       }
     >
-      <div className="-mx-4 border-t border-base-border">
+      <div className="grid grid-cols-2 gap-2 pt-3 sm:grid-cols-3">
         {UOB_COURSEWORK.map((course) => (
           <div
             key={course.title}
-            className="flex items-center justify-between gap-3 border-b border-base-border/60 px-4 py-2 last:border-b-0"
+            className="rounded-md border-l-2 bg-base-raised px-2.5 py-2"
+            style={{ borderLeftColor: PILLAR_COLORS[course.pillar] }}
           >
-            <span
-              className="font-mono text-[10px] shrink-0"
-              style={{ color: PILLAR_COLORS[course.pillar] }}
-            >
-              {course.code}
-            </span>
-            <span className="flex-1 truncate text-xs text-text-primary">
+            <div className="flex items-center justify-between gap-2">
+              <span
+                className="font-mono text-[10px]"
+                style={{ color: PILLAR_COLORS[course.pillar] }}
+              >
+                {course.code}
+              </span>
+              <span className="shrink-0 font-mono text-[9px] text-text-dim">
+                {course.ch}cr
+              </span>
+            </div>
+            <p className="mt-1 text-[11px] leading-tight text-text-primary">
               {course.title}
-            </span>
-            <span className="shrink-0 font-mono text-[10px] text-text-dim">
-              {course.ch} cr
-            </span>
+            </p>
           </div>
         ))}
       </div>

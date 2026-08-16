@@ -4,6 +4,7 @@ import { GraduationCap, Laptop2 } from 'lucide-react';
 import Reveal from './ui/Reveal';
 import SectionHeader from './ui/SectionHeader';
 import CourseworkModule from './ui/CourseworkModule';
+import ProgramJourney from './ui/ProgramJourney';
 import { EDUCATION } from '../data/education';
 
 const ICONS = { uob: GraduationCap, reboot: Laptop2 };
@@ -77,6 +78,7 @@ export default function Education() {
               </p>
 
               {entry.coursework && <CourseworkModule />}
+              {entry.journey && <ProgramJourney />}
             </motion.div>
           </AnimatePresence>
         </Reveal>

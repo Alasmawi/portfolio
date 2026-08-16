@@ -11,10 +11,11 @@ export const EDUCATION = [
   {
     id: 'reboot',
     school: 'Reboot Coding Institute',
-    degree: 'Full Stack Development',
+    degree: 'Full Stack Development \u2014 powered by 01Edu',
     period: '2024 — 2026',
     description:
-      'Part-time full-stack program overlapping the final two years of the CS degree.',
+      'Peer-to-peer, project-based training with no lectures and no given answers \u2014 the 01Edu model, run in Bahrain with Tamkeen backing. Overlaps the final two years of the CS degree.',
     coursework: false,
+    journey: true,
   },
 ];
