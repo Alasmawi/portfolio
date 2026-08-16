@@ -1,5 +1,6 @@
 import { LINKS } from '../data/navLinks';
 import useActiveSection from '../hooks/useActiveSection';
+import { scrollToSection } from '../lib/scrollToSection';
 
 const IDS = LINKS.map((l) => l.id);
 
@@ -11,6 +12,10 @@ export default function Nav() {
       <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
         <a
           href="#hero"
+          onClick={(e) => {
+            e.preventDefault();
+            scrollToSection('hero');
+          }}
           className="font-mono text-sm text-text-primary transition-colors hover:text-amber"
         >
           <span className="text-amber">~/</span>alasmawi
@@ -23,6 +28,10 @@ export default function Nav() {
             <li key={id}>
               <a
                 href={`#${id}`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  scrollToSection(id);
+                }}
                 className={`font-mono text-xs uppercase tracking-wider transition-colors ${
                   active === id
                     ? 'text-amber'
