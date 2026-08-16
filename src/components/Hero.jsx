@@ -115,7 +115,6 @@ export default function Hero() {
 
           {[
             { k: 'location', v: 'Manama, Bahrain' },
-            { k: 'focus', v: 'Cloud / IoT / Backend' },
             { k: 'status', v: 'accepting new roles' },
           ].map((row) => (
             <div

@@ -150,9 +150,6 @@ export default function HeroCloud({ start = true }) {
             transition={{ duration: 0.6, delay: 0.85 }}
             className="mt-8"
           >
-            <p className="mb-2.5 font-mono text-[10px] uppercase tracking-widest text-text-dim">
-              [ focus ] — tap to expand
-            </p>
             <FocusPanel />
           </motion.div>
         </div>

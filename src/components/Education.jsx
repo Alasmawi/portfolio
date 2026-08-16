@@ -1,24 +1,18 @@
+import { useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { GraduationCap, Laptop2 } from 'lucide-react';
 import Reveal from './ui/Reveal';
 import SectionHeader from './ui/SectionHeader';
+import CourseworkModule from './ui/CourseworkModule';
+import { EDUCATION } from '../data/education';
 
-const EDUCATION = [
-  {
-    school: 'University of Bahrain',
-    degree: 'B.Sc. Computer Science (Cloud Computing)',
-    period: '2022 — 2026',
-    accentColor: '#7A3324',
-    dotColor: '#C9A227',
-  },
-  {
-    school: 'Reboot Coding Institute',
-    degree: 'Full Stack Development',
-    period: '2024 — 2026',
-    accentColor: '#1CCFC9',
-    dotColor: '#1CCFC9',
-  },
-];
+const ICONS = { uob: GraduationCap, reboot: Laptop2 };
 
 export default function Education() {
+  const [selectedId, setSelectedId] = useState(EDUCATION[0].id);
+  const entry = EDUCATION.find((e) => e.id === selectedId) ?? EDUCATION[0];
+  const Icon = ICONS[entry.id] ?? GraduationCap;
+
   return (
     <section
       id="education"
@@ -32,31 +26,60 @@ export default function Education() {
           region="~/education"
         />
 
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-          {EDUCATION.map((edu, i) => (
-            <Reveal key={edu.school} delay={i * 0.1}>
-              <div
-                style={{ '--accent': edu.accentColor }}
-                className="border border-l-2 border-base-border border-l-transparent bg-base-surface/40 p-6 transition-all hover:border-l-[var(--accent)] hover:bg-base-surface/70 hover:shadow-[0_0_0_1px_var(--accent),0_0_24px_-6px_var(--accent)]"
+        <Reveal delay={0.1}>
+          {/* Selector row — same shape as the project browser's tab strip,
+              not an accordion: switching entries swaps a single detail
+              card below rather than each row expanding in place. */}
+          <div className="mb-4 flex flex-wrap gap-2" role="tablist" aria-label="Education entries">
+            {EDUCATION.map((e) => (
+              <button
+                key={e.id}
+                type="button"
+                role="tab"
+                aria-selected={selectedId === e.id}
+                onClick={() => setSelectedId(e.id)}
+                className={`rounded border px-3 py-1.5 font-mono text-[11px] uppercase tracking-wider transition-colors ${
+                  selectedId === e.id
+                    ? 'border-amber/50 bg-amber/10 text-amber'
+                    : 'border-base-border text-text-muted hover:text-text-primary'
+                }`}
               >
-                <div className="flex items-center justify-between">
-                  <p className="font-mono text-xs text-text-dim">{edu.period}</p>
-                  <span
-                    className="h-1.5 w-1.5 rounded-full"
-                    style={{ backgroundColor: edu.dotColor }}
-                  />
+                {e.school}
+              </button>
+            ))}
+          </div>
+
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={entry.id}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.2 }}
+              className="border border-base-border bg-base-surface/40 p-6"
+            >
+              <div className="flex items-start gap-3">
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-base-raised">
+                  <Icon size={22} className="text-amber" strokeWidth={1.75} />
                 </div>
-                <h3
-                  className="mt-2 text-lg font-semibold"
-                  style={{ color: edu.dotColor }}
-                >
-                  {edu.school}
-                </h3>
-                <p className="mt-1 text-sm text-text-muted">{edu.degree}</p>
+                <div className="min-w-0">
+                  <h3 className="text-lg font-semibold text-text-primary">
+                    {entry.school}
+                  </h3>
+                  <p className="mt-0.5 font-mono text-xs text-text-dim">
+                    {entry.degree} · {entry.period}
+                  </p>
+                </div>
               </div>
-            </Reveal>
-          ))}
-        </div>
+
+              <p className="mt-4 text-sm leading-relaxed text-text-muted">
+                {entry.description}
+              </p>
+
+              {entry.coursework && <CourseworkModule />}
+            </motion.div>
+          </AnimatePresence>
+        </Reveal>
       </div>
     </section>
   );
