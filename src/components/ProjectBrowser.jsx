@@ -24,6 +24,41 @@ function LanguageDot({ language }) {
   );
 }
 
+function PreviewVideo({ src, label }) {
+  const ref = useRef(null);
+
+  useEffect(() => {
+    const v = ref.current;
+    if (!v) return;
+    // React's `muted` JSX prop sets the attribute at mount, but some mobile
+    // browsers only honour autoplay if `muted` is true on the element's
+    // *property* at the moment play() is called — setting it here, every
+    // time the source changes, is what makes autoplay reliable on first
+    // load and on every subsequent project switch, not just sometimes.
+    v.muted = true;
+    v.src = src;
+    v.load();
+    const playPromise = v.play();
+    // Rapid taps/swipes can call play() while a previous one is still
+    // settling; the browser rejects the superseded call with a benign
+    // AbortError that isn't worth surfacing.
+    if (playPromise) playPromise.catch(() => {});
+  }, [src]);
+
+  return (
+    <video
+      ref={ref}
+      aria-label={label}
+      className="max-h-[440px] w-auto max-w-full object-contain"
+      autoPlay
+      loop
+      muted
+      playsInline
+      preload="auto"
+    />
+  );
+}
+
 function PreviewMedia({ project }) {
   if (project.items?.length) {
     return <RingGallery items={project.items} />;
@@ -36,17 +71,7 @@ function PreviewMedia({ project }) {
             with no controls reads identically but decodes far cheaper on
             mid-range phones than an animated GIF. playsInline keeps iOS
             Safari from hijacking it into fullscreen. */}
-        <video
-          key={project.video}
-          src={project.video}
-          aria-label={`${project.name} demo`}
-          className="max-h-[440px] w-auto max-w-full object-contain"
-          autoPlay
-          loop
-          muted
-          playsInline
-          preload="metadata"
-        />
+        <PreviewVideo src={project.video} label={`${project.name} demo`} />
       </div>
     );
   }

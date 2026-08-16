@@ -27,7 +27,7 @@ func New() *Engineer {
 
 export default function About() {
   return (
-    <section id="about" data-snap-firm className="border-b border-base-border py-24 md:py-32">
+    <section id="about" className="border-b border-base-border py-24 md:py-32">
       <div className="mx-auto max-w-6xl px-6">
         <SectionHeader index="01" id="about" title="About" />
 

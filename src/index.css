@@ -10,6 +10,22 @@
        are taller than a laptop viewport, and mandatory would keep yanking the
        reader back to the top of a section before they reached its end. */
     scroll-snap-type: y proximity;
+    /* Overscroll rubber-banding (iOS/Android momentum bounce past the top or
+       bottom edge) reveals whatever sits behind the document — without this,
+       that's the browser's default white, flashing as a strip above/below
+       the content on every bounce. Matches the darkest stop of the body
+       gradient below so the bounce reads as "more of the same page" rather
+       than a seam. */
+    background-color: #02050a;
+  }
+
+  /* Anchor-link navigation (top nav, mobile tab bar) briefly disables snap —
+     see scrollToSection in src/lib/scrollToSection.js. Without this, a
+     forced snap point along the scroll path can catch and hold the native
+     smooth-scroll partway, which reads as the page starting to navigate and
+     then springing back to where it was. */
+  html.snap-suspended {
+    scroll-snap-type: none;
   }
 
   main > section {
@@ -24,18 +40,17 @@
     scroll-margin-top: 57px;
   }
 
-  /* Mobile: sections that fit in one screen (hero, about, contact) get a
-     firm stop via `scroll-snap-stop` — the swipe-to-next-card feel the
-     bottom tab bar implies — while the container (html, above) stays
-     `proximity` throughout. `scroll-snap-stop: always` forces a landing at
-     that section even mid-fling; sections without it are left to proximity,
-     so a long section (experience, projects, skills, education) never traps
-     a fling that was headed further down. Only applies under 768px —
-     desktop keeps the page's original behaviour untouched. */
+  /* Mobile: no forced per-section snap stop. An earlier version used
+     `scroll-snap-stop: always` on the short sections to get a firm
+     swipe-to-next-card feel, but that fights the browser's own smooth-scroll
+     when the bottom tab bar jumps to a section — the engine can catch and
+     hold the scroll at a snap point it passes through on the way, which
+     reads as the page starting to navigate and then springing back. Gentle
+     `proximity` (set on html above) still gives a soft landing on section
+     boundaries during normal scrolling; getting to a specific section is
+     what the tab bar and top nav are for, handled by scrollToSection with
+     snap briefly suspended so it can land cleanly every time. */
   @media (max-width: 767px) {
-    main > section[data-snap-firm] {
-      scroll-snap-stop: always;
-    }
     /* Extra clearance for the fixed bottom tab bar so a snapped section's
        last line of content isn't tucked behind it. */
     main > section {

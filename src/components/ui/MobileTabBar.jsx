@@ -1,5 +1,6 @@
 import { LINKS } from '../../data/navLinks';
 import useActiveSection from '../../hooks/useActiveSection';
+import { scrollToSection } from '../../lib/scrollToSection';
 
 const IDS = LINKS.map((l) => l.id);
 
@@ -23,6 +24,10 @@ export default function MobileTabBar() {
             <li key={id} className="flex-1">
               <a
                 href={`#${id}`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  scrollToSection(id);
+                }}
                 aria-current={isActive ? 'true' : undefined}
                 className={`flex min-h-[52px] flex-col items-center justify-center gap-1 py-2 font-mono text-[10px] uppercase tracking-wider transition-colors ${
                   isActive ? 'text-amber' : 'text-text-dim'

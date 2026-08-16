@@ -15,7 +15,6 @@ export default function Hero() {
   return (
     <section
       id="hero"
-      data-snap-firm
       className="relative flex min-h-screen min-h-[100dvh] items-center overflow-hidden border-b border-base-border pt-24"
     >
       <NetworkBackground />
@@ -27,9 +26,11 @@ export default function Hero() {
             initial={{ opacity: 0, y: 16, scale: 0.97 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="mb-6 w-[150px] sm:w-[180px] md:hidden"
+            className="mb-6 flex w-full justify-end md:hidden"
           >
-            <HeadshotSlot />
+            <div className="w-[150px] sm:w-[180px]">
+              <HeadshotSlot />
+            </div>
           </motion.div>
 
           <motion.p
