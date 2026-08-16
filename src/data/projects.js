@@ -78,7 +78,7 @@ export const PROJECTS = [
     tags: ['Python', 'FastAPI', 'RAG', 'FAISS', 'Ollama', 'React'],
     githubUrl: 'https://github.com/Alasmawi/guidely',
     liveUrl: null,
-    gif: '/gifs/guidely.gif',
+    video: '/video/guidely.mp4',
   },
   {
     id: 'detecto',
@@ -90,7 +90,7 @@ export const PROJECTS = [
     tags: ['Python', 'FastAPI', 'YOLOv8', 'OpenCV', 'React', 'SQLite'],
     githubUrl: 'https://github.com/Alasmawi/detecto',
     liveUrl: null,
-    gif: '/gifs/detecto.gif',
+    video: '/video/detecto.mp4',
   },
   {
     id: 'brain-book',
@@ -103,7 +103,7 @@ export const PROJECTS = [
     tags: ['Go', 'WebSockets', 'REST APIs', 'Auth', 'SQLite'],
     githubUrl: 'https://github.com/Alasmawi/Brain-Book',
     liveUrl: null,
-    gif: '/gifs/brain-book.gif',
+    video: '/video/brain-book.mp4',
   },
   {
     id: 'localhost',
@@ -115,7 +115,7 @@ export const PROJECTS = [
     tags: ['Rust', 'HTTP/1.1', 'epoll', 'Systems Programming'],
     githubUrl: 'https://github.com/Alasmawi/localhost',
     liveUrl: null,
-    gif: '/gifs/localhost.gif',
+    video: '/video/localhost.mp4',
   },
   {
     id: '0-shell',
@@ -127,7 +127,7 @@ export const PROJECTS = [
     tags: ['Rust', 'Shell', 'Systems Programming'],
     githubUrl: 'https://github.com/Alasmawi/0-shell',
     liveUrl: null,
-    gif: '/gifs/0-shell.gif',
+    video: '/video/0-shell.mp4',
   },
   {
     id: 'rt',
@@ -139,7 +139,7 @@ export const PROJECTS = [
     tags: ['Rust', 'Ray Tracing', 'Computer Graphics'],
     githubUrl: 'https://github.com/Alasmawi/rt',
     liveUrl: null,
-    gif: '/gifs/rt.gif',
+    video: '/video/rt.mp4',
   },
   {
     id: 'smart-road',
@@ -151,7 +151,7 @@ export const PROJECTS = [
     tags: ['Rust', 'SDL2', 'Simulation', 'Scheduling'],
     githubUrl: 'https://github.com/Alasmawi/smart-road',
     liveUrl: null,
-    gif: '/gifs/smart-road.gif',
+    video: '/video/smart-road.mp4',
   },
   {
     id: 'multiplayer-fps',
@@ -163,7 +163,7 @@ export const PROJECTS = [
     tags: ['Rust', 'Multiplayer', 'Game Dev', 'Networking'],
     githubUrl: 'https://github.com/Alasmawi/multiplayer-fps',
     liveUrl: null,
-    gif: '/gifs/multiplayer-fps.gif',
+    video: '/video/multiplayer-fps.mp4',
   },
   {
     id: 'bomberman-dom',
@@ -175,7 +175,7 @@ export const PROJECTS = [
     tags: ['JavaScript', 'WebSockets', 'Game Dev'],
     githubUrl: 'https://github.com/Alasmawi/bomberman-dom',
     liveUrl: null,
-    gif: '/gifs/bomberman-dom.gif',
+    video: '/video/bomberman-dom.mp4',
   },
   {
     id: 'mini-framework',
@@ -187,7 +187,7 @@ export const PROJECTS = [
     tags: ['JavaScript', 'Virtual DOM', 'Framework Design'],
     githubUrl: 'https://github.com/Alasmawi/mini-framework',
     liveUrl: null,
-    gif: '/gifs/mini-framework.gif',
+    video: '/video/mini-framework.mp4',
   },
   {
     id: 'real-time-forum',
@@ -199,7 +199,7 @@ export const PROJECTS = [
     tags: ['Go', 'WebSockets', 'SQLite'],
     githubUrl: 'https://github.com/Alasmawi/real-time-forum',
     liveUrl: null,
-    gif: '/gifs/real-time-forum.gif',
+    video: '/video/real-time-forum.mp4',
   },
   {
     id: 'net-cat',
@@ -211,7 +211,7 @@ export const PROJECTS = [
     tags: ['Go', 'TCP', 'Networking'],
     githubUrl: 'https://github.com/Alasmawi/Net-Cat',
     liveUrl: null,
-    gif: '/gifs/net-cat.gif',
+    video: '/video/net-cat.mp4',
   },
   {
     id: 'groupie-tracker',
@@ -223,6 +223,6 @@ export const PROJECTS = [
     tags: ['Go', 'REST APIs', 'Frontend'],
     githubUrl: 'https://github.com/Alasmawi/groupie-tracker',
     liveUrl: null,
-    gif: '/gifs/groupie-tracker.gif',
+    video: '/video/groupie-tracker.mp4',
   },
 ];

@@ -31,7 +31,8 @@ export default function HeroCloud({ start = true }) {
   return (
     <section
       id="hero"
-      className="relative flex min-h-screen items-center overflow-hidden pt-24"
+      data-snap-firm
+      className="relative flex min-h-screen min-h-[100dvh] items-center overflow-hidden pt-24"
     >
       <div className="hero-sky" aria-hidden="true">
         <motion.img

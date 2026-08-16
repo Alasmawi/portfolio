@@ -34,7 +34,7 @@ const LINKS = [
 
 export default function Contact() {
   return (
-    <section id="contact" className="py-24 md:py-32">
+    <section id="contact" data-snap-firm className="py-24 md:py-32">
       <div className="mx-auto max-w-6xl px-6">
         <div className="grid grid-cols-1 gap-10 md:grid-cols-12 md:gap-8">
           <Reveal className="md:col-span-7">

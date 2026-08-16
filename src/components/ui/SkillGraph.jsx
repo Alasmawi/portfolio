@@ -17,7 +17,7 @@ import {
 import { Maximize2, Minimize2 } from 'lucide-react';
 import '@xyflow/react/dist/style.css';
 import './SkillGraph.css';
-import chipCore from '../../assets/icons/chip-core.gif';
+import chipCore from '../../assets/icons/chip-core.webp';
 import { buildAdjacency, buildSkillGraph, NODE_SIZE } from './skillGraphLayout';
 
 // Hover state travels by context, never through the `nodes` / `edges` props.

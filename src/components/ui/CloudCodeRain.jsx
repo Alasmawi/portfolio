@@ -81,7 +81,18 @@ function buildItems(count) {
 }
 
 export default function CloudCodeRain({ count = 40 }) {
-  const items = useMemo(() => buildItems(count), [count]);
+  // Each item is its own composited layer running an independent CSS
+  // animation. 40 of them is fine on a laptop GPU but adds up on mid-range
+  // phones, so mobile gets roughly half. Read once at mount rather than
+  // reactively on resize — this is decorative background, not layout that
+  // needs to respond live to viewport changes.
+  const effectiveCount = useMemo(() => {
+    if (typeof window === 'undefined') return count;
+    return window.matchMedia('(max-width: 767px)').matches
+      ? Math.round(count / 2)
+      : count;
+  }, [count]);
+  const items = useMemo(() => buildItems(effectiveCount), [effectiveCount]);
 
   return (
     <div

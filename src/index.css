@@ -24,6 +24,25 @@
     scroll-margin-top: 57px;
   }
 
+  /* Mobile: sections that fit in one screen (hero, about, contact) get a
+     firm stop via `scroll-snap-stop` — the swipe-to-next-card feel the
+     bottom tab bar implies — while the container (html, above) stays
+     `proximity` throughout. `scroll-snap-stop: always` forces a landing at
+     that section even mid-fling; sections without it are left to proximity,
+     so a long section (experience, projects, skills, education) never traps
+     a fling that was headed further down. Only applies under 768px —
+     desktop keeps the page's original behaviour untouched. */
+  @media (max-width: 767px) {
+    main > section[data-snap-firm] {
+      scroll-snap-stop: always;
+    }
+    /* Extra clearance for the fixed bottom tab bar so a snapped section's
+       last line of content isn't tucked behind it. */
+    main > section {
+      scroll-margin-bottom: 64px;
+    }
+  }
+
   /* A section taller than the viewport gets a second snap point pinned to its
      bottom edge, so it offers two resting places -- its top and its end --
      rather than only its top. Under proximity this is an offer, not a rail:
