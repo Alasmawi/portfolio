@@ -1,0 +1,164 @@
+/* One fade governs the entire background stack — photo, scrim and side pad
+   together. Fading them individually isn't enough: whichever layer is still
+   strong at the hero's last row puts a hard step against #about, and the side
+   pad is at 0.9 alpha down the left edge. */
+.hero-sky {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 58%, transparent 97%);
+  mask-image: linear-gradient(to bottom, #000 0%, #000 58%, transparent 97%);
+}
+
+/* The photo is masked out toward the bottom rather than painted over, so the
+   page's own gradient shows through and the hero has no visible bottom edge. */
+.hero-sky__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 32%;
+  /* Pulled toward the site's palette so it reads as part of the design rather
+     than a photograph dropped behind it. */
+  filter: saturate(0.86) contrast(1.03);
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    #000 0%,
+    #000 38%,
+    rgb(0 0 0 / 0.55) 66%,
+    transparent 92%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    #000 0%,
+    #000 38%,
+    rgb(0 0 0 / 0.55) 66%,
+    transparent 92%
+  );
+}
+
+/* Cools the whole frame and deepens it downward — the descent. */
+.hero-sky__scrim {
+  position: absolute;
+  inset: 0;
+  background:
+    /* Barely there at the top — the bright cumulus is the point — deepening
+       through the middle, then released to nothing at the very bottom.
+       It must not bottom out dark: the page's own gradient is still a mid
+       navy (#0e264a) this high up, so ending near-black would put a hard
+       band right on the seam with #about. */
+    linear-gradient(
+      to bottom,
+      rgb(9 23 46 / 0.06) 0%,
+      rgb(8 18 38 / 0.2) 44%,
+      rgb(7 16 34 / 0.36) 74%,
+      rgb(7 16 34 / 0) 100%
+    ),
+    radial-gradient(ellipse 90% 70% at 70% 10%, rgb(79 163 196 / 0.14), transparent 70%);
+}
+
+/* Legibility pad under the copy, which sits left. Light text on bright cumulus
+   fails contrast badly without it. */
+.hero-sky__side {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to right,
+    rgb(4 9 18 / 0.9) 0%,
+    rgb(4 9 18 / 0.74) 26%,
+    rgb(4 9 18 / 0.3) 50%,
+    transparent 68%
+  );
+}
+
+@media (max-width: 767px) {
+  /* No side column on a phone, so the copy needs the pad from the bottom up. */
+  .hero-sky__side {
+    background: linear-gradient(
+      to bottom,
+      rgb(4 9 18 / 0.2) 0%,
+      rgb(4 9 18 / 0.62) 45%,
+      rgb(4 9 18 / 0.88) 100%
+    );
+  }
+
+  .hero-sky__img {
+    object-position: 52% 26%;
+  }
+}
+
+/* Scroll-driven dim. --scroll-dim runs 0→1 across the first viewport (see
+   useScrollDim), so the sky fades toward the page's own darkness as you leave
+   it rather than simply sliding away. */
+.hero-sky__dim {
+  position: absolute;
+  inset: 0;
+  background: #04070d;
+  opacity: calc(var(--scroll-dim, 0) * 0.82);
+  will-change: opacity;
+}
+
+.hero-title {
+  text-shadow: 0 2px 24px rgb(3 8 17 / 0.55);
+}
+
+/* Nav follows the same variable: clear over the clouds, solid once you've
+   descended. Scoped to the cloud hero so the original hero is untouched. */
+[data-hero='v2'] header {
+  background-color: rgb(11 15 20 / calc(0.8 * var(--scroll-dim, 0)));
+  background-image: linear-gradient(
+    to bottom,
+    rgb(4 9 18 / calc(0.55 * (1 - var(--scroll-dim, 0)))),
+    rgb(4 9 18 / 0)
+  );
+  border-bottom-color: rgb(28 37 48 / calc(0.85 * var(--scroll-dim, 0)));
+  -webkit-backdrop-filter: blur(calc(var(--scroll-dim, 0) * 8px));
+  backdrop-filter: blur(calc(var(--scroll-dim, 0) * 8px));
+}
+
+/* With the bar clear, the links sit straight on bright cumulus. A shadow that
+   fades out as the bar solidifies keeps them readable without forcing a dark
+   band back across the top. */
+[data-hero='v2'] header a {
+  text-shadow: 0 1px 10px rgb(3 8 17 / calc(0.9 * (1 - var(--scroll-dim, 0))));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-sky__dim {
+    opacity: calc(var(--scroll-dim, 0) * 0.82);
+  }
+}
+
+/* The ridge flipped to the bottom edge: sky above it, circuitry below. The
+   fade lives out here, in screen space, so it always releases downward into
+   the page regardless of the child's rotation. */
+.hero-ridge {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  z-index: 1;
+  height: 12rem;
+  opacity: 0.85;
+  pointer-events: none;
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 42%, transparent 96%);
+  mask-image: linear-gradient(to bottom, #000 0%, #000 42%, transparent 96%);
+}
+
+.hero-ridge__flip {
+  position: absolute;
+  inset: 0;
+  transform: rotate(180deg);
+}
+
+@media (min-width: 640px) {
+  .hero-ridge {
+    height: 15rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-sky__img {
+    transition: none;
+  }
+}
