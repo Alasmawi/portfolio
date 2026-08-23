@@ -16,8 +16,14 @@ export const UOB_COURSEWORK = [
   { code: 'ITCC442', title: 'Cloud Security', ch: 3, pillar: 'cloud' },
   { code: 'ITCC481', title: 'Industrial Training', ch: 1, pillar: 'cloud' },
   { code: 'ITCC498', title: 'Senior Project', ch: 3, pillar: 'cloud' },
-  // AI
+  // AI — Intelligent Systems plus the math that actually underlies it.
+  // Linear Algebra and Probability & Statistics aren't IT-prefixed, but
+  // they're the two real mathematical foundations AI/ML is built on
+  // (matrices and eigenvalues; probability distributions), and both are
+  // confirmed required courses in the plan, not a stretch to include.
   { code: 'ITCS440', title: 'Intelligent Systems', ch: 3, pillar: 'ai' },
+  { code: 'MATHS211', title: 'Linear Algebra', ch: 3, pillar: 'ai' },
+  { code: 'STAT273', title: 'Probability and Statistics', ch: 3, pillar: 'ai' },
   // Full-stack / applications / data
   { code: 'ITCS113', title: 'Computer Programming I', ch: 3, pillar: 'fullstack' },
   { code: 'ITCS114', title: 'Computer Programming II', ch: 3, pillar: 'fullstack' },
