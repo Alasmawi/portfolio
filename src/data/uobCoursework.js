@@ -37,6 +37,13 @@ export const UOB_COURSEWORK = [
   { code: 'ITCS411', title: 'Cryptography and Computer Security', ch: 3, pillar: 'cs' },
   { code: 'ITCS441', title: 'Parallel and Distributed Computing', ch: 3, pillar: 'cs' },
   { code: 'ITCS396', title: 'Professional Issues and Ethics', ch: 3, pillar: 'cs' },
+  // The study plan's Business Free Elective slot only prints four
+  // suggested titles (Financial Accounting, Intro to Business Admin,
+  // Small Business Management, Marketing Mgt.) but explicitly allows "any
+  // other business course approved by the department chair" -- this was
+  // taken as that approved substitute, so it's real but isn't one of the
+  // plan's own listed course codes.
+  { code: 'Dept. Approved', title: 'Business Information Systems', ch: 3, pillar: 'cs' },
 ];
 
 // Distinct categorical hues, not a status-color reuse — the old CS gray
