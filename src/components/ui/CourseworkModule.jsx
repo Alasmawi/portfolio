@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import ExpandTile from './ExpandTile';
 import { FOCUS_PILLARS } from '../../data/focusPillars';
@@ -17,14 +18,18 @@ const card = {
 // choose to). Expanding doesn't drop into a course-by-course list either —
 // it's four per-pillar stat cards (count first, course names folded into a
 // small caption underneath), so the unit you're scanning is "how much of
-// each area" rather than eleven individual rows. Cards stagger in on
-// reveal rather than the whole block popping in at once.
+// each area" rather than a wall of rows. Each card's own caption is
+// truncated to a few names plus "+N more" — with 27 courses now, showing
+// every title inline would be exactly the text-heavy list this format was
+// built to avoid — but tapping a card reveals its full list, so nothing is
+// permanently hidden, just deferred behind one more tap.
 export default function CourseworkModule() {
   const total = UOB_COURSEWORK.length;
   const byPillar = FOCUS_PILLARS.map((pillar) => ({
     ...pillar,
     courses: UOB_COURSEWORK.filter((c) => c.pillar === pillar.id),
   })).filter((p) => p.courses.length > 0);
+  const [openPillar, setOpenPillar] = useState(null);
 
   return (
     <ExpandTile
@@ -56,30 +61,54 @@ export default function CourseworkModule() {
         animate="show"
         className="grid grid-cols-2 gap-2.5 pt-3"
       >
-        {byPillar.map((pillar) => (
-          <motion.div
-            key={pillar.id}
-            variants={card}
-            transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-            className="rounded-lg bg-base-raised p-3"
-          >
-            <div className="flex items-baseline gap-1.5">
-              <span
-                className="text-2xl font-semibold"
-                style={{ color: PILLAR_COLORS[pillar.id] }}
-              >
-                {pillar.courses.length}
-              </span>
-              <span className="font-mono text-[10px] uppercase tracking-wider text-text-dim">
-                {pillar.courses.length === 1 ? 'course' : 'courses'}
-              </span>
-            </div>
-            <p className="mt-1 text-xs text-text-primary">{pillar.label}</p>
-            <p className="mt-1.5 text-[10px] leading-snug text-text-dim">
-              {pillar.courses.map((c) => c.title).join(', ')}
-            </p>
-          </motion.div>
-        ))}
+        {byPillar.map((pillar) => {
+          const isOpen = openPillar === pillar.id;
+          return (
+            <motion.button
+              key={pillar.id}
+              type="button"
+              variants={card}
+              transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+              onClick={() => setOpenPillar(isOpen ? null : pillar.id)}
+              className="rounded-lg bg-base-raised p-3 text-left"
+            >
+              <div className="flex items-baseline gap-1.5">
+                <span
+                  className="text-2xl font-semibold"
+                  style={{ color: PILLAR_COLORS[pillar.id] }}
+                >
+                  {pillar.courses.length}
+                </span>
+                <span className="font-mono text-[10px] uppercase tracking-wider text-text-dim">
+                  {pillar.courses.length === 1 ? 'course' : 'courses'}
+                </span>
+              </div>
+              <p className="mt-1 text-xs text-text-primary">{pillar.label}</p>
+
+              {isOpen ? (
+                <ul className="mt-1.5 space-y-1">
+                  {pillar.courses.map((c) => (
+                    <li
+                      key={c.code}
+                      className="flex items-baseline justify-between gap-2 text-[10px] leading-snug"
+                    >
+                      <span className="text-text-dim">{c.title}</span>
+                      <span className="shrink-0 font-mono text-text-dim/70">{c.code}</span>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="mt-1.5 text-[10px] leading-snug text-text-dim">
+                  {pillar.courses
+                    .slice(0, 3)
+                    .map((c) => c.title)
+                    .join(', ')}
+                  {pillar.courses.length > 3 && ` +${pillar.courses.length - 3} more`}
+                </p>
+              )}
+            </motion.button>
+          );
+        })}
       </motion.div>
     </ExpandTile>
   );
