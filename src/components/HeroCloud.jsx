@@ -1,77 +1,26 @@
 import { motion } from 'framer-motion';
 import { ArrowDown } from 'lucide-react';
 import { GithubMark, LinkedinMark } from './ui/BrandIcons';
-import HeadshotCloud from './ui/HeadshotCloud';
-import SharpHorizon from './ui/SharpHorizon';
+import NeonCloudCanvas from './ui/NeonCloudCanvas';
 import StatusBadge from './ui/StatusBadge';
 import useTypingEffect from '../hooks/useTypingEffect';
-import useScrollDim from '../hooks/useScrollDim';
-import hero2000 from '../assets/hero/hero-2000.webp';
-import hero1200 from '../assets/hero/hero-1200.webp';
-import hero700 from '../assets/hero/hero-700.webp';
-import './HeroCloud.css';
 
 const ROLES = ['Cloud Computing', 'AI Systems', 'Full-Stack Development'];
 
-// Alternate hero: opens above the cloud deck and descends into the dark stack.
-// The photo is masked out toward the bottom rather than covered, so the page's
-// own gradient takes over and the seam into #about disappears. The angular
-// ridge that used to sit at the top of the hero is flipped to the bottom, where
-// it reads as the line where the sky ends and the machine begins.
-// `start` gates the sky's entrance on the loading curtain lifting. Without it
-// the 2.2s settle would run while the overlay still covers the page, and the
-// photo would simply be *there* when the curtain went up. Defaults to true so
-// the component still animates on its own if rendered without a loader.
-export default function HeroCloud({ start = true }) {
+// Hero centerpiece is a procedurally generated neon cloud (see
+// ui/neonCloud.js) — no mesh file, built from metaball-style ring math at
+// runtime. Replaces an earlier sky-photo hero and, before that, an
+// unshippable 114MB/776k-triangle OBJ export of the same creative idea.
+export default function HeroCloud() {
   const typed = useTypingEffect(ROLES);
-  useScrollDim();
 
-  // No bottom border here, unlike the original hero: the descent should read as
-  // continuous, and a 1px rule across it is exactly the seam we're hiding.
   return (
     <section
       id="hero"
       className="relative flex min-h-screen min-h-[100dvh] items-center overflow-hidden pt-24"
     >
-      <div className="hero-sky" aria-hidden="true">
-        <motion.img
-          src={hero2000}
-          srcSet={`${hero700} 700w, ${hero1200} 1200w, ${hero2000} 2000w`}
-          sizes="100vw"
-          alt=""
-          className="hero-sky__img"
-          initial={{ scale: 1.07, opacity: 0 }}
-          animate={start ? { scale: 1, opacity: 1 } : { scale: 1.07, opacity: 0 }}
-          transition={{ duration: 2.2, ease: [0.16, 1, 0.3, 1] }}
-          fetchPriority="high"
-        />
-        <div className="hero-sky__scrim" />
-        <div className="hero-sky__side" />
-        {/* Driven by --scroll-dim: the sky darkens as you descend out of it. */}
-        <div className="hero-sky__dim" />
-      </div>
-
-      {/* Sky above, circuit below. Two elements on purpose: the inner one is
-          rotated so the ridge points up, the outer one carries the fade —
-          a mask on the rotated element would be upside down too, which is
-          what put a hard dark band on the hero's bottom edge. */}
-      <div className="hero-ridge" aria-hidden="true">
-        <div className="hero-ridge__flip">
-          <SharpHorizon />
-        </div>
-      </div>
-
       <div className="relative z-10 mx-auto grid w-full max-w-6xl grid-cols-1 gap-10 px-6 md:grid-cols-12 md:gap-8">
-        <div className="md:col-span-8">
-          <motion.div
-            initial={{ opacity: 0, y: 16, scale: 0.97 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className="mb-6 flex justify-end md:hidden"
-          >
-            <HeadshotCloud />
-          </motion.div>
-
+        <div className="md:col-span-7">
           <motion.p
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -85,7 +34,7 @@ export default function HeroCloud({ start = true }) {
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
-            className="hero-title text-4xl font-semibold tracking-tight text-text-primary sm:text-5xl lg:text-6xl"
+            className="text-4xl font-semibold tracking-tight text-text-primary sm:text-5xl lg:text-6xl"
           >
             Abdulla Alasmawi
           </motion.h1>
@@ -144,26 +93,17 @@ export default function HeroCloud({ start = true }) {
           </motion.div>
         </div>
 
+        {/* The neon cloud stage. Order-first on mobile (sits above the
+            copy), a tall right-hand column on desktop — same shape as the
+            reference implementation's grid, adapted to the site's
+            existing 12-column convention instead of its own CSS grid. */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.6, delay: 0.8 }}
-          className="hidden md:col-span-4 md:flex md:flex-col md:justify-end md:gap-4"
+          transition={{ duration: 0.8, delay: 0.3 }}
+          className="order-first h-[46vh] min-h-[280px] md:order-none md:col-span-5 md:h-[min(70vh,640px)]"
         >
-          <HeadshotCloud />
-
-          {[
-            { k: 'location', v: 'Manama, Bahrain' },
-            { k: 'status', v: 'accepting new roles' },
-          ].map((row) => (
-            <div
-              key={row.k}
-              className="flex items-center justify-between pb-2 font-mono text-xs backdrop-blur-[2px]"
-            >
-              <span className="text-text-dim">{row.k}</span>
-              <span className="text-text-muted">{row.v}</span>
-            </div>
-          ))}
+          <NeonCloudCanvas />
         </motion.div>
       </div>
 
@@ -173,7 +113,7 @@ export default function HeroCloud({ start = true }) {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.6, delay: 1.1 }}
-        className="absolute bottom-8 left-1/2 z-10 flex -translate-x-1/2 flex-col items-center gap-2 text-text-dim transition-colors hover:text-amber"
+        className="absolute bottom-8 left-1/2 z-10 hidden -translate-x-1/2 flex-col items-center gap-2 text-text-dim transition-colors hover:text-amber md:flex"
       >
         <span className="font-mono text-[10px] uppercase tracking-widest">
           descend
