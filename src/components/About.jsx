@@ -50,8 +50,8 @@ export default function About() {
             get to fail.
           </h2>
           <p className="mt-5 max-w-[50ch] text-base leading-relaxed text-text-primary/84 md:text-[16px]">
-            A schema that has to still make sense in a year. An API that stays cheap when traffic
-            triples. A screen someone uses all day without thinking about it. That&apos;s the work.
+            A schema that still makes sense in a year. An API that stays cheap when traffic triples.
+            That&apos;s the work.
           </p>
         </Reveal>
 
@@ -82,14 +82,13 @@ export default function About() {
 
           <Reveal delay={0.15}>
             <p className="max-w-[48ch] text-[15.5px] leading-relaxed text-text-primary/80">
-              Full-stack product work on AWS — schema, API, front end, deploy. The computer-science
-              half isn&apos;t decoration: I&apos;ve written an HTTP server straight onto epoll, a Unix
-              shell with no external binaries, and a ray tracer from first principles, which is why I
+              Full-stack product work on AWS — schema, API, front end, deploy. Underneath it: an HTTP
+              server on epoll, a Unix shell, a ray tracer, all written from scratch. That&apos;s why I
               can go a layer down when a framework stops explaining itself.
             </p>
             <p className="mt-4 max-w-[48ch] text-[15.5px] leading-relaxed text-text-primary/80">
-              AI shows up where it earns its place — retrieval that cites its sources, anomaly
-              detection on sensor data — rather than as the headline.
+              AI where it earns its place: retrieval that cites its sources, anomaly detection on
+              sensor data.
             </p>
             <div className="mt-6 grid max-w-[46ch] gap-3">
               <div className="grid gap-1 sm:grid-cols-[88px_1fr] sm:items-baseline sm:gap-4">

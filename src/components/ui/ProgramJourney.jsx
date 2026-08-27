@@ -32,7 +32,7 @@ export default function ProgramJourney({ color = '#1CCFC9' }) {
             <p className="font-mono text-[11px] uppercase tracking-wider text-text-primary">
               {stage.phase}
             </p>
-            <p className="mt-0.5 font-mono text-[10px] text-text-dim">
+            <p className="mt-0.5 font-mono text-[10.5px] text-text-muted">
               {stage.duration}
               {stage.status === 'active' && (
                 <span className="ml-1.5" style={{ color }}>
@@ -40,7 +40,7 @@ export default function ProgramJourney({ color = '#1CCFC9' }) {
                 </span>
               )}
             </p>
-            <p className="mt-2 text-xs leading-relaxed text-text-muted">
+            <p className="mt-2 hidden text-xs leading-relaxed text-text-muted sm:block">
               {stage.description}
             </p>
           </div>

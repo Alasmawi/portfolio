@@ -133,6 +133,9 @@ const SWIPE_THRESHOLD_PX = 50;
 
 export default function ProjectBrowser() {
   const [selectedId, setSelectedId] = useState(PROJECTS[0].id);
+  // Phones get the first three lines of a description with the rest behind a
+  // tap. The full text is always in the DOM — this clamps, it doesn't truncate.
+  const [descOpen, setDescOpen] = useState(false);
   const project = PROJECTS.find((p) => p.id === selectedId) ?? PROJECTS[0];
   const wide = useIsWide(RING_MIN_WIDTH);
 
@@ -147,6 +150,7 @@ export default function ProjectBrowser() {
   const select = useCallback(
     (id) => {
       setSelectedId(id);
+      setDescOpen(false);
       nudgeIdle();
     },
     [nudgeIdle]
@@ -411,9 +415,25 @@ export default function ProjectBrowser() {
                       </div>
                     </div>
 
-                    <p className="mt-4 max-w-2xl text-[15px] leading-relaxed text-text-primary/80">
-                      {project.description}
-                    </p>
+                    <div className="mt-4 max-w-2xl">
+                      <p
+                        id={`desc-${project.id}`}
+                        className={`text-[15px] leading-relaxed text-text-primary/80 ${
+                          descOpen ? '' : 'line-clamp-3 sm:line-clamp-none'
+                        }`}
+                      >
+                        {project.description}
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => setDescOpen((v) => !v)}
+                        aria-expanded={descOpen}
+                        aria-controls={`desc-${project.id}`}
+                        className="mt-1.5 min-h-6 py-1 font-mono text-[11px] uppercase tracking-[0.12em] text-accent-bright sm:hidden"
+                      >
+                        {descOpen ? 'Less' : 'More'}
+                      </button>
+                    </div>
 
                     <div className="mt-4 flex flex-wrap gap-1.5">
                       {project.tags.map((tag) => (

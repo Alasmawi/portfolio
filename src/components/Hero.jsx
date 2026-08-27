@@ -10,15 +10,15 @@ export default function Hero() {
   return (
     <section
       id="hero"
-      className="relative min-h-screen min-h-[100dvh] overflow-hidden bg-void pt-16"
+      className="relative min-h-[88dvh] overflow-hidden bg-void pt-16 sm:min-h-screen sm:min-h-[100dvh]"
     >
       <SyntaxRain size={14} density={0.68} dim tint="145,132,217" fade={RAIN_FADE} exclude={RAIN_EXCLUDE} />
 
-      {/* On a phone the cloud is a band across the top of the screen and the
-          copy starts underneath it. It used to sit at w-420 / right-[-120],
-          which at 390px put its left edge at x=90 — straight through the
-          kicker. Desktop keeps it as a full-height column on the right. */}
-      <div className="pointer-events-none absolute right-[-70px] top-[-30px] h-[255px] w-[320px] sm:right-[-60px] sm:top-0 sm:h-full sm:w-[560px] md:right-[-60px] md:w-[720px]">
+      {/* Ambient, not a banner. On phones the cloud sits behind the copy at
+          reduced opacity with the radial scrim below carrying legibility —
+          same idea as desktop. Pinning it to the top as its own band left it
+          floating above a gap, disconnected from everything. */}
+      <div className="pointer-events-none absolute right-[-90px] top-[6%] h-[52%] w-[380px] opacity-45 sm:right-[-60px] sm:top-0 sm:h-full sm:w-[560px] sm:opacity-100 md:right-[-60px] md:w-[720px]">
         <HeroCloudCanvas />
       </div>
 
@@ -26,15 +26,14 @@ export default function Hero() {
         className="pointer-events-none absolute inset-0"
         style={{
           background:
-            'radial-gradient(46% 54% at 20% 48%, rgba(15,17,28,.9), rgba(15,17,28,.35) 62%, rgba(15,17,28,0) 78%)',
+            'radial-gradient(120% 62% at 26% 56%, rgba(15,17,28,.94), rgba(15,17,28,.6) 58%, rgba(15,17,28,.2) 82%)',
         }}
       />
 
-      {/* Phone: copy starts below the cloud band, status pinned to the bottom
-          by mt-auto. `justify-between` here used to open a ~250px hole in the
-          middle of the phone hero, since the column is a full viewport tall
-          and only had two children to space apart. */}
-      <div className="relative mx-auto flex min-h-[calc(100dvh-4rem)] max-w-6xl flex-col px-6 pb-7 pt-[182px] sm:justify-between sm:px-10 sm:pt-6 md:px-14">
+      {/* Status pinned to the bottom by mt-auto. `justify-between` is desktop
+          only: there the column is a full viewport tall with two children, and
+          on a phone that opened a ~250px hole between them. */}
+      <div className="relative mx-auto flex min-h-[calc(88dvh-4rem)] max-w-6xl flex-col px-5 pb-7 pt-8 sm:min-h-[calc(100dvh-4rem)] sm:justify-between sm:px-10 sm:pt-6 md:px-14">
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
@@ -42,8 +41,8 @@ export default function Hero() {
           className="max-w-xl"
           style={{ textShadow: '0 1px 18px rgba(15,17,28,.9)' }}
         >
-          {/* Wraps to two lines on a phone, where the cloud canvas comes down
-              into the top-right corner and a single line would run under it. */}
+          {/* Location drops to its own line on a phone rather than trailing an
+              em dash off the edge of a 350px measure. */}
           <p className="mb-5 font-mono text-[11px] uppercase leading-relaxed tracking-[0.2em] text-text-muted">
             Computer science, cloud, full-stack
             <span className="hidden sm:inline"> — </span>
@@ -53,8 +52,7 @@ export default function Hero() {
             Abdulla Alasmawi
           </h1>
           <p className="mt-5 max-w-[42ch] text-lg leading-relaxed text-text-primary/85 sm:text-xl">
-            I build full-stack systems on AWS, and I understand them the whole way down — schema,
-            API, front end, and the fundamentals underneath.
+            I build full-stack systems on AWS — and understand them the whole way down.
           </p>
           <p className="mt-4 max-w-[42ch] border-l-2 border-accent py-0.5 pl-3.5 text-base leading-snug text-text-primary sm:text-[17px]">
             Built the AWS backend for a Ministry of Interior K9 monitoring system.
