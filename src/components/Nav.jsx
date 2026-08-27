@@ -24,7 +24,7 @@ export default function Nav() {
             e.preventDefault();
             go('hero');
           }}
-          className="flex items-center gap-2.5 font-sans text-sm font-medium text-text-primary"
+          className="flex min-h-6 items-center gap-2.5 py-1 font-sans text-sm font-medium text-text-primary"
         >
           <span className="h-2 w-2 rounded-full border border-accent" aria-hidden="true" />
           Abdulla Alasmawi

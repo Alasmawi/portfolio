@@ -37,7 +37,8 @@ export default function CourseworkModule() {
       trigger={
         <div className="w-full">
           <div className="mb-2 flex items-center justify-between">
-            <span className="font-mono text-[10px] uppercase tracking-wider text-text-dim">
+            {/* text-muted, not text-dim: at 10px, dim measured 4.36:1. */}
+            <span className="font-mono text-[10px] uppercase tracking-wider text-text-muted">
               credit distribution
             </span>
           </div>

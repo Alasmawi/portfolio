@@ -37,15 +37,16 @@ export default function Hero() {
           {/* Wraps to two lines on a phone, where the cloud canvas comes down
               into the top-right corner and a single line would run under it. */}
           <p className="mb-5 font-mono text-[11px] uppercase leading-relaxed tracking-[0.2em] text-text-muted">
-            Full stack · cloud · AWS
+            Computer science, cloud, full-stack
             <span className="hidden sm:inline"> — </span>
             <span className="block sm:inline">Manama</span>
           </p>
           <h1 className="text-5xl font-medium leading-[1] tracking-tight text-text-primary sm:text-6xl lg:text-[64px]">
             Abdulla Alasmawi
           </h1>
-          <p className="mt-5 max-w-[40ch] text-lg leading-relaxed text-text-primary/85 sm:text-xl">
-            I build cloud infrastructure, applied AI features, and full-stack systems end to end.
+          <p className="mt-5 max-w-[42ch] text-lg leading-relaxed text-text-primary/85 sm:text-xl">
+            I build full-stack systems on AWS, and I understand them the whole way down — schema,
+            API, front end, and the fundamentals underneath.
           </p>
           <p className="mt-4 max-w-[42ch] border-l-2 border-accent py-0.5 pl-3.5 text-base leading-snug text-text-primary sm:text-[17px]">
             Built the AWS backend for a Ministry of Interior K9 monitoring system.

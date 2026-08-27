@@ -78,23 +78,26 @@ export default function Contact() {
 
         <div className="hr-fade my-8 md:my-10" />
 
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        {/* A real landmark, so "jump to footer" works in a screen reader. */}
+        <footer className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <p className="font-mono text-[11.5px] text-text-dim">alasmawi.dev · Manama, Bahrain · UTC+3</p>
-          <div className="flex flex-wrap gap-x-5 gap-y-2">
+          <div className="flex flex-wrap gap-x-5 gap-y-1">
             {LINKS.map(({ label, href, Icon }) => (
               <a
                 key={label}
                 href={href}
                 target={href.startsWith('http') ? '_blank' : undefined}
                 rel={href.startsWith('http') ? 'noreferrer' : undefined}
-                className="inline-flex items-center gap-2 font-mono text-[11.5px] text-text-muted transition-colors hover:text-accent-bright"
+                // py-1.5 clears the 24px WCAG 2.2 target minimum; these sit in
+                // a flex row, so they don't get the inline-text exemption.
+                className="inline-flex min-h-6 items-center gap-2 py-1.5 font-mono text-[11.5px] text-text-muted transition-colors hover:text-accent-bright"
               >
                 <Icon size={13} className="shrink-0" />
                 {label}
               </a>
             ))}
           </div>
-        </div>
+        </footer>
       </div>
     </section>
   );

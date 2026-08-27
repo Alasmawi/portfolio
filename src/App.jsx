@@ -6,9 +6,6 @@ import Experience from './components/Experience';
 import Education from './components/Education';
 import About from './components/About';
 import Contact from './components/Contact';
-import Preloader from './components/ui/Preloader';
-import useAssetsReady from './hooks/useAssetsReady';
-import headshot from './assets/pfp-nobg.webp';
 
 // Marks sections that don't fit the viewport so they get a second, bottom-edge
 // snap point (see index.css). Re-evaluated on resize and whenever a section's
@@ -37,15 +34,17 @@ function useTallSectionSnapPoints() {
   }, []);
 }
 
-const CRITICAL_ASSETS = [headshot];
-
+// No loading curtain. The old one held the whole page — scroll locked, clicks
+// swallowed — until `document.fonts.ready` and the headshot had settled, with
+// an 8s ceiling. It existed to hide a heavy hero photo decoding, and that photo
+// is gone: the hero is now a canvas, and the headshot sits in About below the
+// fold. Gating first paint on a third-party font host bought nothing and cost
+// every visitor on a slow connection a blank screen, so the page just renders.
 export default function App() {
   useTallSectionSnapPoints();
-  const { ready, progress } = useAssetsReady(CRITICAL_ASSETS);
 
   return (
     <>
-      <Preloader ready={ready} progress={progress} />
       <Nav />
       <main className="relative z-10">
         <Hero />

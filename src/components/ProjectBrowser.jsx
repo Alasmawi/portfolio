@@ -247,7 +247,9 @@ export default function ProjectBrowser() {
             </p>
           </div>
           <div className="mt-5 flex flex-wrap items-center gap-3">
-            <span className="shrink-0 font-mono text-[10.5px] uppercase tracking-[0.16em] text-text-muted/70">
+            {/* Full-strength muted, not /70: at 10.5px the faded variant
+                measured 4.19:1, under the 4.5:1 AA floor. */}
+            <span className="shrink-0 font-mono text-[10.5px] uppercase tracking-[0.16em] text-text-muted">
               Recurring stack
             </span>
             <span className="hidden h-3.5 w-px bg-base-border sm:block" aria-hidden="true" />
