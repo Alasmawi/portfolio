@@ -24,7 +24,7 @@
 }
 
 .ring-mask:focus-visible {
-  outline: 1px solid rgb(242 169 59 / 0.6);
+  outline: 1px solid rgb(145 132 217 / 0.6);
   outline-offset: 4px;
 }
 
@@ -79,7 +79,7 @@
   height: 100%;
   padding: var(--mat);
   overflow: hidden;
-  border: 1px solid #223041;
+  border: 1px solid rgb(233 233 237 / 0.14);
   /* A shade off the artwork behind it, so the mat is legible as a mat and the
      contained image's true extent stays visible. */
   background: #151d28;
@@ -128,26 +128,26 @@
   /* sits just inside the image well rather than floating over the mat */
   bottom: calc(var(--mat) + 4px);
   left: calc(var(--mat) + 4px);
-  border: 1px solid rgb(28 37 48 / 0.8);
+  border: 1px solid rgb(233 233 237 / 0.12);
   border-radius: 0.25rem;
-  background: rgb(11 15 20 / 0.82);
+  background: rgb(15 17 28 / 0.82);
   padding: 0.2rem 0.45rem;
   font-family: 'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
   font-size: 10px;
-  color: #8b98a5;
+  color: rgb(233 233 237 / 0.7);
   backdrop-filter: blur(4px);
   pointer-events: none;
 }
 
 .ring-slot.is-front .ring-card {
-  border-color: rgb(242 169 59 / 0.45);
+  border-color: rgb(145 132 217 / 0.5);
 }
 
 /* Corner brackets on the focused card only — drawn on the slot, which doesn't
    clip, so they can sit just outside the card's edge. Same hard-cornered
    language as the hero ridge. */
 .ring-slot.is-front::after {
-  --b: #f2a93b;
+  --b: #9184d9;
   --len: 16px;
 
   content: '';

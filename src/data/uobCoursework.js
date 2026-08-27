@@ -52,12 +52,14 @@ export const UOB_COURSEWORK = [
   { code: 'Dept. Approved', title: 'Business Information Systems', ch: 3, pillar: 'cs' },
 ];
 
-// Distinct categorical hues, not a status-color reuse — the old CS gray
-// read as "no color"/disabled rather than a real category, and green was
-// double-booked with the site's "operational" status dots elsewhere.
+// One hue, four steps of it. Nocturne runs a single accent, so the credit
+// bar's categories separate by lightness rather than by four competing hues —
+// the segments still read apart, but the bar stops being the loudest thing on
+// the page. Ordered so the pillars the site actually argues for (cloud, AI)
+// take the brightest steps.
 export const PILLAR_COLORS = {
-  cloud: '#F2A93B', // amber
-  ai: '#2FC2E8', // cyan
-  fullstack: '#A78BFA', // violet
-  cs: '#F472B6', // rose
+  cloud: '#d2cefd',
+  ai: '#b5abfc',
+  fullstack: '#9184d9',
+  cs: '#6c62a8',
 };

@@ -1,113 +1,196 @@
 import Reveal from './ui/Reveal';
-import SectionHeader from './ui/SectionHeader';
+import { EXPERIENCE, K9_CROSS_REF } from '../data/experience';
 
-const EXPERIENCE = [
-  {
-    role: 'Network & Information Security Intern',
-    org: 'Bahrain Shura Council',
-    period: 'Jul 2026 — Sep 2026',
-    status: 'active',
-    accentColor: '#CE1126',
-    points: [
-      'Administered Active Directory and Microsoft Intune device policy.',
-      'Implemented Privileged Access Management (PAM) and BitLocker encryption policy.',
-      'Managed OS/software patching across the fleet with ManageEngine.',
-    ],
-    tags: ['Active Directory', 'Intune', 'PAM', 'BitLocker', 'ManageEngine'],
-  },
-  {
-    role: 'Cloud & IoT Intern',
-    org: 'AWS Cloud Innovation Center (CIC)',
-    period: 'Feb 2026 — Jun 2026',
-    status: 'completed',
-    accentColor: '#F2A93B',
-    points: [
-      'Built a smart IoT/cloud monitoring solution for the Bahrain Ministry of Interior’s Police K9 Unit.',
-      'Implemented anomaly detection on sensor data using Amazon Bedrock.',
-      'Shipped a centralized dashboard for real-time health and environment tracking.',
-    ],
-    tags: ['AWS IoT Core', 'Amazon Bedrock', 'Lambda', 'DynamoDB'],
-  },
-];
+const YEAR = 2026;
+const YEAR_START = new Date(Date.UTC(YEAR, 0, 1));
+const YEAR_END = new Date(Date.UTC(YEAR + 1, 0, 1));
+const MS_IN_YEAR = YEAR_END - YEAR_START;
+
+function frac(iso) {
+  return (new Date(`${iso}T00:00:00Z`) - YEAR_START) / MS_IN_YEAR;
+}
+
+const TICKS = ['Jan', 'Apr', 'Jul', 'Oct'].map((label, i) => ({
+  label,
+  pct: (i * 3) / 12,
+}));
+
+const now = new Date();
+const nowPct = now >= YEAR_START && now < YEAR_END ? (now - YEAR_START) / MS_IN_YEAR : null;
+
+function formatRange(entry) {
+  const fmt = (iso) =>
+    new Date(`${iso}T00:00:00Z`).toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+  return `${fmt(entry.start)} — ${entry.status === 'active' ? fmt(entry.end).split(' ')[0] + ' (ongoing)' : fmt(entry.end)}`;
+}
+
+function Bar({ start, end, active, muted = false, indent = false }) {
+  const left = frac(start) * 100;
+  const width = Math.max((frac(end) - frac(start)) * 100, 1.5);
+  return (
+    <div className={`relative h-2 rounded ${indent ? 'ml-4' : ''}`}>
+      <div className="absolute inset-0 rounded shadow-[inset_0_0_0_1px_rgba(233,233,237,0.09)]" />
+      <div
+        className={`absolute top-0 bottom-0 rounded ${
+          active ? 'bg-accent/25 shadow-[inset_0_0_0_1px_rgba(145,132,217,0.6)]' : ''
+        } ${muted ? 'shadow-[inset_0_0_0_1px_rgba(145,132,217,0.35)]' : ''}`}
+        style={{ left: `${left}%`, width: `${width}%` }}
+      />
+    </div>
+  );
+}
 
 export default function Experience() {
   return (
-    <section
-      id="experience"
-      className="border-b border-base-border py-24 md:py-32"
-    >
-      <div className="mx-auto max-w-6xl px-6">
-        <SectionHeader
-          index="02"
-          id="experience"
-          title="Experience"
-          region="~/experience"
-        />
+    <section id="experience" className="bg-base-bg px-6 py-14 sm:px-10 md:px-14 md:py-20">
+      <div className="mx-auto max-w-6xl">
+        <Reveal>
+          <p className="mb-4 font-mono text-[11px] uppercase tracking-[0.18em] text-text-muted">
+            // 02 [ experience ]
+          </p>
+          <div className="flex flex-wrap items-end justify-between gap-6">
+            <h2 className="max-w-[26ch] text-3xl font-medium tracking-tight text-text-primary md:text-[38px]">
+              Two internships, back to back, through {YEAR}.
+            </h2>
+            <p className="whitespace-nowrap font-mono text-[11.5px] text-text-muted">
+              {YEAR} · cloud, then security
+            </p>
+          </div>
+        </Reveal>
 
-        <div className="space-y-6">
+        <Reveal delay={0.1}>
+          <div className="mt-10">
+            <div className="relative mb-2.5 h-4 font-mono text-[10.5px] uppercase tracking-wider text-text-dim">
+              {TICKS.map((t, i) => (
+                <span
+                  key={t.label}
+                  className={`absolute ${i === 0 ? '' : '-translate-x-1/2'}`}
+                  style={{ left: `${t.pct * 100}%` }}
+                >
+                  {t.label}
+                </span>
+              ))}
+            </div>
+
+            <div className="relative grid gap-3.5 pb-1 pt-1.5">
+              {nowPct !== null && (
+                <div
+                  className="pointer-events-none absolute -top-1 bottom-0 w-px bg-accent/40"
+                  style={{ left: `${nowPct * 100}%` }}
+                  aria-hidden="true"
+                />
+              )}
+
+              <div className="grid gap-1.5">
+                <div className="flex items-baseline gap-2 font-mono text-[11px] text-text-muted">
+                  <span className="text-text-primary">{EXPERIENCE[0].role}</span>
+                  <span>· {EXPERIENCE[0].org}</span>
+                </div>
+                <Bar start={EXPERIENCE[0].start} end={EXPERIENCE[0].end} active />
+              </div>
+
+              <div className="grid gap-1.5">
+                <div className="flex items-baseline gap-2 font-mono text-[11px] text-text-dim">
+                  <span className="text-accent-body">└</span>
+                  <span>{K9_CROSS_REF.label}</span>
+                </div>
+                <Bar start={EXPERIENCE[0].start} end={EXPERIENCE[0].end} muted indent />
+              </div>
+
+              <div className="grid gap-1.5">
+                <div className="flex items-baseline gap-2 font-mono text-[11px] text-text-muted">
+                  <span className="text-text-primary">{EXPERIENCE[1].role}</span>
+                  <span>· {EXPERIENCE[1].org}</span>
+                </div>
+                <Bar start={EXPERIENCE[1].start} end={EXPERIENCE[1].end} active />
+              </div>
+            </div>
+
+            <div className="mt-4 flex flex-wrap items-center gap-5 font-mono text-[10.5px] text-text-dim">
+              <span className="inline-flex items-center gap-2">
+                <span className="h-2 w-4 rounded-sm bg-accent/25 shadow-[inset_0_0_0_1px_rgba(145,132,217,0.6)]" />
+                internship
+              </span>
+              <span className="inline-flex items-center gap-2">
+                <span className="h-2 w-4 rounded-sm shadow-[inset_0_0_0_1px_rgba(145,132,217,0.35)]" />
+                what it produced
+              </span>
+              {nowPct !== null && (
+                <span className="inline-flex items-center gap-2">
+                  <span className="h-2.5 w-px bg-accent/40" />
+                  today
+                </span>
+              )}
+            </div>
+          </div>
+        </Reveal>
+
+        <div className="mt-10 divide-y divide-base-border md:mt-14">
           {EXPERIENCE.map((job, i) => (
-            <Reveal key={job.org} delay={i * 0.1}>
-              <div
-                style={{ '--accent': job.accentColor }}
-                className="group relative border border-l-2 border-base-border border-l-transparent bg-base-surface/40 p-6 transition-all duration-300 hover:border-l-[var(--accent)] hover:bg-base-surface/70 hover:shadow-[0_0_0_1px_var(--accent),0_0_24px_-6px_var(--accent)] sm:p-8"
-              >
-                <div className="grid grid-cols-1 gap-6 md:grid-cols-12">
-                  <div className="md:col-span-3">
-                    <p className="font-mono text-xs text-text-dim">
-                      {job.period}
+            <Reveal key={job.id} delay={0.1 + i * 0.05}>
+              <div className="grid gap-3 py-6 md:grid-cols-[190px_1fr_210px] md:gap-9 md:py-7">
+                <div>
+                  <p className="font-mono text-[11.5px] text-text-muted">{formatRange(job)}</p>
+                  {job.status === 'active' ? (
+                    <p className="mt-2 inline-flex items-center gap-1.5 font-mono text-[10.5px] uppercase tracking-wider text-accent-body">
+                      <span className="h-[5px] w-[5px] animate-pulse-slow rounded-full bg-accent" />
+                      current
                     </p>
-                    <div className="mt-3 inline-flex items-center gap-1.5">
-                      <span
-                        className={`h-1.5 w-1.5 rounded-full ${
-                          job.status === 'active'
-                            ? 'animate-pulse-slow bg-ok'
-                            : 'bg-text-dim'
-                        }`}
-                      />
-                      <span className="font-mono text-[11px] uppercase tracking-wider text-text-dim">
-                        {job.status}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="md:col-span-9">
-                    <h3 className="text-xl font-semibold text-text-primary">
-                      {job.role}
-                    </h3>
-                    <p
-                      style={{ color: job.accentColor }}
-                      className="mt-1 font-mono text-sm"
-                    >
-                      {job.org}
+                  ) : (
+                    <p className="mt-2 font-mono text-[10.5px] uppercase tracking-wider text-text-dim">
+                      completed
                     </p>
+                  )}
+                </div>
 
-                    <ul className="mt-4 space-y-2">
-                      {job.points.map((point) => (
-                        <li
-                          key={point}
-                          className="flex gap-2 text-sm leading-relaxed text-text-muted"
-                        >
-                          <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-text-dim" />
-                          {point}
-                        </li>
-                      ))}
-                    </ul>
+                <div>
+                  <h3 className="text-xl font-medium tracking-tight text-text-primary">{job.role}</h3>
+                  <p className="mt-1 font-mono text-xs text-accent-body">{job.context}</p>
+                  <ul className="mt-3.5 space-y-1.5">
+                    {job.points.map((point) => (
+                      <li key={point} className="flex gap-2 text-[14.5px] leading-relaxed text-text-primary/85">
+                        <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-text-dim" />
+                        {point}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
 
-                    <div className="mt-5 flex flex-wrap gap-2">
-                      {job.tags.map((tag) => (
-                        <span
-                          key={tag}
-                          className="rounded border border-base-border px-2 py-1 font-mono text-[11px] text-text-muted"
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
+                <div className="flex flex-wrap content-start gap-1.5">
+                  {job.tags.map((tag) => (
+                    <span key={tag} className="tag-outline text-[11px]">
+                      {tag}
+                    </span>
+                  ))}
                 </div>
               </div>
             </Reveal>
           ))}
+
+          <Reveal delay={0.2}>
+            <div className="grid items-baseline gap-2 py-6 md:grid-cols-[190px_1fr_210px] md:gap-9">
+              <p className="font-mono text-[10.5px] uppercase tracking-wider text-text-dim">
+                from the internship
+              </p>
+              <div>
+                <h3 className="text-lg font-medium tracking-tight text-text-primary">{K9_CROSS_REF.label}</h3>
+                <p className="mt-1 max-w-[62ch] text-[14.5px] leading-relaxed text-text-muted">
+                  {K9_CROSS_REF.blurb}{' '}
+                  <a href="#projects" className="text-accent-bright underline decoration-accent-body/40 underline-offset-2">
+                    Projects
+                  </a>
+                  .
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-1.5">
+                {K9_CROSS_REF.tags.map((tag) => (
+                  <span key={tag} className="tag-outline text-[11px]">
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </Reveal>
         </div>
       </div>
     </section>

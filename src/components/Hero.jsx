@@ -1,146 +1,100 @@
 import { motion } from 'framer-motion';
-import { ArrowDown } from 'lucide-react';
 import { GithubMark, LinkedinMark } from './ui/BrandIcons';
-import HeadshotSlot from './ui/HeadshotSlot';
-import NetworkBackground from './ui/NetworkBackground';
-import SharpHorizon from './ui/SharpHorizon';
-import StatusBadge from './ui/StatusBadge';
-import useTypingEffect from '../hooks/useTypingEffect';
+import HeroCloudCanvas from './ui/HeroCloudCanvas';
+import SyntaxRain from './ui/SyntaxRain';
 
-const ROLES = ['Cloud Computing', 'AI Systems', 'Full-Stack Development'];
+const RAIN_FADE = [{ x1: 0.02, y1: 0.16, x2: 0.92, y2: 0.94, a: 0.26 }];
+const RAIN_EXCLUDE = [{ x1: 0, y1: 0, x2: 1, y2: 0.1 }];
 
 export default function Hero() {
-  const typed = useTypingEffect(ROLES);
-
   return (
     <section
       id="hero"
-      className="relative flex min-h-screen min-h-[100dvh] items-center overflow-hidden border-b border-base-border pt-24"
+      className="relative min-h-screen min-h-[100dvh] overflow-hidden bg-void pt-16"
     >
-      <NetworkBackground />
-      <SharpHorizon />
+      <SyntaxRain size={14} density={0.68} dim tint="145,132,217" fade={RAIN_FADE} exclude={RAIN_EXCLUDE} />
 
-      <div className="relative mx-auto grid w-full max-w-6xl grid-cols-1 gap-10 px-6 md:grid-cols-12 md:gap-8">
-        <div className="md:col-span-8">
-          <motion.div
-            initial={{ opacity: 0, y: 16, scale: 0.97 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className="mb-6 flex w-full justify-end md:hidden"
-          >
-            <div className="w-[150px] sm:w-[180px]">
-              <HeadshotSlot />
-            </div>
-          </motion.div>
+      <div className="pointer-events-none absolute right-[-120px] top-[-40px] h-[360px] w-[420px] sm:right-[-60px] sm:top-0 sm:h-full sm:w-[560px] md:right-[-60px] md:w-[720px]">
+        <HeroCloudCanvas />
+      </div>
 
-          <motion.p
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="mb-6 font-mono text-xs uppercase tracking-wider text-amber"
-          >
-            [ whoami ]
-          </motion.p>
+      <div
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            'radial-gradient(46% 54% at 20% 48%, rgba(15,17,28,.9), rgba(15,17,28,.35) 62%, rgba(15,17,28,0) 78%)',
+        }}
+      />
 
-          <motion.h1
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-4xl font-semibold tracking-tight text-text-primary sm:text-5xl lg:text-6xl"
-          >
+      <div className="relative mx-auto flex min-h-[calc(100dvh-4rem)] max-w-6xl flex-col justify-between px-6 pb-8 pt-6 sm:px-10 md:px-14">
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.1 }}
+          className="max-w-xl"
+          style={{ textShadow: '0 1px 18px rgba(15,17,28,.9)' }}
+        >
+          {/* Wraps to two lines on a phone, where the cloud canvas comes down
+              into the top-right corner and a single line would run under it. */}
+          <p className="mb-5 font-mono text-[11px] uppercase leading-relaxed tracking-[0.2em] text-text-muted">
+            Full stack · cloud · AWS
+            <span className="hidden sm:inline"> — </span>
+            <span className="block sm:inline">Manama</span>
+          </p>
+          <h1 className="text-5xl font-medium leading-[1] tracking-tight text-text-primary sm:text-6xl lg:text-[64px]">
             Abdulla Alasmawi
-          </motion.h1>
+          </h1>
+          <p className="mt-5 max-w-[40ch] text-lg leading-relaxed text-text-primary/85 sm:text-xl">
+            I build cloud infrastructure, applied AI features, and full-stack systems end to end.
+          </p>
+          <p className="mt-4 max-w-[42ch] border-l-2 border-accent py-0.5 pl-3.5 text-base leading-snug text-text-primary sm:text-[17px]">
+            Built the AWS backend for a Ministry of Interior K9 monitoring system.
+          </p>
 
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="mt-4 flex h-8 items-center font-mono text-lg text-steel-bright sm:text-xl"
-          >
-            <span>{typed}</span>
-            <span className="ml-1 h-5 w-[2px] animate-blink bg-steel-bright" />
-          </motion.div>
-
-          <motion.p
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            className="mt-6 max-w-xl text-base leading-relaxed text-text-muted sm:text-lg"
-          >
-            Computer Science graduate building cloud infrastructure, applied
-            AI features, and full-stack systems end to end — mostly AWS, Go,
-            and Python.
-          </motion.p>
-
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-            className="mt-8 flex flex-wrap items-center gap-4"
-          >
+          <div className="mt-8 flex flex-wrap items-center gap-3" style={{ textShadow: 'none' }}>
+            <a href="#contact" className="btn btn-primary min-h-[46px] px-6 text-[15px] shadow-glow-accent">
+              Get in touch
+            </a>
             <a
               href="https://github.com/Alasmawi"
               target="_blank"
               rel="noreferrer"
-              aria-label="GitHub profile"
-              className="group flex items-center gap-2 rounded border border-base-border bg-base-surface px-4 py-2.5 transition-all hover:border-amber hover:shadow-glow-amber"
+              className="btn btn-ghost min-h-[46px]"
             >
-              <GithubMark size={18} className="text-text-primary" />
-              <span className="font-mono text-sm text-text-primary">GitHub</span>
+              <GithubMark size={16} />
+              GitHub
             </a>
             <a
               href="https://linkedin.com/in/alasmawi"
               target="_blank"
               rel="noreferrer"
-              aria-label="LinkedIn profile"
-              className="group flex items-center gap-2 rounded border border-base-border bg-base-surface px-4 py-2.5 transition-all hover:border-steel hover:shadow-glow-steel"
+              className="btn btn-ghost min-h-[46px]"
             >
-              <LinkedinMark size={18} className="text-text-primary" />
-              <span className="font-mono text-sm text-text-primary">LinkedIn</span>
+              <LinkedinMark size={16} />
+              LinkedIn
             </a>
-
-            <div className="ml-0 sm:ml-2">
-              <StatusBadge />
-            </div>
-          </motion.div>
-        </div>
+          </div>
+        </motion.div>
 
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.6, delay: 0.5 }}
-          className="hidden md:col-span-4 md:flex md:flex-col md:justify-end md:gap-4"
+          className="mt-10 flex items-end justify-between gap-4"
         >
-          <HeadshotSlot />
-
-          {[
-            { k: 'location', v: 'Manama, Bahrain' },
-            { k: 'status', v: 'accepting new roles' },
-          ].map((row) => (
-            <div
-              key={row.k}
-              className="flex items-center justify-between border-b border-base-border/70 pb-2 font-mono text-xs"
-            >
-              <span className="text-text-dim">{row.k}</span>
-              <span className="text-text-muted">{row.v}</span>
-            </div>
-          ))}
+          <div className="flex flex-col gap-1.5 font-mono text-xs text-text-muted sm:flex-row sm:items-center sm:gap-8">
+            <span className="inline-flex items-center gap-2 text-accent-bright">
+              <span className="h-[5px] w-[5px] animate-pulse-slow rounded-full bg-accent" />
+              Available for work
+            </span>
+            <span>K9 Pavlov · deployed</span>
+            <span className="hidden sm:inline">UTC+3</span>
+          </div>
+          <span className="hidden font-mono text-[11.5px] uppercase tracking-[0.14em] text-text-muted md:inline">
+            scroll
+          </span>
         </motion.div>
       </div>
-
-      <motion.a
-        href="#about"
-        aria-label="Scroll to about section"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.6, delay: 0.8 }}
-        className="absolute bottom-8 left-1/2 flex -translate-x-1/2 flex-col items-center gap-2 text-text-dim transition-colors hover:text-amber"
-      >
-        <span className="font-mono text-[10px] uppercase tracking-widest">
-          scroll
-        </span>
-        <ArrowDown size={14} className="animate-pulse-slow" />
-      </motion.a>
     </section>
   );
 }

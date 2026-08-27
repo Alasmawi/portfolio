@@ -10,16 +10,10 @@
        are taller than a laptop viewport, and mandatory would keep yanking the
        reader back to the top of a section before they reached its end. */
     scroll-snap-type: y proximity;
-    /* Overscroll rubber-banding (iOS/Android momentum bounce past the top or
-       bottom edge) reveals whatever sits behind the document — without this,
-       that's the browser's default white, flashing as a strip above/below
-       the content on every bounce. Matches the darkest stop of the body
-       gradient below so the bounce reads as "more of the same page" rather
-       than a seam. */
-    background-color: #02050a;
+    background-color: #161826;
   }
 
-  /* Anchor-link navigation (top nav, mobile tab bar) briefly disables snap —
+  /* Anchor-link navigation (top nav, mobile sheet) briefly disables snap —
      see scrollToSection in src/lib/scrollToSection.js. Without this, a
      forced snap point along the scroll path can catch and hold the native
      smooth-scroll partway, which reads as the page starting to navigate and
@@ -36,26 +30,8 @@
        separate flicks no matter how hard you throw the page. Left off, a
        deliberate fling carries, and proximity still settles on a boundary
        whenever the scroll happens to end near one. */
-    /* Clears the fixed 57px nav so a snapped heading isn't tucked under it. */
+    /* Clears the fixed nav so a snapped heading isn't tucked under it. */
     scroll-margin-top: 57px;
-  }
-
-  /* Mobile: no forced per-section snap stop. An earlier version used
-     `scroll-snap-stop: always` on the short sections to get a firm
-     swipe-to-next-card feel, but that fights the browser's own smooth-scroll
-     when the bottom tab bar jumps to a section — the engine can catch and
-     hold the scroll at a snap point it passes through on the way, which
-     reads as the page starting to navigate and then springing back. Gentle
-     `proximity` (set on html above) still gives a soft landing on section
-     boundaries during normal scrolling; getting to a specific section is
-     what the tab bar and top nav are for, handled by scrollToSection with
-     snap briefly suspended so it can land cleanly every time. */
-  @media (max-width: 767px) {
-    /* Extra clearance for the fixed bottom tab bar so a snapped section's
-       last line of content isn't tucked behind it. */
-    main > section {
-      scroll-margin-bottom: 64px;
-    }
   }
 
   /* A section taller than the viewport gets a second snap point pinned to its
@@ -84,45 +60,18 @@
 
   body {
     @apply text-text-primary font-sans antialiased;
-    background:
-      radial-gradient(
-        ellipse 1200px 660px at 50% -10%,
-        rgba(59, 130, 246, 0.34),
-        rgba(59, 130, 246, 0) 65%
-      ),
-      radial-gradient(
-        ellipse 780px 440px at 84% 0%,
-        rgba(242, 169, 59, 0.16),
-        rgba(242, 169, 59, 0) 62%
-      ),
-      radial-gradient(
-        ellipse 620px 380px at 10% 4%,
-        rgba(96, 165, 250, 0.18),
-        rgba(96, 165, 250, 0) 60%
-      ),
-      linear-gradient(
-        to bottom,
-        #14396b 0%,
-        #112f5b 8%,
-        #0e264a 17%,
-        #0b1e3b 27%,
-        #09172e 40%,
-        #071122 52%,
-        #050c19 64%,
-        #030811 76%,
-        #02050a 88%,
-        #000103 100%
-      );
-    background-attachment: local;
+    /* Nocturne: max two ground colours. The page ground is flat #161826 —
+       elevation comes from a hairline edge, not a third background tone. */
+    background: #161826;
   }
 
   ::selection {
-    background: rgba(242, 169, 59, 0.3);
-    color: #e6edf3;
+    background: rgba(145, 132, 217, 0.3);
+    color: #f5f4ff;
   }
 
   :focus-visible {
-    outline: 2px solid #f2a93b;
+    outline: 2px solid #9184d9;
     outline-offset: 2px;
   }
 
@@ -130,49 +79,85 @@
     width: 10px;
   }
   ::-webkit-scrollbar-track {
-    background: #0b0f14;
+    background: #12131f;
   }
   ::-webkit-scrollbar-thumb {
-    background: #1c2530;
+    background: #2b2e40;
     border-radius: 6px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: #2c3644;
+    background: #3a3e56;
   }
 }
 
 @layer components {
   .mono-label {
-    @apply font-mono text-xs tracking-wider text-amber uppercase;
+    @apply font-mono text-xs uppercase tracking-wider text-accent-body;
   }
 
   .card-border {
     @apply border border-base-border bg-base-surface/60;
   }
-}
 
-@keyframes cloud-rain {
-  from {
-    transform: translateY(-12vh);
+  /* — rules — */
+  /* Freestanding rules fade to transparent at both ends instead of stopping
+     cleanly — a Nocturne signature. Box outlines and short accent marks stay
+     solid; this is only for rules with nothing anchoring their ends. */
+  .hr-fade {
+    height: 1px;
+    background: linear-gradient(
+      to right,
+      transparent,
+      rgba(233, 233, 237, 0.16) 48px,
+      rgba(233, 233, 237, 0.16) calc(100% - 48px),
+      transparent
+    );
   }
-  to {
-    transform: translateY(112vh);
+
+  /* — buttons — */
+  /* Outlined, never filled. `.btn-primary` gets its weight from the accent
+     outline plus a faint tint and glow, never a solid fill. */
+  .btn {
+    @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-md border border-transparent px-4 font-sans text-sm font-medium transition-colors;
   }
-}
+  .btn-primary {
+    @apply border-accent text-accent-bright;
+    background: rgba(145, 132, 217, 0.14);
+  }
+  .btn-primary:hover {
+    background: rgba(145, 132, 217, 0.22);
+  }
+  .btn-ghost {
+    @apply border-base-border text-text-muted;
+  }
+  .btn-ghost:hover {
+    @apply border-accent/60 text-accent-bright;
+  }
+  .btn-block {
+    @apply w-full;
+  }
 
-.rain-item {
-  position: absolute;
-  top: 0;
-  animation-name: cloud-rain;
-  animation-timing-function: linear;
-  animation-iteration-count: infinite;
-  will-change: transform;
-}
+  /* — tags — */
+  .tag-outline {
+    @apply inline-flex items-center rounded border border-accent/50 px-2.5 py-1 font-mono text-[11px] tracking-wide text-accent-body;
+  }
 
-@media (prefers-reduced-motion: reduce) {
-  .rain-item {
-    animation: none;
-    display: none;
+  /* — forms — */
+  .field > label {
+    @apply mb-1.5 block font-mono text-xs uppercase tracking-wider text-text-dim;
+  }
+  .input {
+    @apply w-full min-h-11 rounded-md border border-base-border bg-base-surface/60 px-3 py-2 font-sans text-sm text-text-primary transition-colors placeholder:text-text-dim;
+  }
+  .input:hover {
+    @apply border-text-dim;
+  }
+  .input:focus-visible {
+    @apply border-accent outline-offset-0;
+  }
+  textarea.input {
+    min-height: 90px;
+    resize: vertical;
   }
 }
 
@@ -200,5 +185,15 @@
 @media (prefers-reduced-motion: reduce) {
   .sharp-node {
     animation: none;
+  }
+}
+
+/* Experience: the "current" bar's sheen sweep and status pulse. */
+@keyframes rail-sheen {
+  0% {
+    transform: translateX(-40%);
+  }
+  100% {
+    transform: translateX(140%);
   }
 }

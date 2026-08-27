@@ -4,40 +4,41 @@ export default {
   theme: {
     extend: {
       colors: {
+        // Nocturne — max two grounds: `base.bg` is the page ground, `void` is
+        // the deeper rain/hero ground. Surfaces are the same family lifted
+        // only by a hairline edge, never a third ground color.
         base: {
-          bg: '#0A0E15',
-          surface: '#0D131C',
-          raised: '#131B27',
-          border: '#1E2836',
+          bg: '#161826',
+          surface: '#232532',
+          raised: '#2b2e3f',
+          border: '#2b2e40',
         },
+        void: '#0f111c',
         text: {
-          primary: '#EAF0F6',
-          muted: '#94A3B3',
-          dim: '#5E6B7A',
+          primary: '#e9e9ed',
+          muted: '#a4a5b2',
+          dim: '#83848f',
         },
-        amber: {
-          DEFAULT: '#F2A93B',
-          bright: '#FFC168',
-          dim: '#8A6423',
+        // The one accent — blurple. `bright`/`body` are the two accent-tinted
+        // text steps Nocturne allows; raw `accent` never sits on body copy.
+        accent: {
+          DEFAULT: '#9184d9',
+          bright: '#d2cefd',
+          body: '#b9b1ec',
+          dim: '#5d5294',
         },
-        steel: {
-          DEFAULT: '#2FC2E8',
-          bright: '#6FE3FF',
-          dim: '#1B5670',
-        },
-        ok: '#3FB950',
+        ok: '#9184d9',
       },
       fontFamily: {
-        sans: ['"Space Grotesk"', 'Inter', 'system-ui', 'sans-serif'],
+        sans: ['"Inter"', 'system-ui', 'sans-serif'],
         mono: ['"JetBrains Mono"', '"Fira Code"', 'ui-monospace', 'monospace'],
       },
       backgroundImage: {
         'dot-grid':
-          'radial-gradient(circle, rgba(234,240,246,0.08) 1px, transparent 1px)',
+          'radial-gradient(circle, rgba(233,233,237,0.08) 1px, transparent 1px)',
       },
       boxShadow: {
-        'glow-amber': '0 0 0 1px rgba(242,169,59,0.4), 0 0 24px rgba(242,169,59,0.15)',
-        'glow-steel': '0 0 0 1px rgba(47,194,232,0.4), 0 0 24px rgba(47,194,232,0.18)',
+        'glow-accent': '0 0 0 1px rgba(145,132,217,0.5), 0 0 24px rgba(145,132,217,0.18)',
       },
       animation: {
         blink: 'blink 1.6s step-start infinite',

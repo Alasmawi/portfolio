@@ -2,8 +2,9 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ExternalLink, Film, Lock, PlayCircle, Star } from 'lucide-react';
 import Reveal from './ui/Reveal';
-import SectionHeader from './ui/SectionHeader';
+import SyntaxRain from './ui/SyntaxRain';
 import RingGallery from './ui/RingGallery';
+import HardwareStrip from './ui/HardwareStrip';
 import { GithubMark } from './ui/BrandIcons';
 import { LANGUAGE_COLORS, PROJECTS } from '../data/projects';
 
@@ -13,12 +14,29 @@ import { LANGUAGE_COLORS, PROJECTS } from '../data/projects';
 const AUTO_ADVANCE_MS = 30000;
 const IDLE_TICK_MS = 1000;
 
+// Stack tags shared across ≥2 real repos, most-shipped first. Derived from
+// projects.js rather than hand-picked, so it can't drift into inventory that
+// doesn't match what's actually in the list below it.
+const RECURRING_STACK = (() => {
+  const counts = new Map();
+  for (const p of PROJECTS) {
+    for (const t of p.tags) counts.set(t, (counts.get(t) || 0) + 1);
+  }
+  return Array.from(counts.entries())
+    .filter(([, n]) => n >= 2)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 8)
+    .map(([t]) => t);
+})();
+
+const RAIN_FADE = [{ x1: 0.03, y1: 0.05, x2: 0.97, y2: 0.96, a: 0.3 }];
+
 function LanguageDot({ language }) {
   if (!language) return null;
   return (
     <span
       className="inline-block h-2 w-2 shrink-0 rounded-full"
-      style={{ backgroundColor: LANGUAGE_COLORS[language] ?? '#5E6B7A' }}
+      style={{ backgroundColor: LANGUAGE_COLORS[language] ?? '#83848f' }}
       aria-hidden="true"
     />
   );
@@ -59,14 +77,37 @@ function PreviewVideo({ src, label }) {
   );
 }
 
-function PreviewMedia({ project }) {
+// Below this width the 3D ring is replaced by a flat figure + swipe strip:
+// turning a turntable with a thumb on a 390px screen costs more than it pays.
+const RING_MIN_WIDTH = 768;
+
+function useIsWide(px) {
+  const query = `(min-width: ${px}px)`;
+  const [matches, setMatches] = useState(
+    () => typeof window !== 'undefined' && window.matchMedia(query).matches
+  );
+  useEffect(() => {
+    const mq = window.matchMedia(query);
+    const update = () => setMatches(mq.matches);
+    update();
+    mq.addEventListener('change', update);
+    return () => mq.removeEventListener('change', update);
+  }, [query]);
+  return matches;
+}
+
+function PreviewMedia({ project, wide }) {
   if (project.items?.length) {
-    return <RingGallery items={project.items} />;
+    return wide ? (
+      <RingGallery items={project.items} />
+    ) : (
+      <HardwareStrip items={project.items} />
+    );
   }
 
   if (project.video) {
     return (
-      <div className="flex max-h-[440px] min-h-[220px] w-full items-center justify-center border border-base-border bg-base-surface">
+      <div className="flex max-h-[440px] min-h-[220px] w-full items-center justify-center rounded-lg bg-white/[0.03] shadow-[inset_0_0_0_1px_rgba(233,233,237,0.09)]">
         {/* Same visual as a GIF loop, ~90% less data: autoplaying muted video
             with no controls reads identically but decodes far cheaper on
             mid-range phones than an animated GIF. playsInline keeps iOS
@@ -77,14 +118,10 @@ function PreviewMedia({ project }) {
   }
 
   return (
-    <div className="flex aspect-video w-full flex-col items-center justify-center gap-3 border border-dashed border-base-border/80 bg-base-surface/30 text-text-dim">
+    <div className="flex aspect-video w-full flex-col items-center justify-center gap-3 rounded-lg bg-white/[0.03] text-text-dim shadow-[inset_0_0_0_1px_rgba(233,233,237,0.09)]">
       <Film size={22} />
-      <p className="font-mono text-xs uppercase tracking-wider">
-        // preview coming soon
-      </p>
-      <p className="font-mono text-[11px] text-text-dim/70">
-        clone the repo to see it run
-      </p>
+      <p className="font-mono text-xs uppercase tracking-wider">// preview coming soon</p>
+      <p className="font-mono text-[11px] text-text-dim/70">clone the repo to see it run</p>
     </div>
   );
 }
@@ -97,6 +134,7 @@ const SWIPE_THRESHOLD_PX = 50;
 export default function ProjectBrowser() {
   const [selectedId, setSelectedId] = useState(PROJECTS[0].id);
   const project = PROJECTS.find((p) => p.id === selectedId) ?? PROJECTS[0];
+  const wide = useIsWide(RING_MIN_WIDTH);
 
   const sectionRef = useRef(null);
   // Activity is tracked in a ref rather than state: pointermove fires
@@ -194,177 +232,197 @@ export default function ProjectBrowser() {
   }, [nudgeIdle]);
 
   return (
-    <section
-      id="projects"
-      ref={sectionRef}
-      className="border-b border-base-border py-24 md:py-32"
-    >
-      <div className="mx-auto max-w-6xl px-6">
-        <SectionHeader
-          index="03"
-          id="projects"
-          title="Projects"
-          region="~/projects — live from github.com/Alasmawi"
-        />
-
-        <Reveal delay={0.1}>
-          <div className="grid grid-cols-1 border border-base-border bg-base-surface/40 md:grid-cols-12">
-            {/* mobile: horizontal tab list */}
-            <div className="flex gap-2 overflow-x-auto border-b border-base-border p-3 md:hidden">
-              {PROJECTS.map((p) => (
-                <button
-                  key={p.id}
-                  type="button"
-                  onClick={() => select(p.id)}
-                  className={`flex shrink-0 items-center gap-2 whitespace-nowrap rounded border px-3 py-2 font-mono text-xs transition-colors ${
-                    p.id === selectedId
-                      ? 'border-amber/50 bg-amber/10 text-amber'
-                      : 'border-base-border text-text-muted'
-                  }`}
-                >
-                  <LanguageDot language={p.language} />
-                  {p.name}
-                </button>
+    <section id="projects" ref={sectionRef} className="bg-base-bg">
+      <div className="mx-auto max-w-6xl px-6 pb-8 pt-14 sm:px-10 md:px-14 md:pb-10 md:pt-20">
+        <Reveal>
+          <p className="mb-4 font-mono text-[11px] uppercase tracking-[0.18em] text-text-muted">
+            // 01 [ projects ]
+          </p>
+          <div className="flex flex-wrap items-end justify-between gap-6">
+            <h2 className="text-3xl font-medium tracking-tight text-text-primary md:text-[38px]">
+              Projects
+            </h2>
+            <p className="whitespace-nowrap font-mono text-[11.5px] text-text-muted">
+              ~/projects — live from github.com/Alasmawi
+            </p>
+          </div>
+          <div className="mt-5 flex flex-wrap items-center gap-3">
+            <span className="shrink-0 font-mono text-[10.5px] uppercase tracking-[0.16em] text-text-muted/70">
+              Recurring stack
+            </span>
+            <span className="hidden h-3.5 w-px bg-base-border sm:block" aria-hidden="true" />
+            <div className="flex flex-wrap gap-1.5">
+              {RECURRING_STACK.map((tag) => (
+                <span key={tag} className="tag-outline text-[11.5px]">
+                  {tag}
+                </span>
               ))}
             </div>
-
-            {/* desktop: sidebar file list */}
-            <div className="hidden max-h-[560px] overflow-y-auto border-r border-base-border md:col-span-4 md:block lg:col-span-3">
-              <p className="border-b border-base-border px-4 py-3 font-mono text-[11px] uppercase tracking-wider text-text-dim">
-                // repositories ({PROJECTS.length})
-              </p>
-              <ul>
-                {PROJECTS.map((p) => (
-                  <li key={p.id}>
-                    <button
-                      type="button"
-                      onClick={() => select(p.id)}
-                      className={`flex w-full items-center gap-2 border-l-2 px-4 py-3 text-left transition-colors ${
-                        p.id === selectedId
-                          ? 'border-l-amber bg-amber/[0.06] text-text-primary'
-                          : 'border-l-transparent text-text-muted hover:border-l-base-border hover:bg-white/[0.02] hover:text-text-primary'
-                      }`}
-                    >
-                      {p.flagship ? (
-                        <Star
-                          size={13}
-                          className="shrink-0 text-amber"
-                          fill="currentColor"
-                        />
-                      ) : (
-                        <LanguageDot language={p.language} />
-                      )}
-                      <span className="min-w-0 flex-1">
-                        <span className="block truncate font-mono text-xs">
-                          {p.name}
-                        </span>
-                      </span>
-                      {p.private && (
-                        <Lock size={11} className="shrink-0 text-text-dim" />
-                      )}
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* preview pane */}
-            <div
-              className="p-5 md:col-span-8 sm:p-6 lg:col-span-9"
-              onPointerDown={onSwipeDown}
-              onPointerUp={onSwipeUp}
-              onPointerCancel={() => {
-                swipeRef.current = null;
-              }}
-              style={{ touchAction: 'pan-y' }}
-            >
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={project.id}
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -8 }}
-                  transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-                >
-                  <PreviewMedia project={project} />
-
-                  <div className="mt-5 flex flex-wrap items-start justify-between gap-4">
-                    <div>
-                      <div className="flex items-center gap-2">
-                        {project.flagship && (
-                          <span className="rounded border border-amber/40 bg-amber/10 px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-amber">
-                            flagship
-                          </span>
-                        )}
-                        {project.private && (
-                          <span className="flex items-center gap-1 rounded border border-base-border px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-text-dim">
-                            <Lock size={10} /> private repo
-                          </span>
-                        )}
-                      </div>
-                      <h3 className="mt-2 text-2xl font-semibold text-text-primary sm:text-3xl">
-                        {project.name}
-                      </h3>
-                      <p className="mt-1 font-mono text-xs text-steel">
-                        {project.tagline}
-                      </p>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      {project.githubUrl ? (
-                        <a
-                          href={project.githubUrl}
-                          target="_blank"
-                          rel="noreferrer"
-                          aria-label={`${project.name} on GitHub`}
-                          className="flex items-center gap-2 rounded border border-base-border px-3 py-2 font-mono text-xs text-text-muted transition-all hover:border-amber hover:text-amber"
-                        >
-                          <GithubMark size={14} />
-                          <span>source</span>
-                          <ExternalLink size={11} />
-                        </a>
-                      ) : (
-                        <span className="flex items-center gap-2 rounded border border-base-border px-3 py-2 font-mono text-xs text-text-dim">
-                          <PlayCircle size={14} />
-                          internship project
-                        </span>
-                      )}
-                      {project.liveUrl && (
-                        <a
-                          href={project.liveUrl}
-                          target="_blank"
-                          rel="noreferrer"
-                          aria-label={`${project.name} live site`}
-                          className="flex items-center gap-2 rounded border border-base-border px-3 py-2 font-mono text-xs text-text-muted transition-all hover:border-steel hover:text-steel"
-                        >
-                          <PlayCircle size={14} />
-                          <span>live</span>
-                          <ExternalLink size={11} />
-                        </a>
-                      )}
-                    </div>
-                  </div>
-
-                  <p className="mt-4 max-w-2xl text-sm leading-relaxed text-text-muted sm:text-base">
-                    {project.description}
-                  </p>
-
-                  <div className="mt-4 flex flex-wrap gap-2">
-                    {project.tags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="rounded border border-base-border px-2 py-1 font-mono text-[11px] text-text-muted"
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                </motion.div>
-              </AnimatePresence>
-            </div>
+            <p className="hidden font-mono text-[11px] text-text-dim md:block">
+              per-repo stack sits on the repo itself →
+            </p>
           </div>
         </Reveal>
       </div>
+
+      {/* Rain band — the repo browser floats on it, gradient-faded top and
+          bottom so the band reads as one section rather than a panel on
+          flat ground. */}
+      <Reveal delay={0.1}>
+        <div className="relative bg-void">
+          <SyntaxRain size={13} density={0.55} dim tint="145,132,217" fade={RAIN_FADE} />
+          <div
+            className="pointer-events-none absolute inset-0"
+            style={{
+              background:
+                'linear-gradient(180deg,#161826,rgba(15,17,28,.34) 14%,rgba(15,17,28,.34) 86%,#161826)',
+            }}
+          />
+
+          <div className="relative px-6 py-9 sm:px-10 md:px-14">
+            <div className="mx-auto max-w-6xl overflow-hidden rounded-lg bg-void/85 shadow-[0_0_0_1px_rgba(233,233,237,0.12),0_18px_44px_-20px_rgba(0,0,0,0.9)] backdrop-blur-[2px] md:flex">
+              {/* mobile: horizontal chip row */}
+              <div className="flex gap-2 overflow-x-auto p-3 md:hidden">
+                {PROJECTS.map((p) => (
+                  <button
+                    key={p.id}
+                    type="button"
+                    onClick={() => select(p.id)}
+                    className={`flex min-h-11 shrink-0 items-center gap-2 whitespace-nowrap rounded-md px-3 py-2 font-mono text-xs transition-colors ${
+                      p.id === selectedId
+                        ? 'bg-accent/10 text-accent-bright shadow-[inset_0_0_0_1px_rgba(145,132,217,0.5)]'
+                        : 'text-text-muted shadow-[inset_0_0_0_1px_rgba(233,233,237,0.12)]'
+                    }`}
+                  >
+                    <LanguageDot language={p.language} />
+                    {p.name}
+                  </button>
+                ))}
+              </div>
+
+              {/* desktop: fixed-width sidebar */}
+              <div className="hidden max-h-[620px] w-[264px] shrink-0 overflow-y-auto border-r border-white/[0.09] md:block">
+                <p className="sticky top-0 bg-void/85 px-[18px] py-[13px] font-mono text-[11px] uppercase tracking-wider text-text-muted shadow-[inset_0_-1px_0_rgba(233,233,237,0.09)]">
+                  // repositories ({PROJECTS.length})
+                </p>
+                <ul>
+                  {PROJECTS.map((p) => (
+                    <li key={p.id}>
+                      <button
+                        type="button"
+                        onClick={() => select(p.id)}
+                        className={`flex w-full items-center gap-2 border-l-2 px-[18px] py-[11px] text-left transition-colors ${
+                          p.id === selectedId
+                            ? 'border-l-accent text-text-primary'
+                            : 'border-l-transparent text-text-muted hover:bg-white/[0.03] hover:text-text-primary'
+                        }`}
+                      >
+                        {p.flagship ? (
+                          <Star size={12} className="shrink-0 text-accent" fill="currentColor" />
+                        ) : (
+                          <LanguageDot language={p.language} />
+                        )}
+                        <span className="min-w-0 flex-1 truncate font-mono text-xs">{p.name}</span>
+                        {p.private && <Lock size={11} className="shrink-0 text-text-dim" />}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* preview pane */}
+              <div
+                className="flex-1 p-[22px] sm:p-6"
+                onPointerDown={onSwipeDown}
+                onPointerUp={onSwipeUp}
+                onPointerCancel={() => {
+                  swipeRef.current = null;
+                }}
+                style={{ touchAction: 'pan-y' }}
+              >
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={project.id}
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -8 }}
+                    transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+                  >
+                    <PreviewMedia project={project} wide={wide} />
+
+                    <div className="mt-5 flex flex-wrap items-start justify-between gap-4">
+                      <div>
+                        <div className="flex items-center gap-2">
+                          {project.flagship && (
+                            <span className="tag-outline text-[10px] uppercase tracking-wider">
+                              flagship
+                            </span>
+                          )}
+                          {project.private && (
+                            <span className="flex items-center gap-1 rounded border border-base-border px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-text-dim">
+                              <Lock size={10} /> private repo
+                            </span>
+                          )}
+                        </div>
+                        <h3 className="mt-2 text-[27px] font-medium leading-tight tracking-tight text-text-primary">
+                          {project.name}
+                        </h3>
+                        <p className="mt-0.5 font-mono text-xs text-accent-body">{project.tagline}</p>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        {project.githubUrl ? (
+                          <a
+                            href={project.githubUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                            aria-label={`${project.name} on GitHub`}
+                            className="btn btn-ghost min-h-9 text-xs"
+                          >
+                            <GithubMark size={14} />
+                            <span>source</span>
+                            <ExternalLink size={11} />
+                          </a>
+                        ) : (
+                          <span className="flex items-center gap-2 rounded-md border border-base-border px-3 py-2 font-mono text-xs text-text-dim">
+                            <PlayCircle size={14} />
+                            internship project
+                          </span>
+                        )}
+                        {project.liveUrl && (
+                          <a
+                            href={project.liveUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                            aria-label={`${project.name} live site`}
+                            className="btn btn-ghost min-h-9 text-xs"
+                          >
+                            <PlayCircle size={14} />
+                            <span>live</span>
+                            <ExternalLink size={11} />
+                          </a>
+                        )}
+                      </div>
+                    </div>
+
+                    <p className="mt-4 max-w-2xl text-[15px] leading-relaxed text-text-primary/80">
+                      {project.description}
+                    </p>
+
+                    <div className="mt-4 flex flex-wrap gap-1.5">
+                      {project.tags.map((tag) => (
+                        <span key={tag} className="tag-outline text-[11.5px]">
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  </motion.div>
+                </AnimatePresence>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Reveal>
     </section>
   );
 }

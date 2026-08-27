@@ -1,21 +1,13 @@
-import {
-  User,
-  Briefcase,
-  FolderGit2,
-  BarChart3,
-  GraduationCap,
-  Mail,
-} from 'lucide-react';
+import { User, Briefcase, FolderGit2, GraduationCap } from 'lucide-react';
 
-// Single source of truth for section nav: the desktop nav, the mobile
-// hamburger dropdown, and the mobile bottom tab bar all read from this list
-// so they can never drift out of sync with each other or with the actual
-// section ids rendered in App.jsx.
+// Single source of truth for section nav: the desktop link row and the
+// mobile sheet both read from this list so they can't drift out of sync
+// with each other or with the section ids rendered in App.jsx. Order
+// matches the page's own scroll order. Hero and Contact aren't here —
+// the wordmark returns to the hero, and the CTA button goes to contact.
 export const LINKS = [
-  { id: 'about', label: 'about', icon: User },
-  { id: 'experience', label: 'experience', icon: Briefcase },
-  { id: 'projects', label: 'projects', icon: FolderGit2 },
-  { id: 'skills', label: 'skills', icon: BarChart3 },
-  { id: 'education', label: 'education', icon: GraduationCap },
-  { id: 'contact', label: 'contact', icon: Mail },
+  { id: 'projects', label: 'Projects', icon: FolderGit2 },
+  { id: 'experience', label: 'Experience', icon: Briefcase },
+  { id: 'education', label: 'Education', icon: GraduationCap },
+  { id: 'about', label: 'About', icon: User },
 ];

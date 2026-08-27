@@ -20,7 +20,7 @@ export default function ExpandTile({
   return (
     <div
       className={`border border-base-border bg-base-surface/60 transition-colors ${
-        open ? 'border-steel/50' : ''
+        open ? 'border-accent/50' : ''
       } ${className}`}
     >
       <button
@@ -35,7 +35,7 @@ export default function ExpandTile({
           size={16}
           strokeWidth={2}
           className={`shrink-0 text-text-dim transition-transform duration-300 ${
-            open ? 'rotate-180 text-steel-bright' : ''
+            open ? 'rotate-180 text-accent-bright' : ''
           }`}
           aria-hidden="true"
         />
