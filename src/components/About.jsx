@@ -3,12 +3,12 @@ import pfp from '../assets/pfp-nobg.webp';
 
 export default function About() {
   return (
-    <section id="about" className="relative overflow-hidden bg-base-bg px-6 py-14 sm:px-10 md:px-14 md:py-20">
+    <section id="about" className="relative overflow-hidden bg-base-bg px-5 py-11 sm:px-10 sm:py-14 md:px-14 md:py-20">
       {/* The custom element positions *itself* — its script writes inline
           `position:absolute; inset:0` whenever its parent is positioned, which
           beats any utility class we'd put on the element. So the rail geometry
           lives on this wrapper and the helix just fills it. */}
-      <div className="pointer-events-none absolute -top-5 -bottom-5 -right-2 w-[150px] opacity-70 md:-top-8 md:-bottom-8 md:right-2 md:w-[230px] md:opacity-100">
+      <div className="pointer-events-none absolute -top-5 -bottom-5 -right-4 w-[110px] opacity-40 md:-top-8 md:-bottom-8 md:right-2 md:w-[230px] md:opacity-100">
         {/* eslint-disable-next-line react/no-unknown-property */}
         <dna-helix
           axis="vertical"
@@ -92,7 +92,7 @@ export default function About() {
               detection on sensor data — rather than as the headline.
             </p>
             <div className="mt-6 grid max-w-[46ch] gap-3">
-              <div className="grid grid-cols-[88px_1fr] items-baseline gap-4">
+              <div className="grid gap-1 sm:grid-cols-[88px_1fr] sm:items-baseline sm:gap-4">
                 <p className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-text-muted">
                   Good at
                 </p>
@@ -100,7 +100,7 @@ export default function About() {
                   Owning a feature from schema to screen without a handoff.
                 </p>
               </div>
-              <div className="grid grid-cols-[88px_1fr] items-baseline gap-4">
+              <div className="grid gap-1 sm:grid-cols-[88px_1fr] sm:items-baseline sm:gap-4">
                 <p className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-text-muted">
                   Bad at
                 </p>

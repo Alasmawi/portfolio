@@ -14,7 +14,11 @@ export default function Hero() {
     >
       <SyntaxRain size={14} density={0.68} dim tint="145,132,217" fade={RAIN_FADE} exclude={RAIN_EXCLUDE} />
 
-      <div className="pointer-events-none absolute right-[-120px] top-[-40px] h-[360px] w-[420px] sm:right-[-60px] sm:top-0 sm:h-full sm:w-[560px] md:right-[-60px] md:w-[720px]">
+      {/* On a phone the cloud is a band across the top of the screen and the
+          copy starts underneath it. It used to sit at w-420 / right-[-120],
+          which at 390px put its left edge at x=90 — straight through the
+          kicker. Desktop keeps it as a full-height column on the right. */}
+      <div className="pointer-events-none absolute right-[-70px] top-[-30px] h-[255px] w-[320px] sm:right-[-60px] sm:top-0 sm:h-full sm:w-[560px] md:right-[-60px] md:w-[720px]">
         <HeroCloudCanvas />
       </div>
 
@@ -26,7 +30,11 @@ export default function Hero() {
         }}
       />
 
-      <div className="relative mx-auto flex min-h-[calc(100dvh-4rem)] max-w-6xl flex-col justify-between px-6 pb-8 pt-6 sm:px-10 md:px-14">
+      {/* Phone: copy starts below the cloud band, status pinned to the bottom
+          by mt-auto. `justify-between` here used to open a ~250px hole in the
+          middle of the phone hero, since the column is a full viewport tall
+          and only had two children to space apart. */}
+      <div className="relative mx-auto flex min-h-[calc(100dvh-4rem)] max-w-6xl flex-col px-6 pb-7 pt-[182px] sm:justify-between sm:px-10 sm:pt-6 md:px-14">
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
@@ -52,28 +60,33 @@ export default function Hero() {
             Built the AWS backend for a Ministry of Interior K9 monitoring system.
           </p>
 
-          <div className="mt-8 flex flex-wrap items-center gap-3" style={{ textShadow: 'none' }}>
-            <a href="#contact" className="btn btn-primary min-h-[46px] px-6 text-[15px] shadow-glow-accent">
+          {/* Phone: full-width CTA with the two socials split evenly beneath,
+              rather than a flex-wrap that left LinkedIn stranded on its own
+              row. Desktop keeps all three inline. */}
+          <div className="mt-8 grid gap-2.5 sm:flex sm:flex-wrap sm:items-center sm:gap-3" style={{ textShadow: 'none' }}>
+            <a href="#contact" className="btn btn-primary min-h-[48px] px-6 text-[15px] shadow-glow-accent sm:min-h-[46px]">
               Get in touch
             </a>
-            <a
-              href="https://github.com/Alasmawi"
-              target="_blank"
-              rel="noreferrer"
-              className="btn btn-ghost min-h-[46px]"
-            >
-              <GithubMark size={16} />
-              GitHub
-            </a>
-            <a
-              href="https://linkedin.com/in/alasmawi"
-              target="_blank"
-              rel="noreferrer"
-              className="btn btn-ghost min-h-[46px]"
-            >
-              <LinkedinMark size={16} />
-              LinkedIn
-            </a>
+            <div className="grid grid-cols-2 gap-2.5 sm:contents">
+              <a
+                href="https://github.com/Alasmawi"
+                target="_blank"
+                rel="noreferrer"
+                className="btn btn-ghost min-h-[48px] sm:min-h-[46px]"
+              >
+                <GithubMark size={16} />
+                GitHub
+              </a>
+              <a
+                href="https://linkedin.com/in/alasmawi"
+                target="_blank"
+                rel="noreferrer"
+                className="btn btn-ghost min-h-[48px] sm:min-h-[46px]"
+              >
+                <LinkedinMark size={16} />
+                LinkedIn
+              </a>
+            </div>
           </div>
         </motion.div>
 
@@ -81,7 +94,7 @@ export default function Hero() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.6, delay: 0.5 }}
-          className="mt-10 flex items-end justify-between gap-4"
+          className="mt-auto flex items-end justify-between gap-4 pt-7 sm:pt-10"
         >
           <div className="flex flex-col gap-1.5 font-mono text-xs text-text-muted sm:flex-row sm:items-center sm:gap-8">
             <span className="inline-flex items-center gap-2 text-accent-bright">

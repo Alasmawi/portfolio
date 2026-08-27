@@ -28,7 +28,7 @@ function handleSubmit(e) {
 
 export default function Contact() {
   return (
-    <section id="contact" className="bg-base-bg px-6 pb-10 pt-14 sm:px-10 md:px-14 md:pb-14 md:pt-20">
+    <section id="contact" className="bg-base-bg px-5 pb-9 pt-11 sm:px-10 sm:pt-14 md:px-14 md:pb-14 md:pt-20">
       <div className="mx-auto max-w-6xl">
         <div className="grid gap-10 md:grid-cols-[1fr_auto] md:items-start md:gap-16">
           <Reveal>

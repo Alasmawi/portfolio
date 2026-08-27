@@ -5,7 +5,7 @@ import { EDUCATION } from '../data/education';
 
 export default function Education() {
   return (
-    <section id="education" className="bg-base-bg px-6 py-14 sm:px-10 md:px-14 md:py-20">
+    <section id="education" className="bg-base-bg px-5 py-11 sm:px-10 sm:py-14 md:px-14 md:py-20">
       <div className="mx-auto max-w-6xl">
         <Reveal>
           <p className="mb-4 font-mono text-[11px] uppercase tracking-[0.18em] text-text-muted">

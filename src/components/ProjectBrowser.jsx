@@ -233,7 +233,7 @@ export default function ProjectBrowser() {
 
   return (
     <section id="projects" ref={sectionRef} className="bg-base-bg">
-      <div className="mx-auto max-w-6xl px-6 pb-8 pt-14 sm:px-10 md:px-14 md:pb-10 md:pt-20">
+      <div className="mx-auto max-w-6xl px-5 pb-6 pt-11 sm:px-10 sm:pb-8 sm:pt-14 md:px-14 md:pb-10 md:pt-20">
         <Reveal>
           <p className="mb-4 font-mono text-[11px] uppercase tracking-[0.18em] text-text-muted">
             // 01 [ projects ]
@@ -270,7 +270,11 @@ export default function ProjectBrowser() {
       {/* Rain band — the repo browser floats on it, gradient-faded top and
           bottom so the band reads as one section rather than a panel on
           flat ground. */}
-      <Reveal delay={0.1}>
+      {/* Deliberately not wrapped in <Reveal>: this band is a full-bleed
+          background taller than a phone screen, and animating its opacity left
+          a screen-sized blank while it waited to be 80px inside the viewport.
+          The panel sitting on it does the revealing instead. */}
+      <div>
         <div className="relative bg-void">
           <SyntaxRain size={13} density={0.55} dim tint="145,132,217" fade={RAIN_FADE} />
           <div
@@ -281,7 +285,7 @@ export default function ProjectBrowser() {
             }}
           />
 
-          <div className="relative px-6 py-9 sm:px-10 md:px-14">
+          <Reveal delay={0.05} className="relative block px-5 py-6 sm:px-10 sm:py-9 md:px-14">
             <div className="mx-auto max-w-6xl overflow-hidden rounded-lg bg-void/85 shadow-[0_0_0_1px_rgba(233,233,237,0.12),0_18px_44px_-20px_rgba(0,0,0,0.9)] backdrop-blur-[2px] md:flex">
               {/* mobile: horizontal chip row */}
               <div className="flex gap-2 overflow-x-auto p-3 md:hidden">
@@ -422,9 +426,9 @@ export default function ProjectBrowser() {
                 </AnimatePresence>
               </div>
             </div>
-          </div>
+          </Reveal>
         </div>
-      </Reveal>
+      </div>
     </section>
   );
 }

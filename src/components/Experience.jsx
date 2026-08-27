@@ -42,7 +42,7 @@ function Bar({ start, end, active, muted = false, indent = false }) {
 
 export default function Experience() {
   return (
-    <section id="experience" className="bg-base-bg px-6 py-14 sm:px-10 md:px-14 md:py-20">
+    <section id="experience" className="bg-base-bg px-5 py-11 sm:px-10 sm:py-14 md:px-14 md:py-20">
       <div className="mx-auto max-w-6xl">
         <Reveal>
           <p className="mb-4 font-mono text-[11px] uppercase tracking-[0.18em] text-text-muted">
@@ -84,7 +84,7 @@ export default function Experience() {
               <div className="grid gap-1.5">
                 <div className="flex items-baseline gap-2 font-mono text-[11px] text-text-muted">
                   <span className="text-text-primary">{EXPERIENCE[0].role}</span>
-                  <span>· {EXPERIENCE[0].org}</span>
+                  <span className="hidden sm:inline">· {EXPERIENCE[0].org}</span>
                 </div>
                 <Bar start={EXPERIENCE[0].start} end={EXPERIENCE[0].end} active />
               </div>
@@ -100,7 +100,7 @@ export default function Experience() {
               <div className="grid gap-1.5">
                 <div className="flex items-baseline gap-2 font-mono text-[11px] text-text-muted">
                   <span className="text-text-primary">{EXPERIENCE[1].role}</span>
-                  <span>· {EXPERIENCE[1].org}</span>
+                  <span className="hidden sm:inline">· {EXPERIENCE[1].org}</span>
                 </div>
                 <Bar start={EXPERIENCE[1].start} end={EXPERIENCE[1].end} active />
               </div>
