@@ -197,3 +197,21 @@
     transform: translateX(140%);
   }
 }
+
+/* K9 architecture diagram: dashes travel along each path so the direction of
+   flow is obvious without arrowheads cluttering a dense drawing. */
+@keyframes k9-flow {
+  to {
+    stroke-dashoffset: -32;
+  }
+}
+
+.k9-flow {
+  animation: k9-flow 1.6s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .k9-flow {
+    animation: none;
+  }
+}

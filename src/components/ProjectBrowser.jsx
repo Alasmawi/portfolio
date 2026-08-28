@@ -5,6 +5,7 @@ import Reveal from './ui/Reveal';
 import SyntaxRain from './ui/SyntaxRain';
 import RingGallery from './ui/RingGallery';
 import HardwareStrip from './ui/HardwareStrip';
+import K9Architecture from './ui/K9Architecture';
 import { GithubMark } from './ui/BrandIcons';
 import { LANGUAGE_COLORS, PROJECTS } from '../data/projects';
 
@@ -97,11 +98,17 @@ function useIsWide(px) {
 }
 
 function PreviewMedia({ project, wide }) {
-  if (project.items?.length) {
-    return wide ? (
-      <RingGallery items={project.items} />
-    ) : (
-      <HardwareStrip items={project.items} />
+  if (project.architecture || project.items?.length) {
+    return (
+      /* minmax(0,1fr), not a bare grid: the hardware strip's max-content width
+         (~700px) would otherwise size the track and drag the diagram's w-full
+         SVG out to 666px inside a 390px screen. */
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-4">
+        {project.architecture && <K9Architecture />}
+        {project.items?.length ? (
+          wide ? <RingGallery items={project.items} /> : <HardwareStrip items={project.items} />
+        ) : null}
+      </div>
     );
   }
 

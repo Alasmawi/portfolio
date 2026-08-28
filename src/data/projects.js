@@ -5,7 +5,6 @@ import k9Collar from '../assets/k9/collar.webp';
 import k9FoodScale from '../assets/k9/food-scale.webp';
 import k9Pi5Gateway from '../assets/k9/pi5-gateway.webp';
 import k9ReolinkCam from '../assets/k9/reolink-cam.webp';
-import k9ArchitectureDiagram from '../assets/k9/architecture-diagram.webp';
 
 export const LANGUAGE_COLORS = {
   Go: '#2FC2E8',
@@ -27,16 +26,13 @@ export const PROJECTS = [
     description:
       'An end-to-end IoT + cloud platform for police K9 monitoring: real-time health and environmental sensors, AI-powered anomaly detection via Amazon Bedrock, a centralized dashboard, and kennel/handler management — built during the AWS Cloud Innovation Center internship for the Bahrain Ministry of Interior.',
     tags: ['AWS IoT Core', 'Amazon Bedrock', 'Lambda', 'DynamoDB', 'ESP32', 'React'],
+    // Drawn as inline SVG (ui/K9Architecture.jsx), not a picture — it gets its
+    // own block above the hardware shots rather than being one card in a ring.
+    architecture: true,
     githubUrl: null,
     liveUrl: 'https://pavlov-k9.com/',
     gif: null,
     items: [
-      {
-        type: 'diagram',
-        src: k9ArchitectureDiagram,
-        tag: 'architecture',
-        alt: 'Animated data-flow diagram: sensor to AWS IoT Core to Lambda and Bedrock to dashboard',
-      },
       {
         type: 'image',
         src: k9SensorNode,
