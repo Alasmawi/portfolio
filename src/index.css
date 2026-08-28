@@ -198,20 +198,23 @@
   }
 }
 
-/* K9 architecture diagram: dashes travel along each path so the direction of
-   flow is obvious without arrowheads cluttering a dense drawing. */
-@keyframes k9-flow {
-  to {
-    stroke-dashoffset: -32;
-  }
+/* React Flow's attribution badge ships at 1.18:1 against this ground — its
+   default is grey text on a translucent *white* box, which on a dark page is a
+   smudge. The attribution is kept (the library is MIT and its maintainers ask
+   you leave it unless you hold a Pro licence) but restyled to the site's muted
+   token at 5.03:1 so it is legible rather than decorative noise.
+
+   `a[href]` and the custom property are both needed: React Flow's stylesheet
+   is imported inside the lazy chunk, so it lands after this file and wins at
+   equal specificity. */
+.react-flow__attribution {
+  --xy-attribution-background-color: transparent;
+  padding: 0 8px 4px 0;
 }
 
-.k9-flow {
-  animation: k9-flow 1.6s linear infinite;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .k9-flow {
-    animation: none;
-  }
+.react-flow__attribution a[href] {
+  color: #83848f;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 9px;
+  letter-spacing: 0.04em;
 }
