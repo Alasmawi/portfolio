@@ -6,6 +6,7 @@ import Experience from './components/Experience';
 import Education from './components/Education';
 import About from './components/About';
 import Contact from './components/Contact';
+import ContactDock from './components/ui/ContactDock';
 
 // Marks sections that don't fit the viewport so they get a second, bottom-edge
 // snap point (see index.css). Re-evaluated on resize and whenever a section's
@@ -46,7 +47,7 @@ export default function App() {
   return (
     <>
       <Nav />
-      <main className="relative z-10">
+      <main className="relative z-10 pb-16 md:pb-0">
         <Hero />
         <ProjectBrowser />
         <Experience />
@@ -54,6 +55,7 @@ export default function App() {
         <About />
         <Contact />
       </main>
+      <ContactDock />
     </>
   );
 }

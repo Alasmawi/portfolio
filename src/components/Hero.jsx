@@ -18,7 +18,7 @@ export default function Hero() {
           reduced opacity with the radial scrim below carrying legibility —
           same idea as desktop. Pinning it to the top as its own band left it
           floating above a gap, disconnected from everything. */}
-      <div className="pointer-events-none absolute right-[-90px] top-[6%] h-[52%] w-[380px] opacity-45 sm:right-[-60px] sm:top-0 sm:h-full sm:w-[560px] sm:opacity-100 md:right-[-60px] md:w-[720px]">
+      <div className="pointer-events-none absolute right-[-70px] top-[2%] h-[60%] w-[420px] opacity-70 sm:right-[-60px] sm:top-0 sm:h-full sm:w-[560px] sm:opacity-100 md:right-[-60px] md:w-[720px]">
         <HeroCloudCanvas />
       </div>
 

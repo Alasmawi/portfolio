@@ -24,17 +24,20 @@ function formatRange(entry) {
   return `${fmt(entry.start)} — ${entry.status === 'active' ? fmt(entry.end).split(' ')[0] + ' (ongoing)' : fmt(entry.end)}`;
 }
 
-function Bar({ start, end, active, muted = false, indent = false }) {
+function Bar({ start, end, color, muted = false, indent = false }) {
   const left = frac(start) * 100;
   const width = Math.max((frac(end) - frac(start)) * 100, 1.5);
   return (
-    <div className={`relative h-2 rounded ${indent ? 'ml-4' : ''}`}>
+    <div className={`relative h-2.5 rounded ${indent ? 'ml-4' : ''}`}>
       <div className="absolute inset-0 rounded shadow-[inset_0_0_0_1px_rgba(233,233,237,0.09)]" />
       <div
-        className={`absolute top-0 bottom-0 rounded ${
-          active ? 'bg-accent/25 shadow-[inset_0_0_0_1px_rgba(145,132,217,0.6)]' : ''
-        } ${muted ? 'shadow-[inset_0_0_0_1px_rgba(145,132,217,0.35)]' : ''}`}
-        style={{ left: `${left}%`, width: `${width}%` }}
+        className="absolute top-0 bottom-0 rounded"
+        style={{
+          left: `${left}%`,
+          width: `${width}%`,
+          backgroundColor: muted ? 'transparent' : `${color}33`,
+          boxShadow: `inset 0 0 0 1px ${color}${muted ? '55' : 'aa'}`,
+        }}
       />
     </div>
   );
@@ -83,10 +86,15 @@ export default function Experience() {
 
               <div className="grid gap-1.5">
                 <div className="flex items-baseline gap-2 font-mono text-[11px] text-text-muted">
+                  <span
+                    className="inline-block h-2 w-2 shrink-0 rounded-full"
+                    style={{ backgroundColor: EXPERIENCE[0].color }}
+                    aria-hidden="true"
+                  />
                   <span className="text-text-primary">{EXPERIENCE[0].role}</span>
                   <span className="hidden sm:inline">· {EXPERIENCE[0].org}</span>
                 </div>
-                <Bar start={EXPERIENCE[0].start} end={EXPERIENCE[0].end} active />
+                <Bar start={EXPERIENCE[0].start} end={EXPERIENCE[0].end} color={EXPERIENCE[0].color} />
               </div>
 
               <div className="grid gap-1.5">
@@ -94,27 +102,33 @@ export default function Experience() {
                   <span className="text-accent-body">└</span>
                   <span>{K9_CROSS_REF.label}</span>
                 </div>
-                <Bar start={EXPERIENCE[0].start} end={EXPERIENCE[0].end} muted indent />
+                <Bar start={EXPERIENCE[0].start} end={EXPERIENCE[0].end} color={EXPERIENCE[0].color} muted indent />
               </div>
 
               <div className="grid gap-1.5">
                 <div className="flex items-baseline gap-2 font-mono text-[11px] text-text-muted">
+                  <span
+                    className="inline-block h-2 w-2 shrink-0 rounded-full"
+                    style={{ backgroundColor: EXPERIENCE[1].color }}
+                    aria-hidden="true"
+                  />
                   <span className="text-text-primary">{EXPERIENCE[1].role}</span>
                   <span className="hidden sm:inline">· {EXPERIENCE[1].org}</span>
                 </div>
-                <Bar start={EXPERIENCE[1].start} end={EXPERIENCE[1].end} active />
+                <Bar start={EXPERIENCE[1].start} end={EXPERIENCE[1].end} color={EXPERIENCE[1].color} />
               </div>
             </div>
 
             <div className="mt-4 flex flex-wrap items-center gap-5 font-mono text-[10.5px] text-text-dim">
-              <span className="inline-flex items-center gap-2">
-                <span className="h-2 w-4 rounded-sm bg-accent/25 shadow-[inset_0_0_0_1px_rgba(145,132,217,0.6)]" />
-                internship
-              </span>
-              <span className="inline-flex items-center gap-2">
-                <span className="h-2 w-4 rounded-sm shadow-[inset_0_0_0_1px_rgba(145,132,217,0.35)]" />
-                what it produced
-              </span>
+              {EXPERIENCE.map((j) => (
+                <span key={j.id} className="inline-flex items-center gap-2">
+                  <span
+                    className="h-2 w-4 rounded-sm"
+                    style={{ backgroundColor: `${j.color}33`, boxShadow: `inset 0 0 0 1px ${j.color}aa` }}
+                  />
+                  {j.org.replace(' (CIC)', '')}
+                </span>
+              ))}
               {nowPct !== null && (
                 <span className="inline-flex items-center gap-2">
                   <span className="h-2.5 w-px bg-accent/40" />
@@ -132,8 +146,14 @@ export default function Experience() {
                 <div>
                   <p className="font-mono text-[11.5px] text-text-muted">{formatRange(job)}</p>
                   {job.status === 'active' ? (
-                    <p className="mt-2 inline-flex items-center gap-1.5 font-mono text-[10.5px] uppercase tracking-wider text-accent-body">
-                      <span className="h-[5px] w-[5px] animate-pulse-slow rounded-full bg-accent" />
+                    <p
+                      className="mt-2 inline-flex items-center gap-1.5 font-mono text-[10.5px] uppercase tracking-wider"
+                      style={{ color: job.colorText }}
+                    >
+                      <span
+                        className="h-[5px] w-[5px] animate-pulse-slow rounded-full"
+                        style={{ backgroundColor: job.color }}
+                      />
                       current
                     </p>
                   ) : (
@@ -144,9 +164,18 @@ export default function Experience() {
                 </div>
 
                 <div>
-                  <h3 className="text-xl font-medium tracking-tight text-text-primary">{job.role}</h3>
-                  <p className="mt-1 font-mono text-xs text-accent-body">{job.context}</p>
-                  <ul className="mt-3.5 space-y-1.5">
+                  <div className="flex items-center gap-2.5">
+                    <span
+                      className="h-2.5 w-2.5 shrink-0 rounded-full"
+                      style={{ backgroundColor: job.color }}
+                      aria-hidden="true"
+                    />
+                    <h3 className="text-xl font-medium tracking-tight text-text-primary">{job.role}</h3>
+                  </div>
+                  <p className="mt-1 pl-5 font-mono text-xs" style={{ color: job.colorText }}>
+                    {job.context}
+                  </p>
+                  <ul className="mt-3.5 space-y-1.5 pl-5">
                     {job.points.map((point) => (
                       <li key={point} className="flex gap-2 text-[14.5px] leading-relaxed text-text-primary/85">
                         <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-text-dim" />
@@ -156,7 +185,7 @@ export default function Experience() {
                   </ul>
                 </div>
 
-                <div className="flex flex-wrap content-start gap-1.5">
+                <div className="flex flex-wrap content-start gap-1.5 pl-5 md:pl-0">
                   {job.tags.map((tag) => (
                     <span key={tag} className="tag-outline text-[11px]">
                       {tag}
@@ -174,13 +203,13 @@ export default function Experience() {
               </p>
               <div>
                 <h3 className="text-lg font-medium tracking-tight text-text-primary">{K9_CROSS_REF.label}</h3>
-                <p className="mt-1 max-w-[62ch] text-[14.5px] leading-relaxed text-text-muted">
-                  {K9_CROSS_REF.blurb}{' '}
-                  <a href="#projects" className="text-accent-bright underline decoration-accent-body/40 underline-offset-2">
-                    Projects
-                  </a>
-                  .
-                </p>
+                <a
+                  href="#projects"
+                  className="mt-1.5 inline-flex min-h-6 items-center gap-1.5 py-1 font-mono text-[12px] text-accent-bright"
+                >
+                  See the hardware and architecture in Projects
+                  <span aria-hidden="true">→</span>
+                </a>
               </div>
               <div className="flex flex-wrap gap-1.5">
                 {K9_CROSS_REF.tags.map((tag) => (

@@ -57,7 +57,7 @@ export default function About() {
 
         <div className="mt-9 grid gap-9 md:mt-11 md:max-w-[900px] md:grid-cols-[220px_1fr] md:items-start">
           <Reveal delay={0.1}>
-            <div className="relative mx-auto h-[220px] w-[176px] md:mx-0 md:h-[270px] md:w-full">
+            <div className="relative mx-auto h-[300px] w-[240px] sm:h-[260px] sm:w-[200px] md:mx-0 md:h-[270px] md:w-full">
               <div
                 className="pointer-events-none absolute -left-6 -right-6 top-6 -bottom-3.5"
                 style={{
@@ -83,12 +83,7 @@ export default function About() {
           <Reveal delay={0.15}>
             <p className="max-w-[48ch] text-[15.5px] leading-relaxed text-text-primary/80">
               Full-stack product work on AWS — schema, API, front end, deploy. Underneath it: an HTTP
-              server on epoll, a Unix shell, a ray tracer, all written from scratch. That&apos;s why I
-              can go a layer down when a framework stops explaining itself.
-            </p>
-            <p className="mt-4 max-w-[48ch] text-[15.5px] leading-relaxed text-text-primary/80">
-              AI where it earns its place: retrieval that cites its sources, anomaly detection on
-              sensor data.
+              server on epoll, a Unix shell, a ray tracer, all written from scratch.
             </p>
             <div className="mt-6 grid max-w-[46ch] gap-3">
               <div className="grid gap-1 sm:grid-cols-[88px_1fr] sm:items-baseline sm:gap-4">

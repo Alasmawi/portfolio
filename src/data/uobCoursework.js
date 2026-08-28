@@ -52,14 +52,12 @@ export const UOB_COURSEWORK = [
   { code: 'Dept. Approved', title: 'Business Information Systems', ch: 3, pillar: 'cs' },
 ];
 
-// One hue, four steps of it. Nocturne runs a single accent, so the credit
-// bar's categories separate by lightness rather than by four competing hues —
-// the segments still read apart, but the bar stops being the loudest thing on
-// the page. Ordered so the pillars the site actually argues for (cloud, AI)
-// take the brightest steps.
+// Four categories, four hues. A single-accent ramp made these read as one
+// gradient rather than four distinct areas of study, which is the whole point
+// of the bar. Cloud and AI keep the amber/cyan the site has always used.
 export const PILLAR_COLORS = {
-  cloud: '#d2cefd',
-  ai: '#b5abfc',
-  fullstack: '#9184d9',
-  cs: '#6c62a8',
+  cloud: '#F2A93B',
+  ai: '#2FC2E8',
+  fullstack: '#A78BFA',
+  cs: '#F472B6',
 };

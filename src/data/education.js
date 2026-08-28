@@ -1,3 +1,8 @@
+// `color` is the institution's own identity colour, carried over from the
+// original site — Reboot's tiffany and UoB's gold. Nocturne's blurple stays the
+// system/interactive accent; these mark *whose* entry this is, which is a
+// different job and reads as one at a glance.
+//
 // `track` and `stats` drive the accent treatment in Education.jsx. Both are
 // read from real sources — the degree's own specialisation, the course list in
 // uobCoursework.js (30 courses, 88 credit hours), and the 01Edu phase data in
@@ -6,6 +11,7 @@ export const EDUCATION = [
   {
     id: 'uob',
     school: 'University of Bahrain',
+    color: '#C9A227',
     degree: 'B.Sc. Computer Science — Cloud Computing',
     period: '2022 — 2026',
     track: 'Cloud Computing track',
@@ -13,13 +19,13 @@ export const EDUCATION = [
       { value: '30', label: 'courses' },
       { value: '88', label: 'credit hours' },
     ],
-    description:
-      'Specialized cloud computing track, benchmarked against AWS curriculum guidelines.',
+    description: 'Cloud computing track, benchmarked against AWS curriculum guidelines.',
     coursework: true,
   },
   {
     id: 'reboot',
     school: 'Reboot Coding Institute',
+    color: '#1CCFC9',
     degree: 'Full Stack Development — powered by 01Edu',
     period: '2024 — 2026',
     track: 'Cloud DevOps & Cybersecurity',
@@ -31,7 +37,7 @@ export const EDUCATION = [
     // marks it `active`, which is where the live dot comes from.
     current: true,
     description:
-      'Peer-to-peer, project-based training with no lectures and no given answers — the 01Edu model, run in Bahrain with Tamkeen backing. Overlaps the final two years of the CS degree.',
+      'Project-based, peer-to-peer — no lectures, no given answers. Runs alongside the final two years of the degree.',
     coursework: false,
     journey: true,
   },
