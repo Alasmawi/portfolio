@@ -198,6 +198,72 @@
   }
 }
 
+/* — contact tab glare — */
+/* A specular highlight that crosses the Contact tab so it reads as the live
+   thing in the row rather than a fifth icon.
+
+   Deliberately not a pulse. A button that throbs on every scroll is an
+   irritation, not an affordance, so the sweep takes ~1.4s of a 9s cycle and the
+   element sits still for the other 7.6s. It starts and ends outside the
+   button's box, which `overflow-hidden` clips, so the reset is never visible.
+
+   Two constraints shape the implementation:
+   - It is painted *behind* the label (z-index 0 against the content's z-10),
+     not over it. An overlay on top would lift the text's background and eat
+     into its contrast — measured at 8.0:1 at the sweep's peak, still passing,
+     but there is no reason to spend the headroom when going underneath costs
+     nothing.
+   - `transform` only, so it composites on the GPU and never triggers layout. */
+@keyframes contact-glare {
+  0%,
+  72% {
+    transform: translateX(-130%) skewX(-18deg);
+  }
+  88%,
+  100% {
+    transform: translateX(130%) skewX(-18deg);
+  }
+}
+
+.contact-glare {
+  /* A faint standing tint plus a hairline edge, so the tab is still the
+     distinct one when the sweep is not running — including under reduced
+     motion, where it never runs at all. Kept light on purpose: Nocturne's
+     buttons take their weight from an outline and a tint, never a fill, and at
+     0.12 this read as a solid block sitting in the row. */
+  background: rgba(145, 132, 217, 0.075);
+  border-left: 1px solid rgba(145, 132, 217, 0.3);
+}
+
+.contact-glare::after {
+  content: '';
+  position: absolute;
+  inset-block: 0;
+  /* A narrow band that starts and ends outside the tab. `left` stays 0 and the
+     travel is entirely in the transform: an offset here would shift the whole
+     sweep, and the band would sit half off the left edge at mid-cycle instead
+     of crossing the tab. ±130% of a 58%-wide band clears both edges. */
+  left: 0;
+  width: 58%;
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(210, 206, 253, 0.34),
+    transparent
+  );
+  animation: contact-glare 9s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .contact-glare::after {
+    animation: none;
+    /* No sweep at all, rather than a stalled band parked across the tab. */
+    display: none;
+  }
+}
+
 /* React Flow's attribution badge ships at 1.18:1 against this ground — its
    default is grey text on a translucent *white* box, which on a dark page is a
    smudge. The attribution is kept (the library is MIT and its maintainers ask
