@@ -6,6 +6,12 @@ import k9FoodScale from '../assets/k9/food-scale.webp';
 import k9Pi5Gateway from '../assets/k9/pi5-gateway.webp';
 import k9ReolinkCam from '../assets/k9/reolink-cam.webp';
 
+// Files in public/ are referenced by plain runtime strings, which Vite does not
+// rewrite the way it rewrites imports and index.html — so `base` has to be
+// applied by hand here or every preview video 404s once the site is served from
+// a sub-path. BASE_URL carries its own trailing slash ('/v2/', or '/' at root).
+const asset = (path) => `${import.meta.env.BASE_URL}${path.replace(/^\//, '')}`;
+
 export const LANGUAGE_COLORS = {
   Go: '#2FC2E8',
   Rust: '#DE7B4A',
@@ -77,7 +83,7 @@ export const PROJECTS = [
     tags: ['Python', 'FastAPI', 'RAG', 'FAISS', 'Ollama', 'React'],
     githubUrl: 'https://github.com/Alasmawi/guidely',
     liveUrl: null,
-    video: '/video/guidely.mp4',
+    video: asset('/video/guidely.mp4'),
   },
   {
     id: 'detecto',
@@ -90,7 +96,7 @@ export const PROJECTS = [
     tags: ['Python', 'FastAPI', 'YOLOv8', 'OpenCV', 'React', 'SQLite'],
     githubUrl: 'https://github.com/Alasmawi/detecto',
     liveUrl: null,
-    video: '/video/detecto.mp4',
+    video: asset('/video/detecto.mp4'),
   },
   {
     id: 'brain-book',
@@ -104,7 +110,7 @@ export const PROJECTS = [
     tags: ['Go', 'WebSockets', 'REST APIs', 'Auth', 'SQLite'],
     githubUrl: 'https://github.com/Alasmawi/Brain-Book',
     liveUrl: null,
-    video: '/video/brain-book.mp4',
+    video: asset('/video/brain-book.mp4'),
   },
   {
     id: 'localhost',
@@ -117,7 +123,7 @@ export const PROJECTS = [
     tags: ['Rust', 'HTTP/1.1', 'epoll', 'Systems Programming'],
     githubUrl: 'https://github.com/Alasmawi/localhost',
     liveUrl: null,
-    video: '/video/localhost.mp4',
+    video: asset('/video/localhost.mp4'),
   },
   {
     id: '0-shell',
@@ -130,7 +136,7 @@ export const PROJECTS = [
     tags: ['Rust', 'Shell', 'Systems Programming'],
     githubUrl: 'https://github.com/Alasmawi/0-shell',
     liveUrl: null,
-    video: '/video/0-shell.mp4',
+    video: asset('/video/0-shell.mp4'),
   },
   {
     id: 'rt',
@@ -143,7 +149,7 @@ export const PROJECTS = [
     tags: ['Rust', 'Ray Tracing', 'Computer Graphics'],
     githubUrl: 'https://github.com/Alasmawi/rt',
     liveUrl: null,
-    video: '/video/rt.mp4',
+    video: asset('/video/rt.mp4'),
   },
   {
     id: 'smart-road',
@@ -156,7 +162,7 @@ export const PROJECTS = [
     tags: ['Rust', 'SDL2', 'Simulation', 'Scheduling'],
     githubUrl: 'https://github.com/Alasmawi/smart-road',
     liveUrl: null,
-    video: '/video/smart-road.mp4',
+    video: asset('/video/smart-road.mp4'),
   },
   {
     id: 'multiplayer-fps',
@@ -169,7 +175,7 @@ export const PROJECTS = [
     tags: ['Rust', 'Multiplayer', 'Game Dev', 'Networking'],
     githubUrl: 'https://github.com/Alasmawi/multiplayer-fps',
     liveUrl: null,
-    video: '/video/multiplayer-fps.mp4',
+    video: asset('/video/multiplayer-fps.mp4'),
   },
   {
     id: 'bomberman-dom',
@@ -182,7 +188,7 @@ export const PROJECTS = [
     tags: ['JavaScript', 'WebSockets', 'Game Dev'],
     githubUrl: 'https://github.com/Alasmawi/bomberman-dom',
     liveUrl: null,
-    video: '/video/bomberman-dom.mp4',
+    video: asset('/video/bomberman-dom.mp4'),
   },
   {
     id: 'mini-framework',
@@ -195,7 +201,7 @@ export const PROJECTS = [
     tags: ['JavaScript', 'Virtual DOM', 'Framework Design'],
     githubUrl: 'https://github.com/Alasmawi/mini-framework',
     liveUrl: null,
-    video: '/video/mini-framework.mp4',
+    video: asset('/video/mini-framework.mp4'),
   },
   {
     id: 'real-time-forum',
@@ -208,7 +214,7 @@ export const PROJECTS = [
     tags: ['Go', 'WebSockets', 'SQLite'],
     githubUrl: 'https://github.com/Alasmawi/real-time-forum',
     liveUrl: null,
-    video: '/video/real-time-forum.mp4',
+    video: asset('/video/real-time-forum.mp4'),
   },
   {
     id: 'net-cat',
@@ -221,7 +227,7 @@ export const PROJECTS = [
     tags: ['Go', 'TCP', 'Networking'],
     githubUrl: 'https://github.com/Alasmawi/Net-Cat',
     liveUrl: null,
-    video: '/video/net-cat.mp4',
+    video: asset('/video/net-cat.mp4'),
   },
   {
     id: 'groupie-tracker',
@@ -234,6 +240,6 @@ export const PROJECTS = [
     tags: ['Go', 'REST APIs', 'Frontend'],
     githubUrl: 'https://github.com/Alasmawi/groupie-tracker',
     liveUrl: null,
-    video: '/video/groupie-tracker.mp4',
+    video: asset('/video/groupie-tracker.mp4'),
   },
 ];
