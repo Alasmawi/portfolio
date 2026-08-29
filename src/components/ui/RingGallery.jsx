@@ -95,11 +95,28 @@ export default function RingGallery({ items = [] }) {
     });
   }, [step]);
 
-  // Radius is derived from the card's CSS width so the breakpoints stay the
-  // single source of truth. getComputedStyle, not getBoundingClientRect: the
-  // slots are already 3D-transformed, so their client rects are projected.
+  // Card width is derived from the mask's measured width rather than a media
+  // query. The viewport is the wrong variable here: this gallery lives in the
+  // projects panel, which loses 264px to the repo sidebar at 768px, so a
+  // viewport query asked for a 430px card inside a 342px container and the ring
+  // collapsed into one card plus two slivers. 62% is the same ratio the old
+  // breakpoints were hand-tuned to.
+  //
+  // Radius then comes from the card's resolved CSS width, so the variable stays
+  // the single source of truth. getComputedStyle, not getBoundingClientRect:
+  // the slots are already 3D-transformed, so their client rects are projected.
   const measure = useCallback(() => {
-    if (!ringRef.current) return;
+    if (!ringRef.current || !maskRef.current) return;
+    const avail = maskRef.current.clientWidth;
+    if (avail) {
+      const next = `${Math.round(Math.min(460, avail * 0.62))}px`;
+      // Only write on change. The card width drives the mask's own height, so
+      // an unconditional write would feed the ResizeObserver that called this
+      // and bounce a notification back every frame.
+      if (maskRef.current.style.getPropertyValue('--ring-card-w') !== next) {
+        maskRef.current.style.setProperty('--ring-card-w', next);
+      }
+    }
     const w = parseFloat(getComputedStyle(ringRef.current).width);
     if (!w) return;
     const r = count > 1 ? (w / 2 / Math.tan(Math.PI / count)) * RING_GAP : 0;

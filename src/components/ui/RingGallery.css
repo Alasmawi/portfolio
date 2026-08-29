@@ -1,11 +1,17 @@
 /* Card sizing. Height comes from the 16:9 ratio so the landscape shape can't
-   drift when a width changes. The md tier tracks the viewport because the
-   layout drops the gallery into a narrower col-span-8 cell there. */
+   drift when a width changes.
+
+   `--ring-card-w` is written by RingGallery.jsx from the *measured mask width*,
+   not from a media query. It used to step on viewport breakpoints, which is the
+   wrong variable: this gallery sits in the projects panel, and that panel loses
+   264px to the repo sidebar the moment the viewport reaches 768px. A viewport
+   query therefore asked for a 430px card inside a 342px container. The value
+   below is only the pre-measurement fallback. */
 .ring-mask {
   /* Cards run narrower than the column on purpose. The flanking cards sit at
      x = ±R·sin(60°), so an oversized card pushes its neighbours out past the
      frame and the ring collapses into "one card plus two slivers". */
-  --ring-card-w: min(230px, 62vw);
+  --ring-card-w: 230px;
 
   position: relative;
   width: 100%;
@@ -26,24 +32,6 @@
 .ring-mask:focus-visible {
   outline: 1px solid rgb(145 132 217 / 0.6);
   outline-offset: 4px;
-}
-
-@media (min-width: 640px) {
-  .ring-mask {
-    --ring-card-w: 360px;
-  }
-}
-
-@media (min-width: 768px) {
-  .ring-mask {
-    --ring-card-w: min(430px, 45vw);
-  }
-}
-
-@media (min-width: 1024px) {
-  .ring-mask {
-    --ring-card-w: 460px;
-  }
 }
 
 .ring {
@@ -94,6 +82,43 @@
   }
 }
 
+/* — the same card, laid flat — */
+/* Below the width where a turntable earns its keep, the cards stop orbiting and
+   lie in a snap-scrolling row. Everything that makes a card a card — the mat,
+   the hairline around the image well, the tag, the corner brackets on the
+   focused one — is shared with the ring, so the gallery is one design at every
+   width and only the rotation is desktop-only. */
+.hw-strip {
+  display: flex;
+  gap: 0.75rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  /* Room on every side for the focused card's corner brackets, which sit at
+     inset -7px and are otherwise clipped by the scroll container — the left
+     pair first, since that is where the focused card usually is. */
+  padding: 7px;
+  scrollbar-width: none;
+  /* Horizontal drags scroll the strip; vertical ones still scroll the page. */
+  touch-action: pan-y pan-x;
+}
+
+.hw-strip::-webkit-scrollbar {
+  display: none;
+}
+
+.hw-strip:focus-visible {
+  outline: 1px solid rgb(145 132 217 / 0.6);
+  outline-offset: 4px;
+}
+
+.hw-slide {
+  position: relative;
+  /* Under 100% so the next card peeks and the row reads as scrollable. */
+  flex: 0 0 min(74%, 300px);
+  aspect-ratio: 16 / 9;
+  scroll-snap-align: start;
+}
+
 /* Hairline around the image well. */
 .ring-card::after {
   content: '';
@@ -139,14 +164,16 @@
   pointer-events: none;
 }
 
-.ring-slot.is-front .ring-card {
+.ring-slot.is-front .ring-card,
+.hw-slide[data-active='true'] .ring-card {
   border-color: rgb(145 132 217 / 0.5);
 }
 
 /* Corner brackets on the focused card only — drawn on the slot, which doesn't
    clip, so they can sit just outside the card's edge. Same hard-cornered
    language as the hero ridge. */
-.ring-slot.is-front::after {
+.ring-slot.is-front::after,
+.hw-slide[data-active='true']::after {
   --b: #9184d9;
   --len: 16px;
 

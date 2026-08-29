@@ -78,23 +78,36 @@ function PreviewVideo({ src, label }) {
   );
 }
 
-// Below this width the 3D ring is replaced by a flat figure + swipe strip:
-// turning a turntable with a thumb on a 390px screen costs more than it pays.
-const RING_MIN_WIDTH = 768;
+// Below this the 3D ring gives way to the flat card strip: turning a turntable
+// with a thumb costs more than it pays, and under ~560px the flanking cards
+// have nowhere to go.
+//
+// It is the *container's* width, not the viewport's — the same number the
+// architecture diagram switches on, for the same reason. This panel is not a
+// fixed fraction of the window: the repo sidebar appears at a 768px viewport
+// and takes the preview pane from 570px down to 342px, so a viewport query
+// hands the widest treatment to the narrowest container in the range.
+const WIDE_PANEL_PX = 560;
 
-function useIsWide(px) {
-  const query = `(min-width: ${px}px)`;
-  const [matches, setMatches] = useState(
-    () => typeof window !== 'undefined' && window.matchMedia(query).matches
-  );
+function useContainerAtLeast(min) {
+  const ref = useRef(null);
+  // Starts narrow: the strip fits everywhere, so the first paint is never the
+  // broken one while we wait for a measurement.
+  const [wide, setWide] = useState(false);
   useEffect(() => {
-    const mq = window.matchMedia(query);
-    const update = () => setMatches(mq.matches);
-    update();
-    mq.addEventListener('change', update);
-    return () => mq.removeEventListener('change', update);
-  }, [query]);
-  return matches;
+    const el = ref.current;
+    if (!el) return undefined;
+    const measure = () => setWide(el.clientWidth >= min);
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [min]);
+  return [ref, wide];
+}
+
+function Gallery({ items, wide }) {
+  return wide ? <RingGallery items={items} /> : <HardwareStrip items={items} />;
 }
 
 /* The hardware and the architecture drawing are two views of one project, not
@@ -108,8 +121,9 @@ function useIsWide(px) {
    and the diagram was already being shrunk — to 0.60 scale — which is what made
    it unreadable. Given its own panel it gets the full width at 1:1, and it
    costs the photos nothing. Hardware leads. */
-function MediaTabs({ project, wide }) {
+function MediaTabs({ project }) {
   const [tab, setTab] = useState('hardware');
+  const [panelRef, wide] = useContainerAtLeast(WIDE_PANEL_PX);
   const tabs = [
     { id: 'hardware', label: 'Hardware' },
     { id: 'architecture', label: 'Architecture' },
@@ -163,6 +177,7 @@ function MediaTabs({ project, wide }) {
           width (~700px) would otherwise size the track and drag the diagram out
           to 666px inside a 390px screen. */}
       <div
+        ref={panelRef}
         id={`k9panel-${tab}`}
         role="tabpanel"
         aria-labelledby={`k9tab-${tab}`}
@@ -171,28 +186,33 @@ function MediaTabs({ project, wide }) {
       >
         {tab === 'architecture' ? (
           <K9Architecture />
-        ) : wide ? (
-          <RingGallery items={project.items} />
         ) : (
-          <HardwareStrip items={project.items} />
+          <Gallery items={project.items} wide={wide} />
         )}
       </div>
     </div>
   );
 }
 
-function PreviewMedia({ project, wide }) {
+function GalleryOnly({ items }) {
+  const [ref, wide] = useContainerAtLeast(WIDE_PANEL_PX);
+  return (
+    <div ref={ref} className="grid grid-cols-[minmax(0,1fr)]">
+      <Gallery items={items} wide={wide} />
+    </div>
+  );
+}
+
+function PreviewMedia({ project }) {
   if (project.architecture && project.items?.length) {
-    return <MediaTabs project={project} wide={wide} />;
+    return <MediaTabs project={project} />;
   }
 
   if (project.architecture || project.items?.length) {
     return (
       <div className="grid grid-cols-[minmax(0,1fr)] gap-4">
         {project.architecture && <K9Architecture />}
-        {project.items?.length ? (
-          wide ? <RingGallery items={project.items} /> : <HardwareStrip items={project.items} />
-        ) : null}
+        {project.items?.length ? <GalleryOnly items={project.items} /> : null}
       </div>
     );
   }
@@ -229,7 +249,6 @@ export default function ProjectBrowser() {
   // tap. The full text is always in the DOM — this clamps, it doesn't truncate.
   const [descOpen, setDescOpen] = useState(false);
   const project = PROJECTS.find((p) => p.id === selectedId) ?? PROJECTS[0];
-  const wide = useIsWide(RING_MIN_WIDTH);
 
   const sectionRef = useRef(null);
   // Activity is tracked in a ref rather than state: pointermove fires
@@ -450,7 +469,7 @@ export default function ProjectBrowser() {
                     exit={{ opacity: 0, y: -8 }}
                     transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
                   >
-                    <PreviewMedia project={project} wide={wide} />
+                    <PreviewMedia project={project} />
 
                     <div className="mt-5 flex flex-wrap items-start justify-between gap-4">
                       <div>
