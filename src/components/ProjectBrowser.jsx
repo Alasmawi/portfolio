@@ -97,12 +97,97 @@ function useIsWide(px) {
   return matches;
 }
 
+/* The hardware and the architecture drawing are two views of one project, not
+   two stacked blocks. Stacked, the diagram sat above the gallery at 336px
+   (desktop) / 620px (phone) and got read first and longest — while the photos
+   of the boards, the collar and the scale, which are the part that was actually
+   built by hand, were what you had to scroll past it to reach. On a phone the
+   split measured 830px of diagram to 150px of photos.
+
+   Tabs rather than a reorder or a shrink: reordering only moves the problem,
+   and the diagram was already being shrunk — to 0.60 scale — which is what made
+   it unreadable. Given its own panel it gets the full width at 1:1, and it
+   costs the photos nothing. Hardware leads. */
+function MediaTabs({ project, wide }) {
+  const [tab, setTab] = useState('hardware');
+  const tabs = [
+    { id: 'hardware', label: 'Hardware' },
+    { id: 'architecture', label: 'Architecture' },
+  ];
+
+  // Arrow keys move between tabs, per the ARIA tabs pattern.
+  const onKeyDown = (e) => {
+    const i = tabs.findIndex((t) => t.id === tab);
+    const delta = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+    if (!delta) return;
+    e.preventDefault();
+    const next = tabs[(i + delta + tabs.length) % tabs.length];
+    setTab(next.id);
+    document.getElementById(`k9tab-${next.id}`)?.focus();
+  };
+
+  return (
+    <div className="grid grid-cols-[minmax(0,1fr)] gap-3">
+      <div
+        role="tablist"
+        aria-label={`${project.name} media`}
+        onKeyDown={onKeyDown}
+        className="flex gap-1.5"
+      >
+        {tabs.map(({ id, label }) => {
+          const on = tab === id;
+          return (
+            <button
+              key={id}
+              id={`k9tab-${id}`}
+              type="button"
+              role="tab"
+              data-k9tab={id}
+              aria-selected={on}
+              aria-controls={`k9panel-${id}`}
+              tabIndex={on ? 0 : -1}
+              onClick={() => setTab(id)}
+              className={`min-h-11 rounded-md border px-3.5 font-mono text-[11px] uppercase tracking-[0.14em] transition-colors ${
+                on
+                  ? 'border-accent bg-accent/[0.14] text-accent-bright'
+                  : 'border-base-border text-text-muted hover:border-accent/60 hover:text-accent-bright'
+              }`}
+            >
+              {label}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* minmax(0,1fr) above, and min-w-0 here: the hardware strip's max-content
+          width (~700px) would otherwise size the track and drag the diagram out
+          to 666px inside a 390px screen. */}
+      <div
+        id={`k9panel-${tab}`}
+        role="tabpanel"
+        aria-labelledby={`k9tab-${tab}`}
+        tabIndex={0}
+        className="min-w-0"
+      >
+        {tab === 'architecture' ? (
+          <K9Architecture />
+        ) : wide ? (
+          <RingGallery items={project.items} />
+        ) : (
+          <HardwareStrip items={project.items} />
+        )}
+      </div>
+    </div>
+  );
+}
+
 function PreviewMedia({ project, wide }) {
+  if (project.architecture && project.items?.length) {
+    return <MediaTabs project={project} wide={wide} />;
+  }
+
   if (project.architecture || project.items?.length) {
     return (
-      /* minmax(0,1fr), not a bare grid: the hardware strip's max-content width
-         (~700px) would otherwise size the track and drag the diagram's w-full
-         SVG out to 666px inside a 390px screen. */
       <div className="grid grid-cols-[minmax(0,1fr)] gap-4">
         {project.architecture && <K9Architecture />}
         {project.items?.length ? (

@@ -26,8 +26,9 @@ export const PROJECTS = [
     description:
       'An end-to-end IoT + cloud platform for police K9 monitoring: real-time health and environmental sensors, AI-powered anomaly detection via Amazon Bedrock, a centralized dashboard, and kennel/handler management — built during the AWS Cloud Innovation Center internship for the Bahrain Ministry of Interior.',
     tags: ['AWS IoT Core', 'Amazon Bedrock', 'Lambda', 'DynamoDB', 'ESP32', 'React'],
-    // Drawn as inline SVG (ui/K9Architecture.jsx), not a picture — it gets its
-    // own block above the hardware shots rather than being one card in a ring.
+    // Drawn (ui/K9Architecture.jsx), not a picture. Sits behind its own tab
+    // next to the hardware gallery rather than stacked above it — see the note
+    // on MediaTabs in ProjectBrowser.jsx.
     architecture: true,
     githubUrl: null,
     liveUrl: 'https://pavlov-k9.com/',
