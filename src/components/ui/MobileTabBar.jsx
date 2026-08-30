@@ -22,7 +22,7 @@ export default function MobileTabBar() {
   return (
     <nav
       aria-label="Sections"
-      className="fixed inset-x-0 bottom-0 z-40 border-t border-base-border bg-base-bg/95 backdrop-blur md:hidden"
+      className="fixed inset-x-0 bottom-0 z-40 border-t border-base-edge bg-base-bg/95 backdrop-blur md:hidden"
       // Keeps the row clear of the home indicator on a notched phone.
       style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
     >
@@ -53,7 +53,7 @@ export default function MobileTabBar() {
                   />
                 )}
                 <Icon size={18} strokeWidth={1.75} aria-hidden="true" className="relative z-10" />
-                <span className="relative z-10 font-mono text-[9.5px] uppercase tracking-[0.1em]">
+                <span className="relative z-10 font-mono text-[11px] uppercase tracking-[0.06em]">
                   {label}
                 </span>
               </a>

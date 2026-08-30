@@ -66,7 +66,7 @@ export default function HardwareStrip({ items = [] }) {
           </li>
         ))}
       </ul>
-      <p className="mt-1.5 font-mono text-[10px] tracking-wide text-text-dim" aria-hidden="true">
+      <p className="mt-1.5 font-mono text-[10.5px] tracking-wide text-text-dim" aria-hidden="true">
         {active + 1} / {items.length}
       </p>
     </div>

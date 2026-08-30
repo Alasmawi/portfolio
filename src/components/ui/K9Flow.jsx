@@ -113,7 +113,7 @@ const ServiceNode = memo(({ data }) => {
       <div className="min-w-0 leading-tight">
         <div className="truncate text-[12.5px] font-medium text-text-primary">{data.label}</div>
         {data.sub && (
-          <div className="truncate font-mono text-[10px] text-text-muted">{data.sub}</div>
+          <div className="truncate font-mono text-[10.5px] text-text-muted">{data.sub}</div>
         )}
       </div>
     </div>
@@ -135,7 +135,7 @@ const TierNode = memo(({ data }) => (
   >
     {/* Indented past the live-status lane, which runs down the left margin
         and otherwise clips the first letter of "Handler". */}
-    <div className="pl-8 pr-3 pt-2 font-mono text-[10px] uppercase tracking-[0.16em] text-text-muted">
+    <div className="pl-8 pr-3 pt-2 font-mono text-[10.5px] uppercase tracking-[0.16em] text-text-muted">
       {data.label}
     </div>
   </div>

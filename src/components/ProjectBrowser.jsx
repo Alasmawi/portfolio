@@ -179,7 +179,7 @@ function MediaTabs({ project }) {
               className={`min-h-11 rounded-md border px-3.5 font-mono text-[11px] uppercase tracking-[0.14em] transition-colors ${
                 on
                   ? 'border-accent bg-accent/[0.14] text-accent-bright'
-                  : 'border-base-border text-text-muted hover:border-accent/60 hover:text-accent-bright'
+                  : 'border-base-edge text-text-muted hover:border-accent/60 hover:text-accent-bright'
               }`}
             >
               {label}
@@ -253,7 +253,7 @@ function PreviewMedia({ project, playing }) {
     <div className="flex aspect-video w-full flex-col items-center justify-center gap-3 rounded-lg bg-white/[0.03] text-text-dim shadow-[inset_0_0_0_1px_rgba(233,233,237,0.09)]">
       <Film size={22} />
       <p className="font-mono text-xs uppercase tracking-wider">// preview coming soon</p>
-      <p className="font-mono text-[11px] text-text-dim/70">clone the repo to see it run</p>
+      <p className="font-mono text-[11px] text-text-dim">clone the repo to see it run</p>
     </div>
   );
 }
@@ -387,7 +387,7 @@ export default function ProjectBrowser() {
       <div className="mx-auto max-w-6xl px-5 pb-6 pt-11 sm:px-10 sm:pb-8 sm:pt-14 md:px-14 md:pb-10 md:pt-20">
         <Reveal>
           <p className="mb-4 font-mono text-[11px] uppercase tracking-[0.18em] text-text-muted">
-            // 01 [ projects ]
+            // [ projects ]
           </p>
           <div className="flex flex-wrap items-end justify-between gap-6">
             <h2 className="text-3xl font-medium tracking-tight text-text-primary md:text-[38px]">
@@ -403,7 +403,7 @@ export default function ProjectBrowser() {
             <span className="shrink-0 font-mono text-[10.5px] uppercase tracking-[0.16em] text-text-muted">
               Recurring stack
             </span>
-            <span className="hidden h-3.5 w-px bg-base-border sm:block" aria-hidden="true" />
+            <span className="hidden h-3.5 w-px bg-base-hairline sm:block" aria-hidden="true" />
             <div className="flex flex-wrap gap-1.5">
               {RECURRING_STACK.map((tag) => (
                 <span key={tag} className="tag-outline text-[11.5px]">
@@ -438,7 +438,11 @@ export default function ProjectBrowser() {
 
           <Reveal delay={0.05} className="relative block px-5 py-6 sm:px-10 sm:py-9 md:px-14">
             <div className="mx-auto max-w-6xl overflow-hidden rounded-lg bg-void/85 shadow-[0_0_0_1px_rgba(233,233,237,0.12),0_18px_44px_-20px_rgba(0,0,0,0.9)] backdrop-blur-[2px] md:flex">
-              {/* mobile: horizontal chip row */}
+              {/* mobile: horizontal chip row. The rings are inset shadows
+                  rather than borders so the chip's box doesn't grow by 2px when
+                  it becomes selected, but they are still a component boundary —
+                  hence base.edge's value (3.72:1 on this ground) rather than
+                  the hairline these used to carry at 1.33:1. */}
               <div className="flex gap-2 overflow-x-auto p-3 md:hidden">
                 {PROJECTS.map((p) => (
                   <button
@@ -447,8 +451,8 @@ export default function ProjectBrowser() {
                     onClick={() => select(p.id)}
                     className={`flex min-h-11 shrink-0 items-center gap-2 whitespace-nowrap rounded-md px-3 py-2 font-mono text-xs transition-colors ${
                       p.id === selectedId
-                        ? 'bg-accent/10 text-accent-bright shadow-[inset_0_0_0_1px_rgba(145,132,217,0.5)]'
-                        : 'text-text-muted shadow-[inset_0_0_0_1px_rgba(233,233,237,0.12)]'
+                        ? 'bg-accent/10 text-accent-bright shadow-[inset_0_0_0_1px_rgba(145,132,217,0.7)]'
+                        : 'text-text-muted shadow-[inset_0_0_0_1px_#6a6e80]'
                     }`}
                   >
                     <LanguageDot language={p.language} />
@@ -511,12 +515,12 @@ export default function ProjectBrowser() {
                       <div>
                         <div className="flex items-center gap-2">
                           {project.flagship && (
-                            <span className="tag-outline text-[10px] uppercase tracking-wider">
+                            <span className="tag-outline text-[10.5px] uppercase tracking-wider">
                               flagship
                             </span>
                           )}
                           {project.private && (
-                            <span className="flex items-center gap-1 rounded border border-base-border px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-text-dim">
+                            <span className="flex items-center gap-1 rounded border border-base-hairline px-2 py-0.5 font-mono text-[10.5px] uppercase tracking-wider text-text-dim">
                               <Lock size={10} /> private repo
                             </span>
                           )}
@@ -541,7 +545,7 @@ export default function ProjectBrowser() {
                             <ExternalLink size={11} />
                           </a>
                         ) : (
-                          <span className="flex items-center gap-2 rounded-md border border-base-border px-3 py-2 font-mono text-xs text-text-dim">
+                          <span className="flex items-center gap-2 rounded-md border border-base-edge px-3 py-2 font-mono text-xs text-text-dim">
                             <PlayCircle size={14} />
                             internship project
                           </span>

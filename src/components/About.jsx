@@ -33,7 +33,7 @@ export default function About() {
       <div className="relative mx-auto max-w-6xl">
         <Reveal>
           <p className="mb-5 font-mono text-[11px] uppercase tracking-[0.18em] text-text-muted">
-            // 04 [ about ]
+            // [ about ]
           </p>
           <h2 className="max-w-[22ch] text-4xl font-medium leading-[1.08] tracking-tight text-text-primary md:text-[46px]">
             I like the problems that{' '}

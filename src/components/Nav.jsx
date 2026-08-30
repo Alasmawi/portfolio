@@ -16,7 +16,7 @@ export default function Nav() {
   };
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50 border-b border-base-border/80 bg-base-bg/85 backdrop-blur">
+    <header className="fixed inset-x-0 top-0 z-50 border-b border-base-edge/80 bg-base-bg/85 backdrop-blur">
       <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
         <a
           href="#hero"

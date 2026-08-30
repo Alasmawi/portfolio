@@ -50,7 +50,7 @@ export default function K9Architecture() {
             rather than edge labels — routed labels landed on top of the nodes
             they were routed around. */}
         <div
-          className="flex flex-wrap items-center gap-x-4 gap-y-1.5 border-t border-white/[0.08] px-3 py-2 font-mono text-[10px] text-text-muted"
+          className="flex flex-wrap items-center gap-x-4 gap-y-1.5 border-t border-white/[0.08] px-3 py-2 font-mono text-[10.5px] text-text-muted"
           aria-hidden="true"
         >
           <span className="inline-flex items-center gap-1.5">

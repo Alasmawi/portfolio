@@ -9,7 +9,7 @@ export default function Education() {
       <div className="mx-auto max-w-6xl">
         <Reveal>
           <p className="mb-4 font-mono text-[11px] uppercase tracking-[0.18em] text-text-muted">
-            // 03 [ education ]
+            // [ education ]
           </p>
           <div className="flex flex-wrap items-end justify-between gap-6">
             <h2 className="max-w-[26ch] text-3xl font-medium tracking-tight text-text-primary md:text-[38px]">

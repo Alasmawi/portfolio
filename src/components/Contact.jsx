@@ -32,8 +32,8 @@ export default function Contact() {
       <div className="mx-auto max-w-6xl">
         <div className="grid gap-10 md:grid-cols-[1fr_auto] md:items-start md:gap-16">
           <Reveal>
-            <p className="mb-5 font-mono text-[10px] uppercase tracking-[0.18em] text-text-dim">
-              Contact
+            <p className="mb-5 font-mono text-[11.5px] uppercase tracking-[0.18em] text-text-muted">
+              // [ contact ]
             </p>
             <h2 className="max-w-[20ch] text-3xl font-medium leading-[1.1] tracking-tight text-text-primary md:text-[38px]">
               Tell me what you are trying to measure.

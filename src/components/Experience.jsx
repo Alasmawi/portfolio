@@ -49,7 +49,7 @@ export default function Experience() {
       <div className="mx-auto max-w-6xl">
         <Reveal>
           <p className="mb-4 font-mono text-[11px] uppercase tracking-[0.18em] text-text-muted">
-            // 02 [ experience ]
+            // [ experience ]
           </p>
           <div className="flex flex-wrap items-end justify-between gap-6">
             <h2 className="max-w-[26ch] text-3xl font-medium tracking-tight text-text-primary md:text-[38px]">
@@ -139,7 +139,7 @@ export default function Experience() {
           </div>
         </Reveal>
 
-        <div className="mt-10 divide-y divide-base-border md:mt-14">
+        <div className="mt-10 divide-y divide-base-hairline md:mt-14">
           {EXPERIENCE.map((job, i) => (
             <Reveal key={job.id} delay={0.1 + i * 0.05}>
               <div className="grid gap-3 py-6 md:grid-cols-[190px_1fr_210px] md:gap-9 md:py-7">

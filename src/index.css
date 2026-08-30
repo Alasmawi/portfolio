@@ -55,7 +55,7 @@
     background: #12131f;
   }
   ::-webkit-scrollbar-thumb {
-    background: #2b2e40;
+    background: #6a6e80;
     border-radius: 6px;
   }
   ::-webkit-scrollbar-thumb:hover {
@@ -69,7 +69,7 @@
   }
 
   .card-border {
-    @apply border border-base-border bg-base-surface/60;
+    @apply border border-base-hairline bg-base-surface/60;
   }
 
   /* — rules — */
@@ -101,7 +101,7 @@
     background: rgba(145, 132, 217, 0.22);
   }
   .btn-ghost {
-    @apply border-base-border text-text-muted;
+    @apply border-base-edge text-text-muted;
   }
   .btn-ghost:hover {
     @apply border-accent/60 text-accent-bright;
@@ -112,7 +112,7 @@
 
   /* — tags — */
   .tag-outline {
-    @apply inline-flex items-center rounded border border-accent/50 px-2.5 py-1 font-mono text-[11px] tracking-wide text-accent-body;
+    @apply inline-flex items-center rounded border border-accent/70 px-2.5 py-1 font-mono text-[11px] tracking-wide text-accent-body;
   }
 
   /* — forms — */
@@ -120,7 +120,7 @@
     @apply mb-1.5 block font-mono text-xs uppercase tracking-wider text-text-dim;
   }
   .input {
-    @apply w-full min-h-11 rounded-md border border-base-border bg-base-surface/60 px-3 py-2 font-sans text-sm text-text-primary transition-colors placeholder:text-text-dim;
+    @apply w-full min-h-11 rounded-md border border-base-edge bg-base-surface/60 px-3 py-2 font-sans text-sm text-text-primary transition-colors placeholder:text-text-dim;
   }
   .input:hover {
     @apply border-text-dim;
@@ -241,7 +241,7 @@
    default is grey text on a translucent *white* box, which on a dark page is a
    smudge. The attribution is kept (the library is MIT and its maintainers ask
    you leave it unless you hold a Pro licence) but restyled to the site's muted
-   token at 5.03:1 so it is legible rather than decorative noise.
+   token at 5.86:1 so it is legible rather than decorative noise.
 
    `a[href]` and the custom property are both needed: React Flow's stylesheet
    is imported inside the lazy chunk, so it lands after this file and wins at
@@ -252,8 +252,8 @@
 }
 
 .react-flow__attribution a[href] {
-  color: #83848f;
+  color: #8e8f9b;
   font-family: 'JetBrains Mono', ui-monospace, monospace;
-  font-size: 9px;
+  font-size: 10.5px;
   letter-spacing: 0.04em;
 }
