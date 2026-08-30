@@ -5,56 +5,29 @@
 @layer base {
   html {
     scroll-behavior: smooth;
-    /* Land on section boundaries instead of stopping half way between two.
-       Deliberately `proximity`, not `mandatory`: five of the seven sections
-       are taller than a laptop viewport, and mandatory would keep yanking the
-       reader back to the top of a section before they reached its end. */
-    scroll-snap-type: y proximity;
     background-color: #161826;
-  }
-
-  /* Anchor-link navigation (top nav, mobile sheet) briefly disables snap —
-     see scrollToSection in src/lib/scrollToSection.js. Without this, a
-     forced snap point along the scroll path can catch and hold the native
-     smooth-scroll partway, which reads as the page starting to navigate and
-     then springing back to where it was. */
-  html.snap-suspended {
-    scroll-snap-type: none;
   }
 
   main > section {
     position: relative;
-    scroll-snap-align: start;
-    /* No `scroll-snap-stop: always`. It forbids passing more than one snap
-       point per gesture, so reaching contact from the hero costs seven
-       separate flicks no matter how hard you throw the page. Left off, a
-       deliberate fling carries, and proximity still settles on a boundary
-       whenever the scroll happens to end near one. */
-    /* Clears the fixed nav so a snapped heading isn't tucked under it. */
+    /* Clears the fixed nav so a heading jumped to by an anchor isn't tucked
+       under it. */
     scroll-margin-top: 57px;
   }
 
-  /* A section taller than the viewport gets a second snap point pinned to its
-     bottom edge, so it offers two resting places -- its top and its end --
-     rather than only its top. Under proximity this is an offer, not a rail:
-     the reader can still stop anywhere in between, which is the whole point of
-     reading a long section. Flagged from App.jsx, since CSS can't compare the
-     two heights. */
-  main > section[data-snap-tall]::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 1px;
-    height: 1px;
-    scroll-snap-align: end;
-    pointer-events: none;
-  }
+  /* No scroll-snap. It was `y proximity` on the root with an align on every
+     section and a synthetic bottom snap point per tall section, and on a phone
+     it fought touch momentum: a fling aimed past a section decelerated into a
+     boundary it wasn't aimed at. The give-away was that anchor navigation had
+     to switch snap off for the duration of the scroll and time it back on,
+     because a snap point along the path could catch the browser's own smooth
+     scroll and hold it there — the page would start to navigate and spring
+     back. Six full-bleed sections don't need rails to land tidily; they are
+     already a screen apart. */
 
   @media (prefers-reduced-motion: reduce) {
     html {
       scroll-behavior: auto;
-      scroll-snap-type: none;
     }
   }
 
