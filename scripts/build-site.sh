@@ -13,7 +13,11 @@
 # node_modules rather than running its own install.
 set -euo pipefail
 
-ORIGINAL_REF="${ORIGINAL_REF:-origin/main}"
+# Pinned to a dedicated branch, not to main. Once the refactor lands on main,
+# main *is* the new design — so building "the original" from main would serve
+# the refactor at / and /v2 alike. origin/v1-original is parked at d1e7746, the
+# last commit before the Nocturne work, and nothing is meant to move it.
+ORIGINAL_REF="${ORIGINAL_REF:-origin/v1-original}"
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 WORKTREE="$(mktemp -d)/original"
 
