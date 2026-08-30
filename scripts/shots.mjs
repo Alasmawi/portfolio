@@ -107,6 +107,17 @@ try {
 
     const requests = [];
     page.on('request', (r) => requests.push(r.url()));
+    // Transferred bytes, not content-length: this is what the phone pays.
+    const media = { bytes: 0, mp4: 0, posters: 0 };
+    page.on('response', async (r) => {
+      const u = r.url();
+      if (!/\.(mp4|webp)$/.test(u)) return;
+      if (!u.includes('/video/')) return;
+      const len = Number(r.headers()['content-length'] || 0);
+      media.bytes += len;
+      if (u.endsWith('.mp4')) media.mp4 += len;
+      else media.posters += len;
+    });
 
     await page.addInitScript(() => {
       // Counts observers watching top-level sections, for the "one instance,
@@ -160,11 +171,34 @@ try {
     await page.waitForTimeout(900);
     if (MODE === 'preview') await page.screenshot({ path: path.join(OUT, `${vp.name}-projects.png`) });
 
+    // Walk every project once, the way auto-advance or a run of swipes does,
+    // and see what that costs in media. Mobile only — it is the case that matters
+    // and the chip row only exists below md.
+    let walk = null;
+    if (vp.name === 'mobile') {
+      const chips = page.locator('#projects button:has(span), #projects .md\\:hidden button');
+      const clsBefore = await page.evaluate(() => window.__cls);
+      const count = await page.locator('#projects div.md\\:hidden > button').count();
+      for (let i = 0; i < count; i++) {
+        await page.locator('#projects div.md\\:hidden > button').nth(i).click();
+        await page.waitForTimeout(700);
+      }
+      walk = {
+        projects: count,
+        mediaKB: Number((media.bytes / 1024).toFixed(1)),
+        mp4KB: Number((media.mp4 / 1024).toFixed(1)),
+        posterKB: Number((media.posters / 1024).toFixed(1)),
+        clsDuringWalk: Number(((await page.evaluate(() => window.__cls)) - clsBefore).toFixed(4)),
+      };
+      void chips;
+    }
+
     report[vp.name] = {
       heroHeight: { before: heroBefore, after: heroAfter, changed: Math.abs(heroBefore - heroAfter) > 1 },
       buildField: { before: buildsBefore, after: buildsAfter },
       sectionObservers: await page.evaluate(() => window.__ioCount),
       cls: Number((await page.evaluate(() => window.__cls)).toFixed(4)),
+      walk,
       wobble,
       scroll,
       docHeight: await page.evaluate(() => document.documentElement.scrollHeight),

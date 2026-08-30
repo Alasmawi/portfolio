@@ -84,6 +84,7 @@ export const PROJECTS = [
     githubUrl: 'https://github.com/Alasmawi/guidely',
     liveUrl: null,
     video: asset('/video/guidely.mp4'),
+    poster: asset('/video/posters/guidely.webp'),
   },
   {
     id: 'detecto',
@@ -97,6 +98,7 @@ export const PROJECTS = [
     githubUrl: 'https://github.com/Alasmawi/detecto',
     liveUrl: null,
     video: asset('/video/detecto.mp4'),
+    poster: asset('/video/posters/detecto.webp'),
   },
   {
     id: 'brain-book',
@@ -111,6 +113,7 @@ export const PROJECTS = [
     githubUrl: 'https://github.com/Alasmawi/Brain-Book',
     liveUrl: null,
     video: asset('/video/brain-book.mp4'),
+    poster: asset('/video/posters/brain-book.webp'),
   },
   {
     id: 'localhost',
@@ -124,6 +127,7 @@ export const PROJECTS = [
     githubUrl: 'https://github.com/Alasmawi/localhost',
     liveUrl: null,
     video: asset('/video/localhost.mp4'),
+    poster: asset('/video/posters/localhost.webp'),
   },
   {
     id: '0-shell',
@@ -137,6 +141,7 @@ export const PROJECTS = [
     githubUrl: 'https://github.com/Alasmawi/0-shell',
     liveUrl: null,
     video: asset('/video/0-shell.mp4'),
+    poster: asset('/video/posters/0-shell.webp'),
   },
   {
     id: 'rt',
@@ -150,6 +155,7 @@ export const PROJECTS = [
     githubUrl: 'https://github.com/Alasmawi/rt',
     liveUrl: null,
     video: asset('/video/rt.mp4'),
+    poster: asset('/video/posters/rt.webp'),
   },
   {
     id: 'smart-road',
@@ -163,6 +169,7 @@ export const PROJECTS = [
     githubUrl: 'https://github.com/Alasmawi/smart-road',
     liveUrl: null,
     video: asset('/video/smart-road.mp4'),
+    poster: asset('/video/posters/smart-road.webp'),
   },
   {
     id: 'multiplayer-fps',
@@ -176,6 +183,7 @@ export const PROJECTS = [
     githubUrl: 'https://github.com/Alasmawi/multiplayer-fps',
     liveUrl: null,
     video: asset('/video/multiplayer-fps.mp4'),
+    poster: asset('/video/posters/multiplayer-fps.webp'),
   },
   {
     id: 'bomberman-dom',
@@ -189,6 +197,7 @@ export const PROJECTS = [
     githubUrl: 'https://github.com/Alasmawi/bomberman-dom',
     liveUrl: null,
     video: asset('/video/bomberman-dom.mp4'),
+    poster: asset('/video/posters/bomberman-dom.webp'),
   },
   {
     id: 'mini-framework',
@@ -202,6 +211,7 @@ export const PROJECTS = [
     githubUrl: 'https://github.com/Alasmawi/mini-framework',
     liveUrl: null,
     video: asset('/video/mini-framework.mp4'),
+    poster: asset('/video/posters/mini-framework.webp'),
   },
   {
     id: 'real-time-forum',
@@ -215,6 +225,7 @@ export const PROJECTS = [
     githubUrl: 'https://github.com/Alasmawi/real-time-forum',
     liveUrl: null,
     video: asset('/video/real-time-forum.mp4'),
+    poster: asset('/video/posters/real-time-forum.webp'),
   },
   {
     id: 'net-cat',
@@ -228,6 +239,7 @@ export const PROJECTS = [
     githubUrl: 'https://github.com/Alasmawi/Net-Cat',
     liveUrl: null,
     video: asset('/video/net-cat.mp4'),
+    poster: asset('/video/posters/net-cat.webp'),
   },
   {
     id: 'groupie-tracker',
@@ -241,5 +253,6 @@ export const PROJECTS = [
     githubUrl: 'https://github.com/Alasmawi/groupie-tracker',
     liveUrl: null,
     video: asset('/video/groupie-tracker.mp4'),
+    poster: asset('/video/posters/groupie-tracker.webp'),
   },
 ];

@@ -30,7 +30,9 @@ export default {
         ok: '#9184d9',
       },
       fontFamily: {
-        sans: ['"Inter"', 'system-ui', 'sans-serif'],
+        // 'Inter Variable' is the family name @fontsource-variable registers;
+        // plain 'Inter' stays behind it for anyone who has it installed locally.
+        sans: ['"Inter Variable"', '"Inter"', 'system-ui', 'sans-serif'],
         mono: ['"JetBrains Mono"', '"Fira Code"', 'ui-monospace', 'monospace'],
       },
       backgroundImage: {

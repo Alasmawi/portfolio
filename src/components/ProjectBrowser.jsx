@@ -43,12 +43,26 @@ function LanguageDot({ language }) {
   );
 }
 
-function PreviewVideo({ src, label }) {
+function PreviewVideo({ src, poster, label, playing }) {
   const ref = useRef(null);
 
   useEffect(() => {
     const v = ref.current;
-    if (!v) return;
+    if (!v) return undefined;
+
+    // Nothing is fetched until the section is actually on screen. The poster
+    // holds the frame in the meantime, so the box is never empty and never
+    // resizes when the video arrives — it is a still of the first frame of the
+    // same recording, so the swap is invisible.
+    if (!playing) {
+      v.pause();
+      // Dropping the source releases the buffer. Without this, walking the
+      // list leaves every video visited still held in memory.
+      v.removeAttribute('src');
+      v.load();
+      return undefined;
+    }
+
     // React's `muted` JSX prop sets the attribute at mount, but some mobile
     // browsers only honour autoplay if `muted` is true on the element's
     // *property* at the moment play() is called — setting it here, every
@@ -62,18 +76,19 @@ function PreviewVideo({ src, label }) {
     // settling; the browser rejects the superseded call with a benign
     // AbortError that isn't worth surfacing.
     if (playPromise) playPromise.catch(() => {});
-  }, [src]);
+    return undefined;
+  }, [src, playing]);
 
   return (
     <video
       ref={ref}
       aria-label={label}
+      poster={poster}
       className="max-h-[440px] w-auto max-w-full object-contain"
-      autoPlay
       loop
       muted
       playsInline
-      preload="auto"
+      preload="none"
     />
   );
 }
@@ -203,7 +218,7 @@ function GalleryOnly({ items }) {
   );
 }
 
-function PreviewMedia({ project }) {
+function PreviewMedia({ project, playing }) {
   if (project.architecture && project.items?.length) {
     return <MediaTabs project={project} />;
   }
@@ -224,7 +239,12 @@ function PreviewMedia({ project }) {
             with no controls reads identically but decodes far cheaper on
             mid-range phones than an animated GIF. playsInline keeps iOS
             Safari from hijacking it into fullscreen. */}
-        <PreviewVideo src={project.video} label={`${project.name} demo`} />
+        <PreviewVideo
+          src={project.video}
+          poster={project.poster}
+          label={`${project.name} demo`}
+          playing={playing}
+        />
       </div>
     );
   }
@@ -248,6 +268,9 @@ export default function ProjectBrowser() {
   // Phones get the first three lines of a description with the rest behind a
   // tap. The full text is always in the DOM — this clamps, it doesn't truncate.
   const [descOpen, setDescOpen] = useState(false);
+  // Whether the section is on screen. Read by the preview video, which fetches
+  // nothing until it is true, and by the auto-advance clock below.
+  const [inView, setInView] = useState(false);
   const project = PROJECTS.find((p) => p.id === selectedId) ?? PROJECTS[0];
 
   const sectionRef = useRef(null);
@@ -299,6 +322,19 @@ export default function ProjectBrowser() {
     [step]
   );
 
+  // Separate from the auto-advance effect below, which does not run under
+  // reduced motion. The preview video reads this to decide whether to fetch
+  // anything, and a reduced-motion visitor still gets to watch the video.
+  useEffect(() => {
+    const node = sectionRef.current;
+    if (!node) return undefined;
+    const io = new IntersectionObserver(([e]) => setInView(e.isIntersecting), {
+      threshold: 0.35,
+    });
+    io.observe(node);
+    return () => io.disconnect();
+  }, []);
+
   useEffect(() => {
     const node = sectionRef.current;
     if (!node) return undefined;
@@ -306,22 +342,22 @@ export default function ProjectBrowser() {
       return undefined;
     }
 
-    let inView = false;
+    let onScreen = false;
     lastActivityRef.current = Date.now();
 
     const io = new IntersectionObserver(
       ([e]) => {
         // Only cycle while a decent slice of the section is actually on screen,
         // and give a full quiet period from the moment it comes into view.
-        if (e.isIntersecting && !inView) lastActivityRef.current = Date.now();
-        inView = e.isIntersecting;
+        if (e.isIntersecting && !onScreen) lastActivityRef.current = Date.now();
+        onScreen = e.isIntersecting;
       },
       { threshold: 0.35 }
     );
     io.observe(node);
 
     const tick = setInterval(() => {
-      if (!inView || document.hidden) {
+      if (!onScreen || document.hidden) {
         // Time spent off-screen or on another tab shouldn't count as idling.
         lastActivityRef.current = Date.now();
         return;
@@ -469,7 +505,7 @@ export default function ProjectBrowser() {
                     exit={{ opacity: 0, y: -8 }}
                     transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
                   >
-                    <PreviewMedia project={project} />
+                    <PreviewMedia project={project} playing={inView} />
 
                     <div className="mt-5 flex flex-wrap items-start justify-between gap-4">
                       <div>
