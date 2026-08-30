@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import ScrollCounter from './ScrollCounter';
 
 // The gallery for containers too narrow to turn a 3D ring in — phones, and the
 // 768-1023px band where the projects sidebar squeezes the panel to 342px.
@@ -66,9 +67,7 @@ export default function HardwareStrip({ items = [] }) {
           </li>
         ))}
       </ul>
-      <p className="mt-1.5 font-mono text-[10.5px] tracking-wide text-text-dim" aria-hidden="true">
-        {active + 1} / {items.length}
-      </p>
+      <ScrollCounter index={active} total={items.length} className="mt-1.5" />
     </div>
   );
 }

@@ -2,9 +2,12 @@ import { useEffect, useState } from 'react';
 
 // Tracks which section id is currently "active" (i.e. the one the reader is
 // looking at), shared between the top nav and the mobile bottom tab bar so
-// both highlight the same section at the same time. Pulled out of Nav.jsx
-// rather than duplicated — two independent observers on the same sections
-// would double the layout thrash for no benefit.
+// both highlight the same section at the same time.
+//
+// Call this once, in App, and pass the result down. Extracting the hook was
+// never enough on its own: calling it from Nav and again from MobileTabBar
+// built two IntersectionObservers over the same sections, which is the exact
+// duplication it exists to avoid.
 export default function useActiveSection(ids, initial = ids[0]) {
   const [active, setActive] = useState(initial);
 

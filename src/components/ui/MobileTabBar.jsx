@@ -1,6 +1,5 @@
 import { Mail } from 'lucide-react';
 import { LINKS } from '../../data/navLinks';
-import useActiveSection from '../../hooks/useActiveSection';
 import { scrollToSection } from '../../lib/scrollToSection';
 
 // Phone-only bottom navigation. On desktop the top nav is always visible and
@@ -14,10 +13,8 @@ import { scrollToSection } from '../../lib/scrollToSection';
 // deliberately hid over the hero and over Contact itself, so "always one tap
 // away" had two holes in it. This has none.
 const TABS = [...LINKS, { id: 'contact', label: 'Contact', icon: Mail, cta: true }];
-const IDS = TABS.map((t) => t.id);
 
-export default function MobileTabBar() {
-  const active = useActiveSection(IDS, 'projects');
+export default function MobileTabBar({ active }) {
 
   return (
     <nav

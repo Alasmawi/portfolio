@@ -110,6 +110,30 @@
     @apply w-full;
   }
 
+  /* — horizontal chip row — */
+  /* The project selector. Fourteen chips in a 390px column shows about three,
+     and nothing said the other eleven existed: no snap, no counter, no edge
+     treatment. Snap so a flick lands on a chip rather than between two, and a
+     mask that fades the trailing edge so the row visibly continues.
+
+     The fade is removed once the row is scrolled to its end (data-end), because
+     a permanent gradient is a lie about there being more. */
+  .chip-row {
+    scroll-snap-type: x proximity;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    mask-image: linear-gradient(to right, #000 calc(100% - 44px), transparent);
+  }
+  .chip-row::-webkit-scrollbar {
+    display: none;
+  }
+  .chip-row[data-end] {
+    mask-image: none;
+  }
+  .chip-row > * {
+    scroll-snap-align: center;
+  }
+
   /* — tags — */
   .tag-outline {
     @apply inline-flex items-center rounded border border-accent/70 px-2.5 py-1 font-mono text-[11px] tracking-wide text-accent-body;

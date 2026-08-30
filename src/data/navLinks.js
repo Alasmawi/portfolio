@@ -11,3 +11,8 @@ export const LINKS = [
   { id: 'education', label: 'Education', icon: GraduationCap },
   { id: 'about', label: 'About', icon: User },
 ];
+
+// Every section either navigation can highlight — LINKS plus contact, which
+// only the mobile tab bar carries. App observes this union once and passes the
+// active id to both; each ignores the ids it doesn't render.
+export const SECTION_IDS = [...LINKS.map((l) => l.id), 'contact'];

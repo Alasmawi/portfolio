@@ -1,32 +1,88 @@
-import { Mail, Phone } from 'lucide-react';
+import { useCallback, useRef, useState } from 'react';
+import { Check, Copy, Mail, Phone } from 'lucide-react';
 import { GithubMark, LinkedinMark } from './ui/BrandIcons';
 import Reveal from './ui/Reveal';
 
 const EMAIL = 'asmawiabdulla0@gmail.com';
 
+// The email is not in this row. It now sits beside the form, at full size with
+// a copy button; repeating it in the footer said the same thing twice within
+// one screen.
 const LINKS = [
-  { label: EMAIL, href: `mailto:${EMAIL}`, Icon: Mail },
   { label: '+973 3671 1325', href: 'tel:+97336711325', Icon: Phone },
   { label: 'github.com/Alasmawi', href: 'https://github.com/Alasmawi', Icon: GithubMark },
   { label: 'linkedin.com/in/alasmawi', href: 'https://linkedin.com/in/alasmawi', Icon: LinkedinMark },
 ];
 
-// No backend exists for this static site — Send composes a mailto: draft
-// with the form's contents instead of pretending to submit somewhere.
-function handleSubmit(e) {
-  e.preventDefault();
-  const form = e.currentTarget;
-  const name = form.name.value.trim();
-  const email = form.email.value.trim();
-  const message = form.message.value.trim();
+// No backend exists for this static site — Send composes a mailto: draft with
+// the form's contents instead of pretending to submit somewhere.
+//
+// On a phone with no mail client configured, setting location.href to a mailto:
+// does nothing at all: no error, no navigation, no feedback. You type a message,
+// press Send, and the page sits there. So the address is offered directly
+// alongside, and a failed handoff says so rather than staying silent.
+const EMAIL_FALLBACK_MS = 900;
+
+function buildMailto({ name, email, message }) {
   const subject = encodeURIComponent(`Portfolio contact${name ? ` from ${name}` : ''}`);
   const body = encodeURIComponent(
     [message, '', email && `Reply to: ${email}`].filter(Boolean).join('\n')
   );
-  window.location.href = `mailto:${EMAIL}?subject=${subject}&body=${body}`;
+  return `mailto:${EMAIL}?subject=${subject}&body=${body}`;
 }
 
 export default function Contact() {
+  // 'idle' | 'handed-off' | 'stalled' — stalled means the mail client never
+  // took it, which is the case that used to be invisible.
+  const [state, setState] = useState('idle');
+  const [copied, setCopied] = useState(false);
+  const timerRef = useRef(null);
+  const statusRef = useRef(null);
+
+  const handleSubmit = useCallback((e) => {
+    e.preventDefault();
+    const form = e.currentTarget;
+    const draft = {
+      name: form.name.value.trim(),
+      email: form.email.value.trim(),
+      message: form.message.value.trim(),
+    };
+
+    // If a mail client takes the handoff the tab loses visibility or focus.
+    // Neither happening within the window means nothing picked it up.
+    const settled = () => {
+      clearTimeout(timerRef.current);
+      setState('handed-off');
+      window.removeEventListener('blur', settled);
+      document.removeEventListener('visibilitychange', settled);
+    };
+    window.addEventListener('blur', settled, { once: true });
+    document.addEventListener('visibilitychange', settled, { once: true });
+    timerRef.current = setTimeout(() => {
+      window.removeEventListener('blur', settled);
+      document.removeEventListener('visibilitychange', settled);
+      setState('stalled');
+      // It appears below the Send button, which on a phone can put it under
+      // the tab bar — and it is the one thing the reader now needs to see.
+      requestAnimationFrame(() =>
+        statusRef.current?.scrollIntoView({ block: 'center', behavior: 'smooth' })
+      );
+    }, EMAIL_FALLBACK_MS);
+
+    window.location.href = buildMailto(draft);
+  }, []);
+
+  const copyEmail = useCallback(async () => {
+    try {
+      await navigator.clipboard.writeText(EMAIL);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // Clipboard blocked. The address is right there as selectable text.
+      setCopied(false);
+    }
+  }, []);
+
   return (
     <section id="contact" className="bg-base-bg px-5 pb-9 pt-11 sm:px-10 sm:pt-14 md:px-14 md:pb-14 md:pt-20">
       <div className="mx-auto max-w-6xl">
@@ -42,6 +98,27 @@ export default function Contact() {
               I reply to most things within a day. If it involves sensors, a gateway, or AWS, send
               the constraint you are stuck on rather than the job title.
             </p>
+
+            {/* The address, in the open, next to the form rather than only in
+                the footer below it. Send needs a mail client; this needs
+                nothing. */}
+            <div className="mt-7 flex flex-wrap items-center gap-2.5">
+              <a
+                href={`mailto:${EMAIL}`}
+                className="inline-flex min-h-11 items-center gap-2 rounded-md border border-base-edge px-3 font-mono text-[13px] text-text-primary transition-colors hover:border-accent/60 hover:text-accent-bright"
+              >
+                <Mail size={14} className="shrink-0" />
+                {EMAIL}
+              </a>
+              <button
+                type="button"
+                onClick={copyEmail}
+                className="inline-flex min-h-11 items-center gap-2 rounded-md border border-base-edge px-3 font-mono text-[11px] uppercase tracking-[0.12em] text-text-muted transition-colors hover:border-accent/60 hover:text-accent-bright"
+              >
+                {copied ? <Check size={13} /> : <Copy size={13} />}
+                {copied ? 'Copied' : 'Copy'}
+              </button>
+            </div>
           </Reveal>
 
           <Reveal delay={0.1}>
@@ -72,6 +149,24 @@ export default function Contact() {
               <button type="submit" className="btn btn-primary btn-block">
                 Send
               </button>
+              {/* aria-live so a screen reader hears this too — it appears
+                  without anything moving focus. */}
+              <p
+                ref={statusRef}
+                role="status"
+                aria-live="polite"
+                className="min-h-[1.25rem] text-[13px] leading-snug text-text-muted"
+              >
+                {state === 'stalled' ? (
+                  <>
+                    Nothing opened, so this device has no mail app set up. Write to{' '}
+                    <a href={`mailto:${EMAIL}`} className="text-accent-bright underline underline-offset-2">
+                      {EMAIL}
+                    </a>{' '}
+                    instead — the copy button above puts it on your clipboard.
+                  </>
+                ) : null}
+              </p>
             </form>
           </Reveal>
         </div>

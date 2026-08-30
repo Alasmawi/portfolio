@@ -1,15 +1,11 @@
 import { LINKS } from '../data/navLinks';
-import useActiveSection from '../hooks/useActiveSection';
 import { scrollToSection } from '../lib/scrollToSection';
-
-const IDS = LINKS.map((l) => l.id);
 
 // On phones this is a title bar and nothing else. It used to carry a hamburger
 // that opened a sheet with the same four links plus a contact button — which is
 // exactly what the bottom tab bar now shows without a tap to open it. Two
 // navigations for four links is one too many, so the sheet is gone.
-export default function Nav() {
-  const active = useActiveSection(IDS, 'projects');
+export default function Nav({ active }) {
 
   const go = (id) => {
     scrollToSection(id);

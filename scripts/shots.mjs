@@ -176,11 +176,11 @@ try {
     // and the chip row only exists below md.
     let walk = null;
     if (vp.name === 'mobile') {
-      const chips = page.locator('#projects button:has(span), #projects .md\\:hidden button');
       const clsBefore = await page.evaluate(() => window.__cls);
-      const count = await page.locator('#projects div.md\\:hidden > button').count();
+      const chips = page.locator('#projects .chip-row > button');
+      const count = await chips.count();
       for (let i = 0; i < count; i++) {
-        await page.locator('#projects div.md\\:hidden > button').nth(i).click();
+        await chips.nth(i).click();
         await page.waitForTimeout(700);
       }
       walk = {
@@ -190,7 +190,6 @@ try {
         posterKB: Number((media.posters / 1024).toFixed(1)),
         clsDuringWalk: Number(((await page.evaluate(() => window.__cls)) - clsBefore).toFixed(4)),
       };
-      void chips;
     }
 
     report[vp.name] = {

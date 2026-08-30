@@ -6,6 +6,7 @@ import SyntaxRain from './ui/SyntaxRain';
 import RingGallery from './ui/RingGallery';
 import HardwareStrip from './ui/HardwareStrip';
 import K9Architecture from './ui/K9Architecture';
+import ScrollCounter from './ui/ScrollCounter';
 import { GithubMark } from './ui/BrandIcons';
 import { LANGUAGE_COLORS, PROJECTS } from '../data/projects';
 
@@ -31,6 +32,19 @@ const RECURRING_STACK = (() => {
 })();
 
 const RAIN_FADE = [{ x1: 0.03, y1: 0.05, x2: 0.97, y2: 0.96, a: 0.3 }];
+
+// One reserved box for every kind of preview media, so switching project can't
+// move what is underneath it.
+//
+// A fixed height, not max-h. The previews are screen recordings at a dozen
+// different aspect ratios, so sizing to the content moved the title and
+// description below by up to 141px between projects — mid-read, on a 390px
+// column, and auto-advance was doing it unasked. object-contain letterboxes
+// the odd one out instead, which costs a little dead space on two of the
+// fourteen and buys a panel that holds still.
+const MEDIA_WELL =
+  'flex h-[248px] w-full items-center justify-center rounded-lg bg-white/[0.03] ' +
+  'shadow-[inset_0_0_0_1px_rgba(233,233,237,0.09)] sm:h-[320px] md:h-[400px]';
 
 function LanguageDot({ language }) {
   if (!language) return null;
@@ -84,7 +98,7 @@ function PreviewVideo({ src, poster, label, playing }) {
       ref={ref}
       aria-label={label}
       poster={poster}
-      className="max-h-[440px] w-auto max-w-full object-contain"
+      className="h-full w-full object-contain"
       loop
       muted
       playsInline
@@ -103,6 +117,28 @@ function PreviewVideo({ src, poster, label, playing }) {
 // and takes the preview pane from 570px down to 342px, so a viewport query
 // hands the widest treatment to the narrowest container in the range.
 const WIDE_PANEL_PX = 560;
+
+// Drives the trailing-edge mask on the chip row: the fade means "there is more
+// this way", so it has to come off once there isn't.
+function useScrolledToEnd(ref) {
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return undefined;
+    const update = () => {
+      const end = el.scrollLeft + el.clientWidth >= el.scrollWidth - 2;
+      if (end) el.setAttribute('data-end', '');
+      else el.removeAttribute('data-end');
+    };
+    update();
+    el.addEventListener('scroll', update, { passive: true });
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    return () => {
+      el.removeEventListener('scroll', update);
+      ro.disconnect();
+    };
+  }, [ref]);
+}
 
 function useContainerAtLeast(min) {
   const ref = useRef(null);
@@ -234,7 +270,7 @@ function PreviewMedia({ project, playing }) {
 
   if (project.video) {
     return (
-      <div className="flex max-h-[440px] min-h-[220px] w-full items-center justify-center rounded-lg bg-white/[0.03] shadow-[inset_0_0_0_1px_rgba(233,233,237,0.09)]">
+      <div className={MEDIA_WELL}>
         {/* Same visual as a GIF loop, ~90% less data: autoplaying muted video
             with no controls reads identically but decodes far cheaper on
             mid-range phones than an animated GIF. playsInline keeps iOS
@@ -250,7 +286,7 @@ function PreviewMedia({ project, playing }) {
   }
 
   return (
-    <div className="flex aspect-video w-full flex-col items-center justify-center gap-3 rounded-lg bg-white/[0.03] text-text-dim shadow-[inset_0_0_0_1px_rgba(233,233,237,0.09)]">
+    <div className={`${MEDIA_WELL} flex-col gap-3 text-text-dim`}>
       <Film size={22} />
       <p className="font-mono text-xs uppercase tracking-wider">// preview coming soon</p>
       <p className="font-mono text-[11px] text-text-dim">clone the repo to see it run</p>
@@ -271,6 +307,19 @@ export default function ProjectBrowser() {
   // Whether the section is on screen. Read by the preview video, which fetches
   // nothing until it is true, and by the auto-advance clock below.
   const [inView, setInView] = useState(false);
+  // Two ways to change project — the chip row and a swipe on the preview — and
+  // the second announced itself not at all. Shown until the first successful
+  // swipe, then never again this session. sessionStorage rather than
+  // localStorage: a hint nobody ever sees again is a hint that stops helping
+  // the visitor who comes back in six months having forgotten.
+  const [showSwipeHint, setShowSwipeHint] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    try {
+      return sessionStorage.getItem('swipe-hint-seen') !== '1';
+    } catch {
+      return true;
+    }
+  });
   const project = PROJECTS.find((p) => p.id === selectedId) ?? PROJECTS[0];
 
   const sectionRef = useRef(null);
@@ -291,6 +340,18 @@ export default function ProjectBrowser() {
   );
 
   const swipeRef = useRef(null);
+  const chipRowRef = useRef(null);
+  const selectedChipRef = useRef(null);
+  useScrolledToEnd(chipRowRef);
+
+  // A swipe on the preview changes the project, and the chip row is the thing
+  // that says which project you are on — so it has to follow. Without this the
+  // two controls disagree as soon as you use the one below.
+  useEffect(() => {
+    const chip = selectedChipRef.current;
+    if (!chip || !chipRowRef.current) return;
+    chip.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' });
+  }, [selectedId]);
 
   const step = useCallback(
     (delta) => {
@@ -318,6 +379,12 @@ export default function ProjectBrowser() {
         return;
       }
       step(dx < 0 ? 1 : -1);
+      setShowSwipeHint(false);
+      try {
+        sessionStorage.setItem('swipe-hint-seen', '1');
+      } catch {
+        // Private mode, or storage disabled. The hint just shows again.
+      }
     },
     [step]
   );
@@ -338,7 +405,14 @@ export default function ProjectBrowser() {
   useEffect(() => {
     const node = sectionRef.current;
     if (!node) return undefined;
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    // Same shape as the reduced-motion guard: a gallery that walks itself is
+    // a desktop affordance. On a phone the reader is already driving with a
+    // thumb, and a project changing under them mid-read is an interruption —
+    // one that also pulled a video they never asked for, every 30 seconds.
+    if (
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches ||
+      !window.matchMedia('(hover: hover)').matches
+    ) {
       return undefined;
     }
 
@@ -437,33 +511,52 @@ export default function ProjectBrowser() {
           />
 
           <Reveal delay={0.05} className="relative block px-5 py-6 sm:px-10 sm:py-9 md:px-14">
-            <div className="mx-auto max-w-6xl overflow-hidden rounded-lg bg-void/85 shadow-[0_0_0_1px_rgba(233,233,237,0.12),0_18px_44px_-20px_rgba(0,0,0,0.9)] backdrop-blur-[2px] md:flex">
+            <div className="mx-auto max-w-6xl overflow-hidden rounded-lg bg-void shadow-[0_0_0_1px_rgba(233,233,237,0.12),0_18px_44px_-20px_rgba(0,0,0,0.9)] md:flex">
               {/* mobile: horizontal chip row. The rings are inset shadows
                   rather than borders so the chip's box doesn't grow by 2px when
                   it becomes selected, but they are still a component boundary —
                   hence base.edge's value (3.72:1 on this ground) rather than
                   the hairline these used to carry at 1.33:1. */}
-              <div className="flex gap-2 overflow-x-auto p-3 md:hidden">
-                {PROJECTS.map((p) => (
-                  <button
-                    key={p.id}
-                    type="button"
-                    onClick={() => select(p.id)}
-                    className={`flex min-h-11 shrink-0 items-center gap-2 whitespace-nowrap rounded-md px-3 py-2 font-mono text-xs transition-colors ${
-                      p.id === selectedId
-                        ? 'bg-accent/10 text-accent-bright shadow-[inset_0_0_0_1px_rgba(145,132,217,0.7)]'
-                        : 'text-text-muted shadow-[inset_0_0_0_1px_#6a6e80]'
-                    }`}
-                  >
-                    <LanguageDot language={p.language} />
-                    {p.name}
-                  </button>
-                ))}
+              <div className="md:hidden">
+                <div ref={chipRowRef} className="chip-row flex gap-2 overflow-x-auto px-3 pt-3">
+                  {PROJECTS.map((p) => (
+                    <button
+                      key={p.id}
+                      type="button"
+                      ref={p.id === selectedId ? selectedChipRef : null}
+                      onClick={() => select(p.id)}
+                      aria-current={p.id === selectedId ? 'true' : undefined}
+                      className={`flex min-h-11 shrink-0 items-center gap-2 whitespace-nowrap rounded-md px-3 py-2 font-mono text-xs transition-colors ${
+                        p.id === selectedId
+                          ? 'bg-accent/10 text-accent-bright shadow-[inset_0_0_0_1px_rgba(145,132,217,0.7)]'
+                          : 'text-text-muted shadow-[inset_0_0_0_1px_#6a6e80]'
+                      }`}
+                    >
+                      <LanguageDot language={p.language} />
+                      {p.name}
+                    </button>
+                  ))}
+                </div>
+                <div className="flex items-baseline justify-between gap-3 px-3 pb-1 pt-1.5">
+                  <ScrollCounter
+                    label="repo"
+                    index={PROJECTS.findIndex((p) => p.id === selectedId)}
+                    total={PROJECTS.length}
+                  />
+                  {showSwipeHint && (
+                    <p
+                      className="font-mono text-[10.5px] tracking-wide text-text-dim"
+                      aria-hidden="true"
+                    >
+                      swipe the preview to change
+                    </p>
+                  )}
+                </div>
               </div>
 
               {/* desktop: fixed-width sidebar */}
               <div className="hidden max-h-[620px] w-[264px] shrink-0 overflow-y-auto border-r border-white/[0.09] md:block">
-                <p className="sticky top-0 bg-void/85 px-[18px] py-[13px] font-mono text-[11px] uppercase tracking-wider text-text-muted shadow-[inset_0_-1px_0_rgba(233,233,237,0.09)]">
+                <p className="sticky top-0 bg-void px-[18px] py-[13px] font-mono text-[11px] uppercase tracking-wider text-text-muted shadow-[inset_0_-1px_0_rgba(233,233,237,0.09)]">
                   // repositories ({PROJECTS.length})
                 </p>
                 <ul>
@@ -491,7 +584,16 @@ export default function ProjectBrowser() {
                 </ul>
               </div>
 
-              {/* preview pane */}
+              {/* preview pane.
+
+                  No touch-action here. It used to carry `pan-y`, which reads as
+                  "only vertical panning", and touch-action intersects down the
+                  tree — so it also disabled horizontal panning inside the
+                  hardware gallery and anything else scrollable in this pane. It
+                  was suppressing a horizontal page pan that cannot happen
+                  anyway: nothing on the page scrolls sideways. The swipe
+                  handler below does its own angle check, which is what actually
+                  keeps a vertical fling from being read as a project change. */}
               <div
                 className="flex-1 p-[22px] sm:p-6"
                 onPointerDown={onSwipeDown}
@@ -499,9 +601,8 @@ export default function ProjectBrowser() {
                 onPointerCancel={() => {
                   swipeRef.current = null;
                 }}
-                style={{ touchAction: 'pan-y' }}
               >
-                <AnimatePresence mode="wait">
+                <AnimatePresence mode="popLayout">
                   <motion.div
                     key={project.id}
                     initial={{ opacity: 0, y: 8 }}

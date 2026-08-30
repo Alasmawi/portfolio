@@ -268,7 +268,12 @@ export default function SyntaxRain({
         fields.add(f);
         startLoop();
       },
-      { rootMargin: '200px' }
+      // 50px, not 200. Two of these are mounted — the hero and the projects
+      // band — and at 200px both stayed "on screen" well past their own
+      // sections, so both kept painting into the shared rAF loop while you read
+      // something else entirely. 50px is still enough lead to have the field
+      // running before it is visible.
+      { rootMargin: '50px' }
     );
     io.observe(canvas);
 
