@@ -7,10 +7,15 @@ const RAIN_FADE = [{ x1: 0.02, y1: 0.16, x2: 0.92, y2: 0.94, a: 0.26 }];
 const RAIN_EXCLUDE = [{ x1: 0, y1: 0, x2: 1, y2: 0.1 }];
 
 export default function Hero() {
+  // svh, not dvh. dvh tracks the URL bar collapsing as you scroll, so the hero
+  // grew ~60px under the reader's thumb on the first flick of every visit — and
+  // that resize is what used to restart the rain. svh is pinned to the
+  // expanded-bar state, so the height is settled before first paint and never
+  // moves again.
   return (
     <section
       id="hero"
-      className="relative min-h-[88dvh] overflow-hidden bg-void pt-16 sm:min-h-screen sm:min-h-[100dvh]"
+      className="relative min-h-[88svh] overflow-hidden bg-void pt-16 sm:min-h-screen sm:min-h-[100svh]"
     >
       <SyntaxRain size={14} density={0.68} dim tint="145,132,217" fade={RAIN_FADE} exclude={RAIN_EXCLUDE} />
 
@@ -33,7 +38,7 @@ export default function Hero() {
       {/* Status pinned to the bottom by mt-auto. `justify-between` is desktop
           only: there the column is a full viewport tall with two children, and
           on a phone that opened a ~250px hole between them. */}
-      <div className="relative mx-auto flex min-h-[calc(88dvh-4rem)] max-w-6xl flex-col px-5 pb-7 pt-8 sm:min-h-[calc(100dvh-4rem)] sm:justify-between sm:px-10 sm:pt-6 md:px-14">
+      <div className="relative mx-auto flex min-h-[calc(88svh-4rem)] max-w-6xl flex-col px-5 pb-7 pt-8 sm:min-h-[calc(100svh-4rem)] sm:justify-between sm:px-10 sm:pt-6 md:px-14">
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
