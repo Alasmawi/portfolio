@@ -23,11 +23,31 @@ WORKTREE="$(mktemp -d)/original"
 
 cd "$ROOT"
 
-# A CI checkout is usually shallow and often has only the deployed branch, so
-# the ref may need fetching before it can be built.
+# A CI checkout is usually shallow and carries only the deployed branch, so the
+# ref generally has to be fetched before it can be built.
+#
+# The refspec is not optional. `git clone --depth 1 --branch main` configures
+# remote.origin.fetch for main alone, so a bare `git fetch origin v1-original`
+# resolves the branch, writes FETCH_HEAD, and creates no origin/v1-original —
+# leaving the build to die on "invalid reference" one line later. Naming the
+# destination is what actually creates the remote-tracking ref.
 if ! git rev-parse --verify --quiet "$ORIGINAL_REF^{commit}" >/dev/null; then
   echo "==> $ORIGINAL_REF not present, fetching"
-  git fetch --depth=1 origin "${ORIGINAL_REF#origin/}"
+  case "$ORIGINAL_REF" in
+    origin/*)
+      name="${ORIGINAL_REF#origin/}"
+      git fetch --depth=1 origin "+refs/heads/$name:refs/remotes/origin/$name"
+      ;;
+    *)
+      git fetch --depth=1 origin "$ORIGINAL_REF"
+      ;;
+  esac
+fi
+
+if ! git rev-parse --verify --quiet "$ORIGINAL_REF^{commit}" >/dev/null; then
+  echo "error: cannot resolve $ORIGINAL_REF — the original site cannot be built." >&2
+  echo "       Set ORIGINAL_REF to a ref this checkout can reach." >&2
+  exit 1
 fi
 
 cleanup() {
