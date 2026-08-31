@@ -6,6 +6,19 @@
   html {
     scroll-behavior: smooth;
     background-color: #161826;
+    /* Stops iOS's rubber-band at the ends of the page.
+       
+       The bottom tab bar is position: fixed, and iOS does not hold fixed
+       elements still through an overscroll — pull past the end of the document
+       and the whole page, the bar included, slides up, leaving the bar floating
+       several hundred pixels above the bottom of the screen with body
+       background beneath it. It settles back on release, but on a page whose
+       primary navigation lives at the bottom edge that is the bar coming
+       unstuck from the edge it is supposed to define.
+
+       No bounce, no detach. It also disables pull-to-refresh, which this page
+       has no use for. iOS 16+; older WebKit ignores it and bounces as before. */
+    overscroll-behavior-y: none;
   }
 
   main > section {

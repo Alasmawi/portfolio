@@ -26,9 +26,16 @@ export default function MobileTabBar({ active }) {
          base.bg before it reaches here, so a solid bar meets a matching
          ground everywhere on the page. */
       className="fixed inset-x-0 bottom-0 z-40 border-t border-base-edge bg-base-bg md:hidden"
-      /* Fills the home indicator area with the bar's own ground rather than
-         leaving a strip of page showing beneath it. */
-      style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
+      style={{
+        /* Fills the home indicator area with the bar's own ground rather than
+           leaving a strip of page showing beneath it. */
+        paddingBottom: 'env(safe-area-inset-bottom, 0px)',
+        /* Its own compositing layer. A fixed bar that shares a layer with the
+           scrolling page is the one iOS is most willing to drag along with a
+           scroll; promoting it keeps it on the viewport instead of being
+           re-rastered with the content under it. */
+        transform: 'translateZ(0)',
+      }}
     >
       <ul className="grid grid-cols-5">
         {TABS.map(({ id, label, icon: Icon, cta }) => {
