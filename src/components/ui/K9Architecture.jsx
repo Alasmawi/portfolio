@@ -42,7 +42,11 @@ export default function K9Architecture() {
 
   return (
     <figure className="m-0 min-w-0">
-      <div ref={ref} className="overflow-hidden rounded-lg border border-white/[0.12] bg-[#10121d]">
+      {/* Same ground as the panel it sits in, not #10121d. A third dark tone
+          nested inside the panel inside the rain band read as a box in a box in
+          a box; on the panel's own ground with one hairline it reads as part of
+          it. */}
+      <div ref={ref} className="overflow-hidden rounded-lg border border-base-hairline bg-void">
         <Suspense fallback={<div style={{ height: CANVAS[variant].h }} aria-hidden="true" />}>
           <K9Flow variant={variant} />
         </Suspense>
@@ -50,7 +54,7 @@ export default function K9Architecture() {
             rather than edge labels — routed labels landed on top of the nodes
             they were routed around. */}
         <div
-          className="flex flex-wrap items-center gap-x-4 gap-y-1.5 border-t border-white/[0.08] px-3 py-2 font-mono text-[10.5px] text-text-muted"
+          className="flex flex-wrap items-center gap-x-4 gap-y-1.5 border-t border-base-hairline px-3 py-2 font-mono text-[10.5px] text-text-muted"
           aria-hidden="true"
         >
           <span className="inline-flex items-center gap-1.5">

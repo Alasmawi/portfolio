@@ -18,12 +18,43 @@ const LIVE_CLOUD = '(min-width: 768px) and (hover: hover)';
 
 export default function HeroCloudCanvas({ accent = '#9184d9', fill = 0.94, exposure = 0.95, className = '', style }) {
   const canvasRef = useRef(null);
+  const stillRef = useRef(null);
   // Read once, at mount. A phone does not cross this boundary mid-visit, and
   // re-deciding on resize would mean tearing a WebGL context up and down while
   // someone drags a desktop window.
   const [live] = useState(
     () => typeof window !== 'undefined' && window.matchMedia(LIVE_CLOUD).matches
   );
+
+  // Parallax on the still. The live cloud answers the pointer; a phone has no
+  // pointer, so it answers the scroll instead — it drifts up more slowly than
+  // the copy beside it, which is what stops it reading as a sticker on a
+  // background. Written to a custom property and applied inside the same
+  // transform as the drift keyframes, so the two don't fight over `transform`.
+  useEffect(() => {
+    if (live) return undefined;
+    const el = stillRef.current;
+    if (!el) return undefined;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return undefined;
+
+    let frame = 0;
+    const onScroll = () => {
+      if (frame) return;
+      frame = requestAnimationFrame(() => {
+        frame = 0;
+        // Only while the hero is still on screen; past that it is not visible
+        // and the offset would grow without bound.
+        const y = Math.min(window.scrollY, window.innerHeight);
+        el.style.setProperty('--cloud-parallax', `${(y * 0.18).toFixed(1)}px`);
+      });
+    };
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      if (frame) cancelAnimationFrame(frame);
+    };
+  }, [live]);
 
   useEffect(() => {
     if (!live) return undefined;
@@ -53,12 +84,13 @@ export default function HeroCloudCanvas({ accent = '#9184d9', fill = 0.94, expos
   if (!live) {
     return (
       <img
+        ref={stillRef}
         src={cloudPoster}
         alt=""
         aria-hidden="true"
         // Matches how the canvas fills the same box, so the still drops into
         // the wrapper Hero already positions without moving anything.
-        className={className}
+        className={`cloud-still ${className}`}
         style={{ display: 'block', width: '100%', height: '100%', objectFit: 'contain', ...style }}
       />
     );

@@ -118,6 +118,10 @@ function PreviewVideo({ src, poster, label, playing }) {
 // hands the widest treatment to the narrowest container in the range.
 const WIDE_PANEL_PX = 560;
 
+// The fixed bottom tab bar's row height, matching App's bottom padding. Used to
+// work out whether something has actually gone under it.
+const TAB_BAR_PX = 54;
+
 // Drives the trailing-edge mask on the chip row: the fade means "there is more
 // this way", so it has to come off once there isn't.
 function useScrolledToEnd(ref) {
@@ -175,6 +179,29 @@ function Gallery({ items, wide }) {
 function MediaTabs({ project }) {
   const [tab, setTab] = useState('hardware');
   const [panelRef, wide] = useContainerAtLeast(WIDE_PANEL_PX);
+  const tablistRef = useRef(null);
+
+  // The architecture drawing is ~590px tall with its legend. On a 390x844 phone
+  // that fits between the nav and the tab bar — but only if it starts near the
+  // top, and tapping the tab from halfway down the panel left it starting near
+  // the bottom, so the diagram opened mostly below the fold and clipped by the
+  // tab bar. Anchoring the tab strip under the nav gives the drawing the room
+  // it already fits in.
+  //
+  // Only when it would actually overflow: a tab change that is already fully
+  // visible should not move the page under the reader.
+  const anchor = useCallback(() => {
+    const list = tablistRef.current;
+    if (!list) return;
+    requestAnimationFrame(() => {
+      const panel = list.parentElement;
+      if (!panel) return;
+      const bottom = panel.getBoundingClientRect().bottom;
+      const floor = window.innerHeight - TAB_BAR_PX;
+      if (bottom <= floor) return;
+      list.scrollIntoView({ block: 'start', behavior: 'smooth' });
+    });
+  }, []);
   const tabs = [
     { id: 'hardware', label: 'Hardware' },
     { id: 'architecture', label: 'Architecture' },
@@ -189,15 +216,17 @@ function MediaTabs({ project }) {
     const next = tabs[(i + delta + tabs.length) % tabs.length];
     setTab(next.id);
     document.getElementById(`k9tab-${next.id}`)?.focus();
+    anchor();
   };
 
   return (
     <div className="grid grid-cols-[minmax(0,1fr)] gap-3">
       <div
+        ref={tablistRef}
         role="tablist"
         aria-label={`${project.name} media`}
         onKeyDown={onKeyDown}
-        className="flex gap-1.5"
+        className="flex scroll-mt-[68px] gap-1.5"
       >
         {tabs.map(({ id, label }) => {
           const on = tab === id;
@@ -211,7 +240,10 @@ function MediaTabs({ project }) {
               aria-selected={on}
               aria-controls={`k9panel-${id}`}
               tabIndex={on ? 0 : -1}
-              onClick={() => setTab(id)}
+              onClick={() => {
+                setTab(id);
+                anchor();
+              }}
               className={`min-h-11 rounded-md border px-3.5 font-mono text-[11px] uppercase tracking-[0.14em] transition-colors ${
                 on
                   ? 'border-accent bg-accent/[0.14] text-accent-bright'
@@ -307,19 +339,6 @@ export default function ProjectBrowser() {
   // Whether the section is on screen. Read by the preview video, which fetches
   // nothing until it is true, and by the auto-advance clock below.
   const [inView, setInView] = useState(false);
-  // Two ways to change project — the chip row and a swipe on the preview — and
-  // the second announced itself not at all. Shown until the first successful
-  // swipe, then never again this session. sessionStorage rather than
-  // localStorage: a hint nobody ever sees again is a hint that stops helping
-  // the visitor who comes back in six months having forgotten.
-  const [showSwipeHint, setShowSwipeHint] = useState(() => {
-    if (typeof window === 'undefined') return false;
-    try {
-      return sessionStorage.getItem('swipe-hint-seen') !== '1';
-    } catch {
-      return true;
-    }
-  });
   const project = PROJECTS.find((p) => p.id === selectedId) ?? PROJECTS[0];
 
   const sectionRef = useRef(null);
@@ -345,12 +364,25 @@ export default function ProjectBrowser() {
   useScrolledToEnd(chipRowRef);
 
   // A swipe on the preview changes the project, and the chip row is the thing
-  // that says which project you are on — so it has to follow. Without this the
-  // two controls disagree as soon as you use the one below.
+  // that says which project you are on — so it has to follow.
+  //
+  // This scrolls the row, not the chip. scrollIntoView on the chip also scrolls
+  // every scrollable ancestor, including the document: on first mount it
+  // dragged the whole page down to the panel before the reader had seen the
+  // hero. Setting scrollLeft can only ever move the row.
+  const didMountRef = useRef(false);
   useEffect(() => {
+    const row = chipRowRef.current;
     const chip = selectedChipRef.current;
-    if (!chip || !chipRowRef.current) return;
-    chip.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' });
+    if (!row || !chip) return;
+    // Nothing to follow on the first render — the row already starts at the
+    // selected chip, which is the first one.
+    if (!didMountRef.current) {
+      didMountRef.current = true;
+      return;
+    }
+    const target = chip.offsetLeft - (row.clientWidth - chip.clientWidth) / 2;
+    row.scrollTo({ left: Math.max(0, target), behavior: 'smooth' });
   }, [selectedId]);
 
   const step = useCallback(
@@ -379,12 +411,6 @@ export default function ProjectBrowser() {
         return;
       }
       step(dx < 0 ? 1 : -1);
-      setShowSwipeHint(false);
-      try {
-        sessionStorage.setItem('swipe-hint-seen', '1');
-      } catch {
-        // Private mode, or storage disabled. The hint just shows again.
-      }
     },
     [step]
   );
@@ -512,13 +538,36 @@ export default function ProjectBrowser() {
 
           <Reveal delay={0.05} className="relative block px-5 py-6 sm:px-10 sm:py-9 md:px-14">
             <div className="mx-auto max-w-6xl overflow-hidden rounded-lg bg-void shadow-[0_0_0_1px_rgba(233,233,237,0.12),0_18px_44px_-20px_rgba(0,0,0,0.9)] md:flex">
-              {/* mobile: horizontal chip row. The rings are inset shadows
-                  rather than borders so the chip's box doesn't grow by 2px when
-                  it becomes selected, but they are still a component boundary —
-                  hence base.edge's value (3.72:1 on this ground) rather than
-                  the hairline these used to carry at 1.33:1. */}
+              {/* mobile: one header line, then the chips.
+
+                  This was three stacked control strips before any content
+                  appeared — chips, then a counter row, then the hardware /
+                  architecture tabs. The counter now shares a line with the same
+                  "// repositories (14)" header the desktop sidebar carries, so
+                  the phone and the desktop say the same thing in the same
+                  words, and the panel opens on one strip instead of two.
+
+                  The swipe hint is gone with it. The counter and the fading
+                  right edge already say the row continues, and a permanent
+                  instruction for a gesture that is a shortcut — the chips do
+                  the same job, in the open — was not worth a row of its own. */}
               <div className="md:hidden">
-                <div ref={chipRowRef} className="chip-row flex gap-2 overflow-x-auto px-3 pt-3">
+                <div className="flex items-baseline justify-between gap-3 px-3 pt-2.5">
+                  <p className="font-mono text-[10.5px] uppercase tracking-wider text-text-muted">
+                    // repositories ({PROJECTS.length})
+                  </p>
+                  <ScrollCounter
+                    index={PROJECTS.findIndex((p) => p.id === selectedId)}
+                    total={PROJECTS.length}
+                  />
+                </div>
+
+                {/* The rings are inset shadows rather than borders so the
+                    chip's box doesn't grow by 2px when it becomes selected,
+                    but they are still a component boundary — hence base.edge's
+                    value (3.72:1 on this ground) rather than the hairline these
+                    used to carry at 1.33:1. */}
+                <div ref={chipRowRef} className="chip-row flex gap-2 overflow-x-auto p-3">
                   {PROJECTS.map((p) => (
                     <button
                       key={p.id}
@@ -536,21 +585,6 @@ export default function ProjectBrowser() {
                       {p.name}
                     </button>
                   ))}
-                </div>
-                <div className="flex items-baseline justify-between gap-3 px-3 pb-1 pt-1.5">
-                  <ScrollCounter
-                    label="repo"
-                    index={PROJECTS.findIndex((p) => p.id === selectedId)}
-                    total={PROJECTS.length}
-                  />
-                  {showSwipeHint && (
-                    <p
-                      className="font-mono text-[10.5px] tracking-wide text-text-dim"
-                      aria-hidden="true"
-                    >
-                      swipe the preview to change
-                    </p>
-                  )}
                 </div>
               </div>
 

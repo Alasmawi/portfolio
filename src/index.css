@@ -158,6 +158,48 @@
   }
 }
 
+/* — hero cloud, still frame — */
+/* On a phone the cloud is a build-time still of the three.js object rather than
+   the live scene (see HeroCloudCanvas). A still of a thing that used to move
+   reads as broken, so it keeps a slow drift: a long vertical float against a
+   slight scale, on different periods so the two never sync into an obvious
+   loop. This is transform-only, so it composites on the GPU and never lays out.
+
+   It is not pretending to be the contour sweep. It is enough motion that the
+   cloud reads as alive rather than pasted on. */
+@keyframes cloud-drift {
+  0%,
+  100% {
+    transform: translate3d(0, calc(var(--cloud-parallax, 0px) * -1), 0) scale(1);
+  }
+  50% {
+    transform: translate3d(-6px, calc(-14px - var(--cloud-parallax, 0px)), 0) scale(1.035);
+  }
+}
+
+@keyframes cloud-glow {
+  0%,
+  100% {
+    opacity: 0.82;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.cloud-still {
+  --cloud-parallax: 0px;
+  animation: cloud-drift 19s ease-in-out infinite, cloud-glow 11s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cloud-still {
+    animation: none;
+    opacity: 0.92;
+  }
+}
+
 /* Hero ridge nodes: a hard on/off blink rather than a drift, to keep the
    header's motion sharp. step-end gives it a switching feel, not a fade. */
 @keyframes sharp-node-blink {

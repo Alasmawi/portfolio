@@ -27,8 +27,11 @@ export default function App() {
     <>
       <Nav active={active} />
       {/* Clears the fixed bottom tab bar plus the home indicator on a notched
-          phone; the bar isn't rendered at md and up, so neither is the space. */}
-      <main className="relative z-10 pb-[calc(3.75rem+env(safe-area-inset-bottom))] md:pb-0">
+          phone; the bar isn't rendered at md and up, so neither is the space.
+          The 54px is the bar's own row height (see MobileTabBar's min-h-[54px])
+          — it was 60px here, which left a 6px strip of page below the last
+          section that the bar did not cover. */}
+      <main className="relative z-10 pb-[calc(54px+env(safe-area-inset-bottom,0px))] md:pb-0">
         <Hero />
         <ProjectBrowser />
         <Experience />

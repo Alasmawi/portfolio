@@ -19,9 +19,16 @@ export default function MobileTabBar({ active }) {
   return (
     <nav
       aria-label="Sections"
-      className="fixed inset-x-0 bottom-0 z-40 border-t border-base-edge bg-base-bg/95 backdrop-blur md:hidden"
-      // Keeps the row clear of the home indicator on a notched phone.
-      style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+      /* Opaque, not bg-base-bg/95 with a blur behind it. Translucent, it took
+         its tint from whatever was under it — over the hero, whose ground is
+         the darker `void`, it read as a foreign lighter slab floating above the
+         page rather than the page's own bottom edge. The hero now fades into
+         base.bg before it reaches here, so a solid bar meets a matching
+         ground everywhere on the page. */
+      className="fixed inset-x-0 bottom-0 z-40 border-t border-base-edge bg-base-bg md:hidden"
+      /* Fills the home indicator area with the bar's own ground rather than
+         leaving a strip of page showing beneath it. */
+      style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
     >
       <ul className="grid grid-cols-5">
         {TABS.map(({ id, label, icon: Icon, cta }) => {
