@@ -84,7 +84,7 @@ export default function Contact() {
   }, []);
 
   return (
-    <section id="contact" className="bg-base-bg px-5 pb-9 pt-11 sm:px-10 sm:pt-14 md:px-14 md:pb-14 md:pt-20">
+    <section id="contact" className="relative px-5 pb-9 pt-11 sm:px-10 sm:pt-14 md:px-14 md:pb-14 md:pt-20">
       <div className="mx-auto max-w-6xl">
         <div className="grid gap-10 md:grid-cols-[1fr_auto] md:items-start md:gap-16">
           <Reveal>
@@ -105,24 +105,31 @@ export default function Contact() {
             <div className="mt-7 flex flex-wrap items-center gap-2.5">
               <a
                 href={`mailto:${EMAIL}`}
-                className="inline-flex min-h-11 items-center gap-2 rounded-md border border-base-edge px-3 font-mono text-[13px] text-text-primary transition-colors hover:border-accent/60 hover:text-accent-bright"
+                className="glass-control inline-flex min-h-11 items-center gap-2 rounded-full px-4 font-mono text-[13px] text-text-primary"
               >
-                <Mail size={14} className="shrink-0" />
-                {EMAIL}
+                <span className="flex items-center gap-2">
+                  <Mail size={14} className="shrink-0" />
+                  {EMAIL}
+                </span>
               </a>
               <button
                 type="button"
                 onClick={copyEmail}
-                className="inline-flex min-h-11 items-center gap-2 rounded-md border border-base-edge px-3 font-mono text-[11px] uppercase tracking-[0.12em] text-text-muted transition-colors hover:border-accent/60 hover:text-accent-bright"
+                className="glass-control inline-flex min-h-11 items-center gap-2 rounded-full px-4 font-mono text-[11px] uppercase tracking-[0.12em] text-text-primary"
               >
-                {copied ? <Check size={13} /> : <Copy size={13} />}
-                {copied ? 'Copied' : 'Copy'}
+                <span className="flex items-center gap-2">
+                  {copied ? <Check size={13} /> : <Copy size={13} />}
+                  {copied ? 'Copied' : 'Copy'}
+                </span>
               </button>
             </div>
           </Reveal>
 
           <Reveal delay={0.1}>
-            <form onSubmit={handleSubmit} className="grid gap-3.5 md:min-w-[340px]">
+            <form
+              onSubmit={handleSubmit}
+              className="glass-pane grid gap-3.5 rounded-[26px] p-5 sm:p-6 md:min-w-[380px]"
+            >
               <div className="field">
                 <label htmlFor="contact-name">Name</label>
                 <input id="contact-name" name="name" className="input" placeholder="Your name" />

@@ -4,46 +4,54 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Nocturne — max two grounds: `base.bg` is the page ground, `void` is
-        // the deeper rain/hero ground. Surfaces are the same family lifted
-        // only by a hairline edge, never a third ground color.
+        // Dusk. The rule Nocturne set — at most two grounds, elevation from an
+        // edge rather than a third background tone — survives the repaint; only
+        // the hues move. `base.bg` is the page ground, `void` the deeper ground
+        // the hero and the dock sit on.
         base: {
-          bg: '#161826',
-          surface: '#232532',
-          // Two border tiers, because they are asked to do two different jobs.
+          bg: '#17121a',
+          surface: '#241c28',
+          // Two border tiers, doing two different jobs.
           //
           // `edge` bounds things you can operate — inputs, ghost buttons, the
-          // unselected tab. WCAG 1.4.11 wants 3:1 for a boundary that is what
-          // identifies a component, and the old single token was 1.31:1 on the
-          // page ground and 1.21:1 on a card fill, so a field's outline was
-          // effectively invisible. #6a6e80 measures 3.48 / 3.20 / 3.01 against
+          // unselected chip. WCAG 1.4.11 asks 3:1 of a boundary that is what
+          // identifies a component: #7a6b74 measures 3.68 / 3.45 / 3.29 against
           // bg / the composited card fill / surface.
           //
-          // `hairline` separates things you only read — card edges, dividers,
-          // the rule between metadata. 1.4.11 does not ask 3:1 of those, and
-          // meeting it would mean a line at #676e9a, one perceptual step off
-          // the accent, outlining every card on the site. That spends the one
-          // signalling colour on decoration. Lifted instead from 1.31 to 2.03
-          // on bg, which is enough to read as an edge without competing.
-          edge: '#6a6e80',
-          hairline: '#454a66',
+          // `hairline` separates things you only read — pane edges, dividers.
+          // 1.4.11 does not ask 3:1 of those, and meeting it here would mean
+          // outlining every glass pane in something a step off the accent,
+          // which is exactly the heavy rim the glass rule says to keep off
+          // panes. 1.72 on bg: an edge, not a frame.
+          edge: '#7a6b74',
+          hairline: '#453a48',
         },
-        void: '#0f111c',
+        void: '#0d0a0f',
         text: {
-          primary: '#e9e9ed',
-          muted: '#a4a5b2',
-          // 4.10:1 on surface before, which fails AA, and 3.62:1 on the
-          // third ground this file used to carry. 5.49 / 5.04 / 4.74 now.
-          dim: '#8e8f9b',
+          primary: '#fdf3f4',
+          muted: '#b6a7ad',
+          dim: '#9c8f96',
         },
-        // The one accent — blurple. `bright`/`body` are the two accent-tinted
-        // text steps Nocturne allows; raw `accent` never sits on body copy.
+        // Rose is the accent — the one colour that signals. Amber is the
+        // secondary, reserved for the primary call to action and the gateway
+        // in the K9 diagram, so "amber" always means "this is the hop
+        // everything passes through".
         accent: {
-          DEFAULT: '#9184d9',
-          bright: '#d2cefd',
-          body: '#b9b1ec',
+          DEFAULT: '#e07a9a',
+          bright: '#fbd0dc',
+          body: '#f6a8bf',
         },
-        ok: '#9184d9',
+        amber: {
+          DEFAULT: '#f0a448',
+          bright: '#fbd7a4',
+        },
+        // Teal, spent on status and nothing else: the "available for work"
+        // dot, the "live" marker on a project. It is the one cool colour in
+        // the palette, which is what makes live read as live at a glance.
+        // (Reboot's own brand teal in education.js is an institution's colour,
+        // not this token — the two never appear in the same figure.)
+        signal: '#4fd1c5',
+        ok: '#4fd1c5',
       },
       fontFamily: {
         // 'Inter Variable' is the family name @fontsource-variable registers;
@@ -53,10 +61,13 @@ export default {
       },
       backgroundImage: {
         'dot-grid':
-          'radial-gradient(circle, rgba(233,233,237,0.08) 1px, transparent 1px)',
+          'radial-gradient(circle, rgba(253,243,244,0.08) 1px, transparent 1px)',
       },
       boxShadow: {
-        'glow-accent': '0 0 0 1px rgba(145,132,217,0.5), 0 0 24px rgba(145,132,217,0.18)',
+        'glow-accent': '0 0 0 1px rgba(224,122,154,0.5), 0 0 24px rgba(224,122,154,0.18)',
+        // The drop under a glass pane. Long, soft and almost black: it is what
+        // separates the pane from the ground now that the border is a hairline.
+        pane: '0 30px 62px -32px rgba(0,0,0,0.85)',
       },
       animation: {
         blink: 'blink 1.6s step-start infinite',

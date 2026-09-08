@@ -3,7 +3,7 @@ import pfp from '../assets/pfp-nobg.webp';
 
 export default function About() {
   return (
-    <section id="about" className="relative overflow-hidden bg-base-bg px-5 py-11 sm:px-10 sm:py-14 md:px-14 md:py-20">
+    <section id="about" className="relative overflow-hidden px-5 py-11 sm:px-10 sm:py-14 md:px-14 md:py-20">
       {/* The custom element positions *itself* — its script writes inline
           `position:absolute; inset:0` whenever its parent is positioned, which
           beats any utility class we'd put on the element. So the rail geometry
@@ -23,10 +23,20 @@ export default function About() {
           aria-hidden="true"
         />
       </div>
+      {/* Desktop only. The helix is 110px wide at 40% opacity on a phone and
+          the copy never reaches it, so there was nothing to fade — and the
+          overlay's own left edge was a straight vertical seam across the
+          atmosphere behind it, which is more visible than the thing it was
+          hiding. */}
       <div
-        className="pointer-events-none absolute inset-y-0 right-0 w-[200px] md:w-[420px]"
+        className="pointer-events-none absolute inset-y-0 right-0 hidden w-[420px] md:block"
         style={{
-          background: 'linear-gradient(270deg, rgba(22,24,38,0), rgba(22,24,38,.7) 62%, rgba(22,24,38,.96))',
+          // A fade, not a slab. At .96 this painted an opaque band down the
+          // right of the section, and against the atmosphere layer behind it
+          // that band had a visible vertical edge — the grid and the orb light
+          // simply stopped. It only has to take the helix down far enough for
+          // the copy to win, which .62 does.
+          background: 'linear-gradient(270deg, rgba(23,18,26,0), rgba(23,18,26,.38) 62%, rgba(23,18,26,.62))',
         }}
       />
 
@@ -43,7 +53,7 @@ export default function About() {
                 className="absolute -bottom-1.5 left-0 right-0 h-0.5"
                 style={{
                   background:
-                    'linear-gradient(90deg, rgba(145,132,217,0), #9184d9 18%, #9184d9 82%, rgba(145,132,217,0))',
+                    'linear-gradient(90deg, rgba(224,122,154,0), #e07a9a 18%, #e07a9a 82%, rgba(224,122,154,0))',
                 }}
               />
             </span>{' '}
@@ -61,7 +71,7 @@ export default function About() {
               <div
                 className="pointer-events-none absolute -left-6 -right-6 top-6 -bottom-3.5"
                 style={{
-                  background: 'radial-gradient(50% 44% at 50% 62%, rgba(145,132,217,.22), rgba(145,132,217,0) 74%)',
+                  background: 'radial-gradient(50% 44% at 50% 62%, rgba(224,122,154,.22), rgba(224,122,154,0) 74%)',
                 }}
               />
               <img
@@ -74,7 +84,7 @@ export default function About() {
                 className="absolute bottom-0 left-1 right-1 h-px"
                 style={{
                   background:
-                    'linear-gradient(90deg, rgba(145,132,217,0), rgba(145,132,217,.55) 22%, rgba(145,132,217,.55) 78%, rgba(145,132,217,0))',
+                    'linear-gradient(90deg, rgba(224,122,154,0), rgba(224,122,154,.55) 22%, rgba(224,122,154,.55) 78%, rgba(224,122,154,0))',
                 }}
               />
             </div>
@@ -85,7 +95,7 @@ export default function About() {
               Full-stack product work on AWS — schema, API, front end, deploy. Underneath it: an HTTP
               server on epoll, a Unix shell, a ray tracer, all written from scratch.
             </p>
-            <div className="mt-6 grid max-w-[46ch] gap-3">
+            <div className="glass-pane mt-6 grid max-w-[46ch] gap-3 rounded-[22px] p-4 sm:p-5">
               <div className="grid gap-1 sm:grid-cols-[88px_1fr] sm:items-baseline sm:gap-4">
                 <p className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-text-muted">
                   Good at
@@ -104,7 +114,7 @@ export default function About() {
               </div>
             </div>
             <div className="mt-7">
-              <a href="#contact" className="btn btn-primary">
+              <a href="#contact" className="btn btn-primary px-6">
                 Get in touch
               </a>
             </div>

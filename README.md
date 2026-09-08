@@ -1,15 +1,33 @@
 # Portfolio — Abdulla Alasmawi
 
-A single-page portfolio site for a Cloud Computing / AWS / IoT / Backend developer, built with React, Vite, Tailwind CSS, and Framer Motion. Styled around a "cloud infrastructure" aesthetic — a top-light-to-bottom-dark gradient sky, an animated AWS-cloud/code "rain" backdrop, mono-labeled sections, and a GitHub-repo-style project browser.
+A single-page portfolio site built with React, Vite, Tailwind CSS and Framer Motion, served at `/v2`. Systems-diagram furniture — mono labels, status dots, a GitHub-style repo browser, a real architecture diagram — on a warm dusk ground under glass.
 
-Live sections: Hero, About, Experience, Projects (browsable, GIF/architecture previews), Skills, Education, Contact.
+Live sections: Hero, Focus, Projects (browsable, video/architecture previews), Experience, Education, About, Contact.
+
+## Design system
+
+Two things carry the look, and both are in `src/index.css`.
+
+**The glass rule.** Two effects, split by job, and never mixed:
+
+| | `.glass-control` (liquid) | `.glass-pane` (flat) |
+|---|---|---|
+| Reads as | a physical object | a surface |
+| Used on | nav pill, dock, buttons, filter chips, badges | large panes holding diagrams and copy |
+| Recipe | thick tint, `saturate(205%) brightness(1.07)`, masked inner ring, specular top stroke, travelling highlight | one `blur(14px)`, low tint, hairline edge, no rim |
+
+The cost sits with the control — a nested `backdrop-filter` behind a composited mask — so its ring renders only where the mask primitive is supported and only on pointer devices at `md` and up. Everything falls back to an opaque tint where `backdrop-filter` is missing entirely.
+
+**The atmosphere.** `Atmosphere.jsx` paints four drifting orbs and a 72px grid in one `position: fixed`, `contain: strict` layer for the whole document, instead of each section carrying its own gradients. Fixed means it never repaints on scroll, and the parallax comes free. Two of the four orbs are desktop-only.
+
+Palette: ground `#17121a`, deeper `#0d0a0f`, cream `#fdf3f4`, rose `#e07a9a` (the accent), amber `#f0a448` (calls to action, and the gateway in the K9 diagram), teal `#4fd1c5` (status, nothing else). `node scripts/check-contrast.mjs` reads the tokens out of `tailwind.config.js` and fails if any pairing drops below its WCAG floor.
 
 ## Stack
 
 - React (functional components, hooks)
 - Vite
 - Tailwind CSS (custom theme in `tailwind.config.js`)
-- Framer Motion (scroll reveals, hero typing effect, project-browser transitions)
+- Framer Motion (scroll reveals, project-browser transitions)
 - lucide-react (icons)
 
 ## Local development
@@ -31,22 +49,25 @@ npm run preview   # serve the production build locally
 ```
 src/
   components/
-    Hero.jsx, About.jsx, Experience.jsx, ProjectBrowser.jsx,
-    Skills.jsx, Education.jsx, Contact.jsx, Nav.jsx
+    Hero.jsx, FocusPillars.jsx, ProjectBrowser.jsx, Experience.jsx,
+    Education.jsx, About.jsx, Contact.jsx, Nav.jsx
     ui/
-      CloudCodeRain.jsx    — fixed full-page falling AWS-cloud/code background
-      CloudHorizon.jsx     — static cloud skyline banner at the top of the hero
-      SkyDrift.jsx         — slow drifting clouds behind the hero name/tagline
-      CloudShapes.jsx      — shared cloud SVG shapes (tech + soft cloud)
-      CodeSnippet.jsx      — hand-rolled syntax-highlighted code block
-      AwsIcon.jsx           — small glyph chips for the Cloud & AI skills group
-      ArchitectureDiagram.jsx, SectionHeader.jsx, StatusBadge.jsx, Reveal.jsx, BrandIcons.jsx
+      Atmosphere.jsx       — the fixed orb + grid layer behind the whole page
+      HeroCloudCanvas.jsx  — three.js cloud on desktop, a build-time still on phones
+      MobileTabBar.jsx     — the floating glass dock (phones only)
+      K9Architecture.jsx, K9Flow.jsx  — the sensors → AWS diagram (lazy)
+      RingGallery.jsx, HardwareStrip.jsx  — the K9 hardware photos
+      CourseworkModule.jsx, ProgramJourney.jsx, ExpandTile.jsx
+      ScrollCounter.jsx, Reveal.jsx, BrandIcons.jsx
   data/
-    projects.js  — every project shown in the Projects browser
-  hooks/
-    useTypingEffect.js
+    projects.js       — every project shown in the Projects browser
+    focusPillars.js   — the four pillars; project counts are derived from projects.js
+    experience.js, education.js, uobCoursework.js, rebootJourney.js, navLinks.js
+  lib/
+    mountCloud.js     — the hero cloud's three.js scene
+    dna-helix.js      — the custom element in About
 public/
-  gifs/          — project demo GIFs, referenced from data/projects.js
+  video/         — project preview clips, referenced from data/projects.js
 ```
 
 ### Adding or updating a project

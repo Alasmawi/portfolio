@@ -5,7 +5,7 @@ import { EDUCATION } from '../data/education';
 
 export default function Education() {
   return (
-    <section id="education" className="bg-base-bg px-5 py-11 sm:px-10 sm:py-14 md:px-14 md:py-20">
+    <section id="education" className="relative px-5 py-11 sm:px-10 sm:py-14 md:px-14 md:py-20">
       <div className="mx-auto max-w-6xl">
         <Reveal>
           <p className="mb-4 font-mono text-[11px] uppercase tracking-[0.18em] text-text-muted">
@@ -21,16 +21,14 @@ export default function Education() {
           </div>
         </Reveal>
 
-        <div className="mt-8 md:mt-10">
+        {/* A pane per track rather than rows split by an inset rule. The two
+            run in parallel and are read as a pair, which two panes say and a
+            divided list does not. */}
+        <div className="mt-8 grid gap-4 md:mt-10">
           {EDUCATION.map((entry, i) => {
-            const last = i === EDUCATION.length - 1;
             return (
               <Reveal key={entry.id} delay={0.1 + i * 0.05}>
-                <div
-                  className={`grid grid-cols-[20px_1fr] gap-4 py-5 sm:grid-cols-[22px_1fr] sm:gap-5 md:py-[22px] ${
-                    !last ? 'shadow-[inset_0_-1px_0_rgba(233,233,237,0.07)]' : ''
-                  }`}
-                >
+                <div className="glass-pane grid grid-cols-[20px_1fr] gap-4 rounded-[26px] p-5 sm:grid-cols-[22px_1fr] sm:gap-5 sm:p-6">
                   {/* Status rail: filled dot for the completed track, a live
                       pulsing ring for the one still running. */}
                   <div className="flex flex-col items-center gap-2 pt-1">

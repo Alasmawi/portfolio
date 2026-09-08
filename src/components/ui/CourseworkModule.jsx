@@ -71,7 +71,7 @@ export default function CourseworkModule() {
               variants={card}
               transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
               onClick={() => setOpenPillar(isOpen ? null : pillar.id)}
-              className="rounded-lg bg-base-surface/60 p-3 text-left"
+              className="rounded-xl bg-white/[0.05] p-3 text-left"
             >
               <div className="flex items-baseline gap-1.5">
                 <span

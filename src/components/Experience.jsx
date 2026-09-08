@@ -29,7 +29,7 @@ function Bar({ start, end, color, muted = false, indent = false }) {
   const width = Math.max((frac(end) - frac(start)) * 100, 1.5);
   return (
     <div className={`relative h-2.5 rounded ${indent ? 'ml-4' : ''}`}>
-      <div className="absolute inset-0 rounded shadow-[inset_0_0_0_1px_rgba(233,233,237,0.09)]" />
+      <div className="absolute inset-0 rounded shadow-[inset_0_0_0_1px_rgba(253,243,244,0.09)]" />
       <div
         className="absolute top-0 bottom-0 rounded"
         style={{
@@ -45,7 +45,7 @@ function Bar({ start, end, color, muted = false, indent = false }) {
 
 export default function Experience() {
   return (
-    <section id="experience" className="bg-base-bg px-5 py-11 sm:px-10 sm:py-14 md:px-14 md:py-20">
+    <section id="experience" className="relative px-5 py-11 sm:px-10 sm:py-14 md:px-14 md:py-20">
       <div className="mx-auto max-w-6xl">
         <Reveal>
           <p className="mb-4 font-mono text-[11px] uppercase tracking-[0.18em] text-text-muted">
@@ -61,8 +61,12 @@ export default function Experience() {
           </div>
         </Reveal>
 
+        {/* The year, as a figure. The two internships and the K9 deliverable
+            hanging off the first one are three bars on one axis, which says
+            "back to back, one overlapping" in a glance — the prose below only
+            has to fill in what each involved. */}
         <Reveal delay={0.1}>
-          <div className="mt-10">
+          <div className="glass-pane mt-10 rounded-[26px] p-5 sm:p-7">
             <div className="relative mb-2.5 h-4 font-mono text-[10.5px] uppercase tracking-wider text-text-dim">
               {TICKS.map((t, i) => (
                 <span
@@ -139,10 +143,10 @@ export default function Experience() {
           </div>
         </Reveal>
 
-        <div className="mt-10 divide-y divide-base-hairline md:mt-14">
+        <div className="mt-8 grid gap-4 md:mt-12 md:grid-cols-2">
           {EXPERIENCE.map((job, i) => (
-            <Reveal key={job.id} delay={0.1 + i * 0.05}>
-              <div className="grid gap-3 py-6 md:grid-cols-[190px_1fr_210px] md:gap-9 md:py-7">
+            <Reveal key={job.id} delay={0.1 + i * 0.05} className="h-full">
+              <div className="glass-pane grid h-full gap-3 rounded-[26px] p-5 sm:p-6">
                 <div>
                   <p className="font-mono text-[11.5px] text-text-muted">{formatRange(job)}</p>
                   {job.status === 'active' ? (
@@ -185,7 +189,7 @@ export default function Experience() {
                   </ul>
                 </div>
 
-                <div className="flex flex-wrap content-start gap-1.5 pl-5 md:pl-0">
+                <div className="mt-auto flex flex-wrap content-start gap-1.5 pl-5">
                   {job.tags.map((tag) => (
                     <span key={tag} className="tag-outline text-[11px]">
                       {tag}
@@ -196,8 +200,8 @@ export default function Experience() {
             </Reveal>
           ))}
 
-          <Reveal delay={0.2}>
-            <div className="grid items-baseline gap-2 py-6 md:grid-cols-[190px_1fr_210px] md:gap-9">
+          <Reveal delay={0.2} className="md:col-span-2">
+            <div className="glass-pane grid items-baseline gap-2 rounded-[26px] p-5 sm:p-6 md:grid-cols-[190px_1fr_210px] md:gap-9">
               <p className="font-mono text-[10.5px] uppercase tracking-wider text-text-dim">
                 from the internship
               </p>

@@ -2,7 +2,6 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ExternalLink, Film, Lock, PlayCircle, Star } from 'lucide-react';
 import Reveal from './ui/Reveal';
-import SyntaxRain from './ui/SyntaxRain';
 import RingGallery from './ui/RingGallery';
 import HardwareStrip from './ui/HardwareStrip';
 import K9Architecture from './ui/K9Architecture';
@@ -31,8 +30,6 @@ const RECURRING_STACK = (() => {
     .map(([t]) => t);
 })();
 
-const RAIN_FADE = [{ x1: 0.03, y1: 0.05, x2: 0.97, y2: 0.96, a: 0.3 }];
-
 // One reserved box for every kind of preview media, so switching project can't
 // move what is underneath it.
 //
@@ -44,7 +41,7 @@ const RAIN_FADE = [{ x1: 0.03, y1: 0.05, x2: 0.97, y2: 0.96, a: 0.3 }];
 // fourteen and buys a panel that holds still.
 const MEDIA_WELL =
   'flex h-[248px] w-full items-center justify-center rounded-lg bg-white/[0.03] ' +
-  'shadow-[inset_0_0_0_1px_rgba(233,233,237,0.09)] sm:h-[320px] md:h-[400px]';
+  'shadow-[inset_0_0_0_1px_rgba(253,243,244,0.09)] sm:h-[320px] md:h-[400px]';
 
 function LanguageDot({ language }) {
   if (!language) return null;
@@ -226,7 +223,10 @@ function MediaTabs({ project }) {
         role="tablist"
         aria-label={`${project.name} media`}
         onKeyDown={onKeyDown}
-        className="flex scroll-mt-[68px] gap-1.5"
+        /* One liquid object holding two chips, rather than two outlined
+           buttons. w-fit so the pill is the width of its chips and not the
+           width of the panel. */
+        className="glass-control flex w-fit scroll-mt-[68px] gap-1 rounded-full p-1.5"
       >
         {tabs.map(({ id, label }) => {
           const on = tab === id;
@@ -244,11 +244,17 @@ function MediaTabs({ project }) {
                 setTab(id);
                 anchor();
               }}
-              className={`min-h-11 rounded-md border px-3.5 font-mono text-[11px] uppercase tracking-[0.14em] transition-colors ${
-                on
-                  ? 'border-accent bg-accent/[0.14] text-accent-bright'
-                  : 'border-base-edge text-text-muted hover:border-accent/60 hover:text-accent-bright'
+              className={`min-h-11 rounded-full px-4 font-mono text-[11px] uppercase tracking-[0.14em] transition-colors ${
+                on ? 'text-[#2b1016]' : 'text-text-primary/70 hover:text-text-primary'
               }`}
+              style={
+                on
+                  ? {
+                      background: 'linear-gradient(160deg, #fbd0dc, #f6a8bf)',
+                      boxShadow: 'inset 0 1.5px 0 rgba(255,255,255,.85)',
+                    }
+                  : undefined
+              }
             >
               {label}
             </button>
@@ -483,7 +489,7 @@ export default function ProjectBrowser() {
   }, [nudgeIdle]);
 
   return (
-    <section id="projects" ref={sectionRef} className="bg-base-bg">
+    <section id="projects" ref={sectionRef} className="relative">
       <div className="mx-auto max-w-6xl px-5 pb-6 pt-11 sm:px-10 sm:pb-8 sm:pt-14 md:px-14 md:pb-10 md:pt-20">
         <Reveal>
           <p className="mb-4 font-mono text-[11px] uppercase tracking-[0.18em] text-text-muted">
@@ -518,26 +524,17 @@ export default function ProjectBrowser() {
         </Reveal>
       </div>
 
-      {/* Rain band — the repo browser floats on it, gradient-faded top and
-          bottom so the band reads as one section rather than a panel on
-          flat ground. */}
-      {/* Deliberately not wrapped in <Reveal>: this band is a full-bleed
-          background taller than a phone screen, and animating its opacity left
-          a screen-sized blank while it waited to be 80px inside the viewport.
-          The panel sitting on it does the revealing instead. */}
+      {/* The browser is a pane on the page's own surface. It used to float on a
+          full-bleed band of `void` with a canvas of falling glyphs behind it,
+          faded top and bottom to hide where the band started — a second ground,
+          a per-frame canvas and two gradients, all to stop one panel looking
+          pasted on. The atmosphere layer behind the document does that for
+          every section at once, so the band and the rain are gone and what is
+          left is the panel. */}
       <div>
-        <div className="relative bg-void">
-          <SyntaxRain size={13} density={0.55} dim tint="145,132,217" fade={RAIN_FADE} />
-          <div
-            className="pointer-events-none absolute inset-0"
-            style={{
-              background:
-                'linear-gradient(180deg,#161826,rgba(15,17,28,.34) 14%,rgba(15,17,28,.34) 86%,#161826)',
-            }}
-          />
-
+        <div className="relative">
           <Reveal delay={0.05} className="relative block px-5 py-6 sm:px-10 sm:py-9 md:px-14">
-            <div className="mx-auto max-w-6xl overflow-hidden rounded-lg bg-void shadow-[0_0_0_1px_rgba(233,233,237,0.12),0_18px_44px_-20px_rgba(0,0,0,0.9)] md:flex">
+            <div className="glass-pane mx-auto max-w-6xl overflow-hidden rounded-[26px] md:flex">
               {/* mobile: one header line, then the chips.
 
                   This was three stacked control strips before any content
@@ -575,10 +572,10 @@ export default function ProjectBrowser() {
                       ref={p.id === selectedId ? selectedChipRef : null}
                       onClick={() => select(p.id)}
                       aria-current={p.id === selectedId ? 'true' : undefined}
-                      className={`flex min-h-11 shrink-0 items-center gap-2 whitespace-nowrap rounded-md px-3 py-2 font-mono text-xs transition-colors ${
+                      className={`flex min-h-11 shrink-0 items-center gap-2 whitespace-nowrap rounded-full px-3 py-2 font-mono text-xs transition-colors ${
                         p.id === selectedId
-                          ? 'bg-accent/10 text-accent-bright shadow-[inset_0_0_0_1px_rgba(145,132,217,0.7)]'
-                          : 'text-text-muted shadow-[inset_0_0_0_1px_#6a6e80]'
+                          ? 'bg-accent/15 text-accent-bright shadow-[inset_0_0_0_1px_rgba(224,122,154,0.7)]'
+                          : 'text-text-muted shadow-[inset_0_0_0_1px_#7a6b74]'
                       }`}
                     >
                       <LanguageDot language={p.language} />
@@ -590,7 +587,7 @@ export default function ProjectBrowser() {
 
               {/* desktop: fixed-width sidebar */}
               <div className="hidden max-h-[620px] w-[264px] shrink-0 overflow-y-auto border-r border-white/[0.09] md:block">
-                <p className="sticky top-0 bg-void px-[18px] py-[13px] font-mono text-[11px] uppercase tracking-wider text-text-muted shadow-[inset_0_-1px_0_rgba(233,233,237,0.09)]">
+                <p className="sticky top-0 bg-[#1e1722]/95 px-[18px] py-[13px] font-mono text-[11px] uppercase tracking-wider text-text-muted shadow-[inset_0_-1px_0_rgba(253,243,244,0.09)]">
                   // repositories ({PROJECTS.length})
                 </p>
                 <ul>
@@ -673,7 +670,7 @@ export default function ProjectBrowser() {
                             target="_blank"
                             rel="noreferrer"
                             aria-label={`${project.name} on GitHub`}
-                            className="btn btn-ghost min-h-9 text-xs"
+                            className="btn btn-ghost glass-control min-h-9 text-xs"
                           >
                             <GithubMark size={14} />
                             <span>source</span>
@@ -691,7 +688,7 @@ export default function ProjectBrowser() {
                             target="_blank"
                             rel="noreferrer"
                             aria-label={`${project.name} live site`}
-                            className="btn btn-ghost min-h-9 text-xs"
+                            className="btn btn-ghost glass-control min-h-9 text-xs"
                           >
                             <PlayCircle size={14} />
                             <span>live</span>

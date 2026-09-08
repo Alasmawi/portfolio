@@ -46,7 +46,7 @@ export default function K9Architecture() {
           nested inside the panel inside the rain band read as a box in a box in
           a box; on the panel's own ground with one hairline it reads as part of
           it. */}
-      <div ref={ref} className="overflow-hidden rounded-lg border border-base-hairline bg-void">
+      <div ref={ref} className="glass-pane overflow-hidden rounded-2xl">
         <Suspense fallback={<div style={{ height: CANVAS[variant].h }} aria-hidden="true" />}>
           <K9Flow variant={variant} />
         </Suspense>
@@ -58,7 +58,7 @@ export default function K9Architecture() {
           aria-hidden="true"
         >
           <span className="inline-flex items-center gap-1.5">
-            <span className="h-0 w-4 border-t border-dashed" style={{ borderColor: '#9184d9' }} />
+            <span className="h-0 w-4 border-t border-dashed" style={{ borderColor: '#e07a9a' }} />
             telemetry
           </span>
           <span className="inline-flex items-center gap-1.5">

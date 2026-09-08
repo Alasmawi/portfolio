@@ -1,14 +1,17 @@
 import * as THREE from 'three';
 
-/* Abdulla's neon cloud hero, recolored to Nocturne's accent and mountable
+/* Abdulla's neon cloud hero, recolored to the dusk accent and mountable
    on any canvas. Geometry, orbits and fit logic are unchanged from the
    original: contour-swept ring tubes, two small laps, three satellites,
    a mirrored ghost reflection, pointer parallax, visibility gating.
 
-   Ported from the Nocturne design bundle's neon-cloud.js — only the three.js
-   import switched from a CDN URL to the npm package. */
+   Ported from the design bundle's neon-cloud.js — the three.js import switched
+   from a CDN URL to the npm package, and the rig recoloured with it: the studio
+   lights and the environment gradient were blurple, which under a rose emissive
+   turned every reflection mauve. They are dusk plum now, so the only saturated
+   colour coming off the object is the accent's own. */
 export function mountCloud(canvas, opts = {}) {
-  const accent = opts.accent || '#9184d9';
+  const accent = opts.accent || '#e07a9a';
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
@@ -78,7 +81,7 @@ export function mountCloud(canvas, opts = {}) {
   }
 
   const coreMat = neonShader(new THREE.MeshStandardMaterial({
-    color: 0x090713, emissive: NEON, roughness: 0.22, metalness: 0.32, envMapIntensity: 1.4,
+    color: 0x120b10, emissive: NEON, roughness: 0.22, metalness: 0.32, envMapIntensity: 1.4,
   }), 0.92);
   const haloMat = neonShader(new THREE.MeshStandardMaterial({
     color: 0x000000, emissive: NEON, roughness: 1, metalness: 0,
@@ -139,18 +142,18 @@ export function mountCloud(canvas, opts = {}) {
   });
   scene.add(cloud);
 
-  /* colored studio rig — blurple, no white light */
-  scene.add(new THREE.HemisphereLight(0x3b3470, 0x241d47, 0.5));
-  const key = new THREE.DirectionalLight(0x453e86, 1.2); key.position.set(4, 7, 5); scene.add(key);
-  const fill = new THREE.DirectionalLight(0x241d47, 0.28); fill.position.set(-5, 3, -4); scene.add(fill);
+  /* colored studio rig — dusk plum, no white light */
+  scene.add(new THREE.HemisphereLight(0x4a2b3a, 0x2a1a24, 0.5));
+  const key = new THREE.DirectionalLight(0x6b4457, 1.2); key.position.set(4, 7, 5); scene.add(key);
+  const fill = new THREE.DirectionalLight(0x2a1a24, 0.28); fill.position.set(-5, 3, -4); scene.add(fill);
   const rim = new THREE.PointLight(NEON, 6, 6, 2); rim.position.set(-1.2, 0.9, -1.1); scene.add(rim);
 
   const grad = document.createElement('canvas');
   grad.width = 16; grad.height = 256;
   const g2 = grad.getContext('2d');
   const lin = g2.createLinearGradient(0, 0, 0, 256);
-  lin.addColorStop(0.00, '#171433'); lin.addColorStop(0.42, accent);
-  lin.addColorStop(0.60, '#221f42'); lin.addColorStop(1.00, '#050509');
+  lin.addColorStop(0.00, '#2a1520'); lin.addColorStop(0.42, accent);
+  lin.addColorStop(0.60, '#3a2029'); lin.addColorStop(1.00, '#0d0a0f');
   g2.fillStyle = lin; g2.fillRect(0, 0, 16, 256);
   const envTex = new THREE.CanvasTexture(grad);
   envTex.mapping = THREE.EquirectangularReflectionMapping;

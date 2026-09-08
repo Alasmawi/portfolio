@@ -1,63 +1,90 @@
 import { LINKS } from '../data/navLinks';
 import { scrollToSection } from '../lib/scrollToSection';
 
-// On phones this is a title bar and nothing else. It used to carry a hamburger
-// that opened a sheet with the same four links plus a contact button — which is
-// exactly what the bottom tab bar now shows without a tap to open it. Two
-// navigations for four links is one too many, so the sheet is gone.
+// A floating pill rather than a full-width bar. The bar was a band of page
+// ground with a blur behind it, which on a page whose whole surface is now
+// glass read as a seam across the top; a pill is an object sitting on the page,
+// which is what the rest of the furniture is.
+//
+// On phones it carries the wordmark and the status only. The four section links
+// are in the dock at the bottom, where a thumb is — a second copy of them here
+// would be the same four links twice on a 390px screen.
 export default function Nav({ active }) {
-
   const go = (id) => {
     scrollToSection(id);
   };
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50 border-b border-base-edge/80 bg-base-bg/85 backdrop-blur">
-      <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+    <header className="pointer-events-none fixed inset-x-0 top-0 z-50 flex justify-center px-4 pt-[max(14px,env(safe-area-inset-top,0px))] sm:pt-[22px]">
+      <nav
+        className="glass-control pointer-events-auto flex max-w-full items-center gap-3 rounded-full py-0 pl-4 pr-1.5 sm:gap-5 sm:pl-[22px] sm:pr-[9px]"
+        style={{ minHeight: 52 }}
+      >
         <a
           href="#hero"
           onClick={(e) => {
             e.preventDefault();
             go('hero');
           }}
-          className="flex min-h-6 items-center gap-2.5 py-1 font-sans text-sm font-medium text-text-primary"
+          className="flex min-h-11 items-center gap-2.5 text-sm font-medium text-text-primary"
         >
-          <span className="h-2 w-2 rounded-full border border-accent" aria-hidden="true" />
-          Abdulla Alasmawi
+          {/* The wordmark's dot is the site's one gradient bead — rose into
+              amber, the two accents in the order the page uses them. */}
+          <span
+            aria-hidden="true"
+            className="h-[9px] w-[9px] shrink-0 rounded-full"
+            style={{
+              background: 'linear-gradient(135deg, #fbd7a4, #e07a9a)',
+              boxShadow: '0 0 10px rgba(224,122,154,.85), inset 0 1px 1px rgba(255,255,255,.7)',
+            }}
+          />
+          alasmawi.dev
         </a>
 
-        {/* Desktop link row + CTA */}
-        <div className="hidden items-center gap-6 md:flex">
-          <ul className="flex items-center gap-6">
-            {LINKS.map(({ id, label }) => (
-              <li key={id}>
-                <a
-                  href={`#${id}`}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    go(id);
-                  }}
-                  className={`font-sans text-[13px] transition-colors ${
-                    active === id ? 'text-accent-bright' : 'text-text-muted hover:text-text-primary'
-                  }`}
-                >
-                  {label}
-                </a>
-              </li>
-            ))}
-          </ul>
-          <a
-            href="#contact"
-            onClick={(e) => {
-              e.preventDefault();
-              go('contact');
-            }}
-            className="btn btn-primary"
-          >
-            Get in touch
-          </a>
+        <div className="hidden h-[22px] w-px bg-white/20 md:block" aria-hidden="true" />
+
+        <div className="hidden items-center gap-1 md:flex">
+          {LINKS.map(({ id, label }) => (
+            <a
+              key={id}
+              href={`#${id}`}
+              onClick={(e) => {
+                e.preventDefault();
+                go(id);
+              }}
+              aria-current={active === id ? 'true' : undefined}
+              className={`flex min-h-11 items-center rounded-full px-3.5 text-[13.5px] transition-colors ${
+                active === id
+                  ? 'text-text-primary'
+                  : 'text-text-primary/70 hover:text-text-primary'
+              }`}
+              // The selected link is a lit facet of the same glass rather than
+              // a differently coloured chip: a white wash plus the same top
+              // stroke the pill itself carries.
+              style={
+                active === id
+                  ? {
+                      background: 'rgba(255,255,255,.18)',
+                      boxShadow: 'inset 0 1px 0 rgba(255,255,255,.5)',
+                    }
+                  : undefined
+              }
+            >
+              {label}
+            </a>
+          ))}
         </div>
 
+        <a
+          href="#contact"
+          onClick={(e) => {
+            e.preventDefault();
+            go('contact');
+          }}
+          className="btn btn-amber min-h-[40px] px-4 text-[13.5px] sm:min-h-[42px] sm:px-[22px] sm:text-sm"
+        >
+          Say hello
+        </a>
       </nav>
     </header>
   );
