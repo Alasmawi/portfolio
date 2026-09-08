@@ -2,12 +2,14 @@ import useActiveSection from './hooks/useActiveSection';
 import { SECTION_IDS } from './data/navLinks';
 import Nav from './components/Nav';
 import Hero from './components/Hero';
+import FocusPillars from './components/FocusPillars';
 import ProjectBrowser from './components/ProjectBrowser';
 import Experience from './components/Experience';
 import Education from './components/Education';
 import About from './components/About';
 import Contact from './components/Contact';
 import MobileTabBar from './components/ui/MobileTabBar';
+import Atmosphere from './components/ui/Atmosphere';
 
 // No loading curtain. The old one held the whole page — scroll locked, clicks
 // swallowed — until `document.fonts.ready` and the headshot had settled, with
@@ -25,14 +27,18 @@ export default function App() {
 
   return (
     <>
+      {/* The page's ground light — one fixed layer for the whole document
+          rather than a set of blurred orbs per section. */}
+      <Atmosphere />
       <Nav active={active} />
-      {/* Clears the fixed bottom tab bar plus the home indicator on a notched
-          phone; the bar isn't rendered at md and up, so neither is the space.
-          The 54px is the bar's own row height (see MobileTabBar's min-h-[54px])
-          — it was 60px here, which left a 6px strip of page below the last
-          section that the bar did not cover. */}
-      <main className="relative z-10 pb-[calc(54px+env(safe-area-inset-bottom,0px))] md:pb-0">
+      {/* Clears the floating dock plus the home indicator on a notched phone;
+          the dock isn't rendered at md and up, so neither is the space. 54px is
+          the tab row's own height (MobileTabBar's min-h-[54px]), 12px the
+          dock's internal padding, and 10px the gap it floats above the bottom
+          edge — the same max(10px, safe-area) the dock itself sits on. */}
+      <main className="relative z-10 pb-[calc(76px+max(10px,env(safe-area-inset-bottom,0px)))] md:pb-0">
         <Hero />
+        <FocusPillars />
         <ProjectBrowser />
         <Experience />
         <Education />

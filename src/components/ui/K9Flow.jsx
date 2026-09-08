@@ -34,7 +34,7 @@ import { CANVAS } from './k9Geometry';
 // downwards and spending the spare width on rows instead of ranks lets both
 // layouts sit at scale 1.0. See k9Geometry.js for the measurements.
 
-const TELEMETRY = '#9184d9'; // sensor path — the site's accent
+const TELEMETRY = '#e07a9a'; // sensor path — the site's accent
 const VIDEO = '#2FC2E8'; // camera path — distinct, so the two ingests read apart
 
 const ICONS = {
@@ -84,7 +84,7 @@ const ServiceNode = memo(({ data }) => {
         data.sub ? 'gap-2.5 px-3 py-2.5' : 'gap-2 px-2.5 py-2'
       }`}
       style={{
-        background: 'rgba(15,17,28,.94)',
+        background: 'rgba(13,10,15,.94)',
         border: `1px solid ${color}66`,
         width: data.w,
       }}
@@ -129,8 +129,8 @@ const TierNode = memo(({ data }) => (
     style={{
       width: data.w,
       height: data.h,
-      background: 'rgba(233,233,237,.02)',
-      border: '1px solid rgba(233,233,237,.14)',
+      background: 'rgba(253,243,244,.02)',
+      border: '1px solid rgba(253,243,244,.14)',
     }}
   >
     {/* Indented past the live-status lane, which runs down the left margin

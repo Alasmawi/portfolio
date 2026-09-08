@@ -38,6 +38,21 @@ const context = await browser.newContext({
   deviceScaleFactor: 3,
 });
 const page = await context.newPage();
+
+// Force the live-cloud branch. HeroCloudCanvas decides between the three.js
+// scene and this very still by matching '(min-width: 768px) and (hover: hover)',
+// and at a 390px viewport that is false — so without this the script renders the
+// existing still, screenshots it, and writes back a re-encode of itself. Which
+// is exactly what it did after the dusk recolour: the poster stayed blurple
+// through a rebuild because no cloud was ever rendered.
+await page.addInitScript(() => {
+  const native = window.matchMedia.bind(window);
+  window.matchMedia = (q) =>
+    q.includes('hover: hover')
+      ? { matches: true, media: q, addEventListener() {}, removeEventListener() {}, addListener() {}, removeListener() {} }
+      : native(q);
+});
+
 await page.goto(`http://localhost:${PORT}/v2/`, { waitUntil: 'load' });
 
 // The cloud mounts on an idle callback and then eases in, so wait for it to
@@ -48,7 +63,15 @@ await page.waitForTimeout(6000);
 // the object on transparency rather than the object on the hero's ground.
 await page.addStyleTag({
   content: `
-    #hero > *:not([data-cloud]) { visibility: hidden !important; }
+    /* [data-cloud] is nested inside the hero's cloud pane now, so this hides
+       everything in the hero and then puts the cloud box back — a
+       :not() on the hero's direct children would take the pane with it. The
+       pane's own glass fill never paints, because a hidden parent paints
+       nothing even where a child is visible again. Both rules are !important,
+       so the override has to out-specify the hide rule (0,1,0 loses to 1,0,1) —
+       hence the id on the front of it. */
+    #hero *, #hero { visibility: hidden !important; }
+    #hero [data-cloud], #hero [data-cloud] * { visibility: visible !important; }
     /* The top nav and the bottom tab bar are fixed, so they sit outside #hero
        and an element screenshot would otherwise capture them overlapping it. */
     header, nav[aria-label='Sections'] { display: none !important; }

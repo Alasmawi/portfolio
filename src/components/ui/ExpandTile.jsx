@@ -19,7 +19,7 @@ export default function ExpandTile({
 
   return (
     <div
-      className={`border border-base-hairline bg-base-surface/60 transition-colors ${
+      className={`glass-pane rounded-2xl transition-colors ${
         open ? 'border-accent/50' : ''
       } ${className}`}
     >

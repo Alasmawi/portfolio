@@ -5,16 +5,16 @@
 @layer base {
   html {
     scroll-behavior: smooth;
-    background-color: #161826;
+    background-color: #17121a;
     /* Stops iOS's rubber-band at the ends of the page.
-       
-       The bottom tab bar is position: fixed, and iOS does not hold fixed
-       elements still through an overscroll — pull past the end of the document
-       and the whole page, the bar included, slides up, leaving the bar floating
-       several hundred pixels above the bottom of the screen with body
-       background beneath it. It settles back on release, but on a page whose
-       primary navigation lives at the bottom edge that is the bar coming
-       unstuck from the edge it is supposed to define.
+
+       The bottom dock is position: fixed, and iOS does not hold fixed elements
+       still through an overscroll — pull past the end of the document and the
+       whole page, the dock included, slides up, leaving it floating several
+       hundred pixels above the bottom of the screen with body background
+       beneath it. It settles back on release, but on a page whose primary
+       navigation lives at the bottom edge that is the dock coming unstuck from
+       the edge it is supposed to define.
 
        No bounce, no detach. It also disables pull-to-refresh, which this page
        has no use for. iOS 16+; older WebKit ignores it and bounces as before. */
@@ -23,20 +23,10 @@
 
   main > section {
     position: relative;
-    /* Clears the fixed nav so a heading jumped to by an anchor isn't tucked
-       under it. */
-    scroll-margin-top: 57px;
+    /* Clears the floating nav pill so a heading jumped to by an anchor isn't
+       tucked under it: 22px of top offset plus the pill's own 58px. */
+    scroll-margin-top: 88px;
   }
-
-  /* No scroll-snap. It was `y proximity` on the root with an align on every
-     section and a synthetic bottom snap point per tall section, and on a phone
-     it fought touch momentum: a fling aimed past a section decelerated into a
-     boundary it wasn't aimed at. The give-away was that anchor navigation had
-     to switch snap off for the duration of the scroll and time it back on,
-     because a snap point along the path could catch the browser's own smooth
-     scroll and hold it there — the page would start to navigate and spring
-     back. Six full-bleed sections don't need rails to land tidily; they are
-     already a screen apart. */
 
   @media (prefers-reduced-motion: reduce) {
     html {
@@ -46,18 +36,19 @@
 
   body {
     @apply text-text-primary font-sans antialiased;
-    /* Nocturne: max two ground colours. The page ground is flat #161826 —
-       elevation comes from a hairline edge, not a third background tone. */
-    background: #161826;
+    /* Two grounds, still. The page ground is flat; the atmosphere layer paints
+       the orbs and the grid over it once, for the whole document, rather than
+       each section carrying its own gradient. */
+    background: #17121a;
   }
 
   ::selection {
-    background: rgba(145, 132, 217, 0.3);
-    color: #f5f4ff;
+    background: rgba(224, 122, 154, 0.32);
+    color: #fdf3f4;
   }
 
   :focus-visible {
-    outline: 2px solid #9184d9;
+    outline: 2px solid #f6a8bf;
     outline-offset: 2px;
   }
 
@@ -65,62 +56,212 @@
     width: 10px;
   }
   ::-webkit-scrollbar-track {
-    background: #12131f;
+    background: #0d0a0f;
   }
   ::-webkit-scrollbar-thumb {
-    background: #6a6e80;
+    background: #4b3f4d;
     border-radius: 6px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: #3a3e56;
+    background: #7a6b74;
   }
 }
 
 @layer components {
   .mono-label {
-    @apply font-mono text-xs uppercase tracking-wider text-accent-body;
+    @apply font-mono text-xs uppercase tracking-[0.14em] text-text-muted;
   }
 
-  .card-border {
-    @apply border border-base-hairline bg-base-surface/60;
+  /* ——— glass, and the rule that splits it ———————————————————————————
+     Two effects, one job each. This is the whole finding from the redesign
+     exploration, written down as two classes so it can't drift back into one:
+
+       .glass-pane     a *surface*. Large things that hold a diagram or copy.
+                       One blur, low tint, hairline edge, no rim. A heavy rim
+                       at pane scale fights the figure inside it.
+
+       .glass-control  an *object*. Small things you operate — the nav pill,
+                       the dock, buttons, filter chips, badges. Thick tint,
+                       saturation and brightness pushed, a masked inner ring
+                       for edge refraction, a specular top stroke and a
+                       travelling highlight. Object quality is a feature only
+                       where no text is competing with it.
+
+     The cost sits entirely with the control: a nested backdrop-filter behind a
+     composited mask, per element. That is why it is confined to controls —
+     there are about a dozen on the page, against the panes' several dozen —
+     and why the ring is gated below.                                        */
+
+  .glass-pane {
+    background: rgba(253, 243, 244, 0.06);
+    /* .14, not the mock-ups' .11. The mock-ups place every pane over the bright
+       part of an orb; on the real page the atmosphere is fixed, so a pane
+       halfway down a 6000px document sits over the darkest part of the ground
+       and a .11 edge disappears into it. The inset top stroke does the rest —
+       it is what keeps the pane reading as a lit surface rather than a hole. */
+    border: 1px solid rgba(253, 243, 244, 0.14);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.07),
+      0 30px 62px -32px rgba(0, 0, 0, 0.85);
+  }
+
+  .glass-control {
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(150deg, rgba(255, 255, 255, 0.17), rgba(255, 255, 255, 0.045));
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(11px) saturate(205%) brightness(1.07);
+    -webkit-backdrop-filter: blur(11px) saturate(205%) brightness(1.07);
+    box-shadow:
+      inset 0 1.5px 0 rgba(255, 255, 255, 0.55),
+      inset 0 -1.5px 1px rgba(255, 255, 255, 0.14),
+      0 20px 42px -18px rgba(0, 0, 0, 0.82);
+  }
+
+  /* The travelling highlight. A specular band crossing the object every ~18s,
+     which is what stops the glass reading as a printed gradient. transform and
+     opacity only, so it composites and never lays out. */
+  .glass-control::after {
+    content: '';
+    position: absolute;
+    inset: -70%;
+    pointer-events: none;
+    background: linear-gradient(
+      112deg,
+      rgba(255, 255, 255, 0) 40%,
+      rgba(255, 255, 255, 0.3) 49%,
+      rgba(255, 255, 255, 0) 58%
+    );
+    filter: blur(8px);
+    animation: glass-specular 18s ease-in-out infinite;
+  }
+
+  /* Edge refraction: a second, stronger blur confined to a 10px inset ring by
+     an excluded mask, so the rim samples the background differently from the
+     face. This is the expensive half of liquid glass — a nested backdrop-filter
+     behind a composited mask — and it is also the half that degrades worst:
+     Firefox composites the mask without the filter and Android WebView drops
+     both, which leaves a grey band rather than a ring.
+
+     So it is opt-in rather than opt-out. It renders only where the mask
+     primitive is actually supported, and only on a pointer device wide enough
+     to be a laptop, which is also where the specular detail is visible at all.
+     Everywhere else the control keeps its tint, its top stroke and its
+     highlight — still an object, one effect lighter. */
+  @supports ((mask-composite: exclude) or (-webkit-mask-composite: xor)) {
+    @media (min-width: 768px) and (hover: hover) {
+      .glass-control::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        padding: 10px;
+        box-sizing: border-box;
+        pointer-events: none;
+        backdrop-filter: blur(7px) saturate(250%) brightness(1.14);
+        -webkit-backdrop-filter: blur(7px) saturate(250%) brightness(1.14);
+        mask:
+          linear-gradient(#000, #000) content-box,
+          linear-gradient(#000, #000);
+        mask-composite: exclude;
+        -webkit-mask-composite: xor;
+      }
+    }
+  }
+
+  /* Content inside a control has to clear both pseudo-elements, which are
+     painted in the same stacking context. */
+  .glass-control > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* No backdrop-filter at all — older Firefox, and anything with the effect
+     switched off for battery. Both classes fall back to an opaque-enough tint
+     of the page ground, because a translucent surface over an unblurred
+     background is a smear, not a material. */
+  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .glass-pane {
+      background: rgba(36, 28, 40, 0.92);
+    }
+    .glass-control {
+      background: linear-gradient(150deg, rgba(74, 60, 78, 0.96), rgba(45, 35, 49, 0.96));
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .glass-control::after {
+      animation: none;
+      /* Parked where the band is off the object, not frozen mid-sweep across
+         it — a stalled highlight reads as a rendering fault. */
+      opacity: 0;
+    }
   }
 
   /* — rules — */
   /* Freestanding rules fade to transparent at both ends instead of stopping
-     cleanly — a Nocturne signature. Box outlines and short accent marks stay
-     solid; this is only for rules with nothing anchoring their ends. */
+     cleanly. Box outlines and short accent marks stay solid; this is only for
+     rules with nothing anchoring their ends. */
   .hr-fade {
     height: 1px;
     background: linear-gradient(
       to right,
       transparent,
-      rgba(233, 233, 237, 0.16) 48px,
-      rgba(233, 233, 237, 0.16) calc(100% - 48px),
+      rgba(253, 243, 244, 0.16) 48px,
+      rgba(253, 243, 244, 0.16) calc(100% - 48px),
       transparent
     );
   }
 
   /* — buttons — */
-  /* Outlined, never filled. `.btn-primary` gets its weight from the accent
-     outline plus a faint tint and glow, never a solid fill. */
+  /* Filled, warm, dark-labelled. This is the one place the redesign overrules
+     Nocturne, which took a button's weight from an outline and never a fill: on
+     a ground this dark, an outlined button beside a dozen glass objects is the
+     quietest thing on the screen, and the primary action should not be. Rose
+     for "talk to me", amber for the one call to action in the nav.
+
+     #2b1016 measures 9.48:1 on the rose gradient's darker stop and 8.51:1 on
+     the amber's, so the label clears AA at its worst point on either. */
   .btn {
-    @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-md border border-transparent px-4 font-sans text-sm font-medium transition-colors;
+    @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-transparent px-5 font-sans text-sm font-medium transition-transform;
   }
   .btn-primary {
-    @apply border-accent text-accent-bright;
-    background: rgba(145, 132, 217, 0.14);
+    color: #2b1016;
+    background: linear-gradient(160deg, #fbd0dc, #f6a8bf);
+    box-shadow:
+      inset 0 2px 0 rgba(255, 255, 255, 0.85),
+      0 18px 38px -14px rgba(224, 122, 154, 0.85);
   }
-  .btn-primary:hover {
-    background: rgba(145, 132, 217, 0.22);
+  .btn-amber {
+    color: #2b1016;
+    background: linear-gradient(160deg, #fbd7a4, #f0a448);
+    box-shadow:
+      inset 0 1.5px 0 rgba(255, 255, 255, 0.85),
+      0 12px 26px -10px rgba(240, 164, 72, 0.85);
   }
+  .btn-primary:hover,
+  .btn-amber:hover {
+    transform: translateY(-1px);
+  }
+  /* The secondary button is a glass control, so it holds its own beside a
+     filled one instead of disappearing next to it. Composed in the markup as
+     `btn glass-control` rather than @apply-ed here: @apply copies a class's own
+     declarations and not the ::before/::after rules attached to it, so an
+     @apply-ed control would come out flat — tint but no ring, no highlight. */
   .btn-ghost {
-    @apply border-base-edge text-text-muted;
-  }
-  .btn-ghost:hover {
-    @apply border-accent/60 text-accent-bright;
+    @apply text-text-primary;
   }
   .btn-block {
     @apply w-full;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .btn-primary:hover,
+    .btn-amber:hover {
+      transform: none;
+    }
   }
 
   /* — horizontal chip row — */
@@ -149,7 +290,7 @@
 
   /* — tags — */
   .tag-outline {
-    @apply inline-flex items-center rounded border border-accent/70 px-2.5 py-1 font-mono text-[11px] tracking-wide text-accent-body;
+    @apply inline-flex items-center rounded-full border border-accent/70 px-2.5 py-1 font-mono text-[11px] tracking-wide text-accent-body;
   }
 
   /* — forms — */
@@ -157,7 +298,7 @@
     @apply mb-1.5 block font-mono text-xs uppercase tracking-wider text-text-dim;
   }
   .input {
-    @apply w-full min-h-11 rounded-md border border-base-edge bg-base-surface/60 px-3 py-2 font-sans text-sm text-text-primary transition-colors placeholder:text-text-dim;
+    @apply w-full min-h-11 rounded-xl border border-base-edge bg-black/20 px-3 py-2 font-sans text-sm text-text-primary transition-colors placeholder:text-text-dim;
   }
   .input:hover {
     @apply border-text-dim;
@@ -171,15 +312,74 @@
   }
 }
 
+/* ——— atmosphere ————————————————————————————————————————————————————
+   Four drifting orbs and a grid, painted once behind the whole document.
+
+   The mock-ups carry these per section, which on a page this tall means a
+   dozen blurred radial gradients each promoted to its own layer and each
+   repainted as its section scrolls. One `position: fixed` layer costs the
+   same as one section's worth and covers all of them, and because it is fixed
+   it never repaints on scroll at all — the parallax comes free from the layer
+   staying still while the page moves over it.
+
+   `contain: strict` keeps the layer out of the rest of the page's layout and
+   paint work, and the animations are transform-only for the same reason. */
+@keyframes orb-drift {
+  0%,
+  100% {
+    transform: translate3d(-4%, -3%, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(6%, 5%, 0) scale(1.08);
+  }
+}
+
+/* Reduced motion stops the drift outright. The orbs are ambient light, not
+   information, so there is nothing to preserve by slowing them down. */
+@media (prefers-reduced-motion: reduce) {
+  .atmosphere-orb {
+    animation: none !important;
+  }
+}
+
+@keyframes glass-specular {
+  0%,
+  100% {
+    transform: translate3d(-26%, -16%, 0) rotate(10deg);
+  }
+  50% {
+    transform: translate3d(22%, 14%, 0) rotate(10deg);
+  }
+}
+
+/* A hard on/off blink for status dots — a switching feel, not a fade. */
+@keyframes signal-blip {
+  0%,
+  60% {
+    opacity: 1;
+  }
+  61%,
+  100% {
+    opacity: 0.25;
+  }
+}
+
+.signal-blip {
+  animation: signal-blip 3.4s step-end infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .signal-blip {
+    animation: none;
+  }
+}
+
 /* — hero cloud, still frame — */
 /* On a phone the cloud is a build-time still of the three.js object rather than
    the live scene (see HeroCloudCanvas). A still of a thing that used to move
    reads as broken, so it keeps a slow drift: a long vertical float against a
    slight scale, on different periods so the two never sync into an obvious
-   loop. This is transform-only, so it composites on the GPU and never lays out.
-
-   It is not pretending to be the contour sweep. It is enough motion that the
-   cloud reads as alive rather than pasted on. */
+   loop. Transform-only, so it composites on the GPU and never lays out. */
 @keyframes cloud-drift {
   0%,
   100% {
@@ -240,7 +440,7 @@
   }
 }
 
-/* Experience: the "current" bar's sheen sweep and status pulse. */
+/* Experience: the "current" bar's sheen sweep. */
 @keyframes rail-sheen {
   0% {
     transform: translateX(-40%);
@@ -250,77 +450,11 @@
   }
 }
 
-/* — contact tab glare — */
-/* A specular highlight that crosses the Contact tab so it reads as the live
-   thing in the row rather than a fifth icon.
-
-   Deliberately not a pulse. A button that throbs on every scroll is an
-   irritation, not an affordance, so the sweep takes ~1.4s of a 9s cycle and the
-   element sits still for the other 7.6s. It starts and ends outside the
-   button's box, which `overflow-hidden` clips, so the reset is never visible.
-
-   Two constraints shape the implementation:
-   - It is painted *behind* the label (z-index 0 against the content's z-10),
-     not over it. An overlay on top would lift the text's background and eat
-     into its contrast — measured at 8.0:1 at the sweep's peak, still passing,
-     but there is no reason to spend the headroom when going underneath costs
-     nothing.
-   - `transform` only, so it composites on the GPU and never triggers layout. */
-@keyframes contact-glare {
-  0%,
-  72% {
-    transform: translateX(-130%) skewX(-18deg);
-  }
-  88%,
-  100% {
-    transform: translateX(130%) skewX(-18deg);
-  }
-}
-
-.contact-glare {
-  /* A faint standing tint plus a hairline edge, so the tab is still the
-     distinct one when the sweep is not running — including under reduced
-     motion, where it never runs at all. Kept light on purpose: Nocturne's
-     buttons take their weight from an outline and a tint, never a fill, and at
-     0.12 this read as a solid block sitting in the row. */
-  background: rgba(145, 132, 217, 0.075);
-  border-left: 1px solid rgba(145, 132, 217, 0.3);
-}
-
-.contact-glare::after {
-  content: '';
-  position: absolute;
-  inset-block: 0;
-  /* A narrow band that starts and ends outside the tab. `left` stays 0 and the
-     travel is entirely in the transform: an offset here would shift the whole
-     sweep, and the band would sit half off the left edge at mid-cycle instead
-     of crossing the tab. ±130% of a 58%-wide band clears both edges. */
-  left: 0;
-  width: 58%;
-  z-index: 0;
-  pointer-events: none;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(210, 206, 253, 0.34),
-    transparent
-  );
-  animation: contact-glare 9s ease-in-out infinite;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .contact-glare::after {
-    animation: none;
-    /* No sweep at all, rather than a stalled band parked across the tab. */
-    display: none;
-  }
-}
-
 /* React Flow's attribution badge ships at 1.18:1 against this ground — its
    default is grey text on a translucent *white* box, which on a dark page is a
    smudge. The attribution is kept (the library is MIT and its maintainers ask
    you leave it unless you hold a Pro licence) but restyled to the site's muted
-   token at 5.86:1 so it is legible rather than decorative noise.
+   token so it is legible rather than decorative noise.
 
    `a[href]` and the custom property are both needed: React Flow's stylesheet
    is imported inside the lazy chunk, so it lands after this file and wins at
@@ -331,7 +465,7 @@
 }
 
 .react-flow__attribution a[href] {
-  color: #8e8f9b;
+  color: #9c8f96;
   font-family: 'JetBrains Mono', ui-monospace, monospace;
   font-size: 10.5px;
   letter-spacing: 0.04em;

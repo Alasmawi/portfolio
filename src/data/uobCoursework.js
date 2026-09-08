@@ -55,9 +55,16 @@ export const UOB_COURSEWORK = [
 // Four categories, four hues. A single-accent ramp made these read as one
 // gradient rather than four distinct areas of study, which is the whole point
 // of the bar. Cloud and AI keep the amber/cyan the site has always used.
+// Four categorical colours, not four accents. They label segments of a bar and
+// the pillar counts, so they only have to be told apart from each other — the
+// old set (cyan, violet, hot pink) was cool against a warm ground and read as
+// leftovers from the previous palette.
+//
+// Teal is deliberately absent: it is the status colour everywhere else on the
+// page, and spending it on a category here would make "live" stop meaning live.
 export const PILLAR_COLORS = {
   cloud: '#F2A93B',
-  ai: '#2FC2E8',
-  fullstack: '#A78BFA',
-  cs: '#F472B6',
+  ai: '#E07A9A',
+  fullstack: '#B08BD9',
+  cs: '#E7D8DE',
 };

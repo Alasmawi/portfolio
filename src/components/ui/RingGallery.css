@@ -174,7 +174,7 @@
    language as the hero ridge. */
 .ring-slot.is-front::after,
 .hw-slide[data-active='true']::after {
-  --b: #9184d9;
+  --b: #e07a9a;
   --len: 16px;
 
   content: '';
