@@ -52,12 +52,17 @@ export const UOB_COURSEWORK = [
   { code: 'Dept. Approved', title: 'Business Information Systems', ch: 3, pillar: 'cs' },
 ];
 
-// Four categories, four hues. A single-accent ramp made these read as one
-// gradient rather than four distinct areas of study, which is the whole point
-// of the bar. Cloud and AI keep the amber/cyan the site has always used.
+// One hue, four steps. This was amber/cyan/violet/pink — four saturated hues
+// for a decorative summary bar, in a palette whose whole rule is one accent.
+//
+// The old comment argued a single-hue ramp reads as one gradient rather than
+// four areas, and it was right about the ramp on its own. The fix is not more
+// hues, it is a gap: the segments are separated by 3px of the panel ground in
+// CourseworkModule, which separates them far more clearly than hue did, and
+// each one is named in the legend beside it anyway.
 export const PILLAR_COLORS = {
-  cloud: '#F2A93B',
-  ai: '#2FC2E8',
-  fullstack: '#A78BFA',
-  cs: '#F472B6',
+  cloud: 'rgb(var(--accent))',
+  ai: 'rgb(var(--accent) / 0.74)',
+  fullstack: 'rgb(var(--accent) / 0.5)',
+  cs: 'rgb(var(--accent) / 0.3)',
 };

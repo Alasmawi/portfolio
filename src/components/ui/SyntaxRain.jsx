@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { tokenChannels } from '../../lib/tokens';
 
 // Matrix-style syntax rain, ported from the Nocturne design bundle's boot()
 // rain engine (Portfolio Refactor.dc.html). One shared rAF loop animates
@@ -80,7 +81,7 @@ function paint(f, dt) {
     const ch = chars[(Math.random() * chars.length) | 0];
     const hot = d.lead > 0.72;
     ctx.fillStyle = hot
-      ? `rgba(210,206,253,${opacity * (f.dim ? 0.6 : 1) * m})`
+      ? `rgba(${f.hot},${opacity * (f.dim ? 0.6 : 1) * m})`
       : `rgba(${f.tint},${opacity * (f.dim ? 0.32 : 0.62) * m})`;
     ctx.fillText(ch, x, d.y);
   });
@@ -182,7 +183,8 @@ function buildField(canvas, props) {
     fadeFrac,
     exclude: excludeFrac.map((r) => toRect(r, w, h)),
     fade: fadeFrac.map((r) => toRect(r, w, h)),
-    tint: props.tint || '145,132,217',
+    tint: props.tint || tokenChannels('--accent', '224,163,64'),
+    hot: tokenChannels('--accent-bright', '246,214,162'),
     dim: !!props.dim,
     opacity: props.opacity ?? 0.55,
     onScreen: false,

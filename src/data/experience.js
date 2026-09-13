@@ -8,16 +8,17 @@ export const EXPERIENCE = [
     role: 'Cloud & IoT Intern',
     org: 'AWS Cloud Innovation Center (CIC)',
     context: 'AWS CIC Bahrain · University of Bahrain',
-    color: '#F2A93B',
-    // Same hue, used for text. Marks only need 3:1; text needs 4.5:1.
-    colorText: '#F2A93B',
+    // The AWS gold is the site accent now, so this mark stopped being an
+    // exception to the palette and became part of it.
+    color: 'rgb(var(--accent))',
+    colorText: 'rgb(var(--accent))',
     start: '2026-02-01',
     end: '2026-06-30',
     status: 'completed',
     points: [
-      'Built a smart IoT/cloud monitoring solution for the Bahrain Ministry of Interior’s Police K9 Unit.',
+      'Built the IoT and cloud monitoring system for the Bahrain Ministry of Interior’s police K9 unit.',
       'Implemented anomaly detection on sensor data using Amazon Bedrock.',
-      'Shipped a centralized dashboard for real-time health and environment tracking.',
+      'Shipped the dashboard handlers use to see each dog’s vitals and kennel conditions live.',
     ],
     tags: ['AWS IoT Core', 'Amazon Bedrock', 'Lambda', 'DynamoDB'],
   },

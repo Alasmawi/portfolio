@@ -7,7 +7,7 @@ import { REBOOT_JOURNEY } from '../../data/rebootJourney';
 // mobile rather than another block of prose. Takes the institution's own
 // accent color rather than a hardcoded one, matching Education's
 // per-school color coding.
-export default function ProgramJourney({ color = '#1CCFC9' }) {
+export default function ProgramJourney({ color = '#2FC2E8' }) {
   return (
     <div className="mt-4 flex gap-0">
       {REBOOT_JOURNEY.map((stage, i) => (

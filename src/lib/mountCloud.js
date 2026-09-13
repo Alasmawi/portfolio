@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { tokenColor } from './tokens';
 
 /* Abdulla's neon cloud hero, recolored to Nocturne's accent and mountable
    on any canvas. Geometry, orbits and fit logic are unchanged from the
@@ -8,7 +9,8 @@ import * as THREE from 'three';
    Ported from the Nocturne design bundle's neon-cloud.js — only the three.js
    import switched from a CDN URL to the npm package. */
 export function mountCloud(canvas, opts = {}) {
-  const accent = opts.accent || '#9184d9';
+  // THREE.Color cannot parse a CSS variable, so the token is resolved here.
+  const accent = opts.accent || tokenColor('--accent', 'rgb(224,163,64)');
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
@@ -149,8 +151,8 @@ export function mountCloud(canvas, opts = {}) {
   grad.width = 16; grad.height = 256;
   const g2 = grad.getContext('2d');
   const lin = g2.createLinearGradient(0, 0, 0, 256);
-  lin.addColorStop(0.00, '#171433'); lin.addColorStop(0.42, accent);
-  lin.addColorStop(0.60, '#221f42'); lin.addColorStop(1.00, '#050509');
+  lin.addColorStop(0.00, '#1E1608'); lin.addColorStop(0.42, accent);
+  lin.addColorStop(0.60, '#2A2113'); lin.addColorStop(1.00, '#06060A');
   g2.fillStyle = lin; g2.fillRect(0, 0, 16, 256);
   const envTex = new THREE.CanvasTexture(grad);
   envTex.mapping = THREE.EquirectangularReflectionMapping;

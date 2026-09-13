@@ -29,7 +29,7 @@ function Bar({ start, end, color, muted = false, indent = false }) {
   const width = Math.max((frac(end) - frac(start)) * 100, 1.5);
   return (
     <div className={`relative h-2.5 rounded ${indent ? 'ml-4' : ''}`}>
-      <div className="absolute inset-0 rounded shadow-[inset_0_0_0_1px_rgba(233,233,237,0.09)]" />
+      <div className="absolute inset-0 rounded shadow-[inset_0_0_0_1px_rgb(var(--text-primary) / 0.09)]" />
       <div
         className="absolute top-0 bottom-0 rounded"
         style={{
@@ -61,8 +61,16 @@ export default function Experience() {
           </div>
         </Reveal>
 
+        {/* The timeline is desktop-only.
+
+            Two internships is not enough data to need a chart, and on a phone
+            this cost ~400px to say something the headline above it already says
+            and the rows below it then repeat verbatim — every role was labelled
+            three times: once on its bar, once in the legend, once in its row.
+            At md and up it costs a strip of otherwise empty column and the
+            overlap is genuinely easier to see than to read, so it stays there. */}
         <Reveal delay={0.1}>
-          <div className="mt-10">
+          <div className="mt-10 hidden md:block">
             <div className="relative mb-2.5 h-4 font-mono text-[10.5px] uppercase tracking-wider text-text-dim">
               {TICKS.map((t, i) => (
                 <span

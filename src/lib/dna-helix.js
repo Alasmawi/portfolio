@@ -2,6 +2,8 @@
 // respects reduced motion. Ported verbatim from the Nocturne design bundle
 // (project/dna-helix.js) — self-contained, no external deps.
 // Attributes: axis="vertical|horizontal" amplitude spacing font-size speed twist opacity accent glyphs rungs
+import { tokenChannels, tokenColor } from './tokens';
+
 (() => {
   const SETS = {
     mixed: '{}[]()<>/=;:*+-|&!?01abcdefconstawaitasyncAWSiot=>',
@@ -66,6 +68,9 @@
     }
     _n(name, d) { const v = parseFloat(this.getAttribute(name)); return isNaN(v) ? d : v; }
     _draw() {
+      const ACCENT = tokenChannels('--accent', '224,163,64');
+      const ACCENT_BODY = tokenChannels('--accent-body', '231,188,119');
+      const TEXT = tokenChannels('--text-primary', '236,234,229');
       const ctx = this._ctx, w = this._w, h = this._h;
       const vertical = (this.getAttribute('axis') || 'vertical') === 'vertical';
       const len = vertical ? h : w;
@@ -76,7 +81,7 @@
       const speed = this._n('speed', 0.5);
       const twist = this._n('twist', 0.011);
       const alpha = this._n('opacity', 0.5);
-      const accent = this.getAttribute('accent') || '#9184d9';
+      const accent = this.getAttribute('accent') || tokenColor('--accent', 'rgb(224,163,64)');
       const rungEvery = Math.max(0, Math.round(this._n('rungs', 3)));
       const chars = (SETS[this.getAttribute('glyphs')] || SETS.mixed).split('');
       ctx.clearRect(0, 0, w, h);
@@ -104,9 +109,9 @@
           const g = ctx.createLinearGradient(a.x, a.y, b.x, b.y);
           const ra = alpha * 0.28 * (0.35 + 0.65 * a.depth);
           const rb = alpha * 0.28 * (0.35 + 0.65 * b.depth);
-          g.addColorStop(0, `rgba(145,132,217,${ra.toFixed(3)})`);
-          g.addColorStop(0.5, `rgba(145,132,217,${(Math.max(ra, rb) * 0.5).toFixed(3)})`);
-          g.addColorStop(1, `rgba(145,132,217,${rb.toFixed(3)})`);
+          g.addColorStop(0, `rgba(${ACCENT},${ra.toFixed(3)})`);
+          g.addColorStop(0.5, `rgba(${ACCENT},${(Math.max(ra, rb) * 0.5).toFixed(3)})`);
+          g.addColorStop(1, `rgba(${ACCENT},${rb.toFixed(3)})`);
           ctx.strokeStyle = g; ctx.lineWidth = 1;
           ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
         }
@@ -119,10 +124,10 @@
           const a = alpha * (0.14 + 0.86 * Math.pow(p.depth, 1.5));
           ctx.font = `${size.toFixed(1)}px ui-monospace, SFMono-Regular, Menlo, monospace`;
           if (p.depth > 0.72) {
-            ctx.fillStyle = `rgba(185,177,236,${(a * 0.95).toFixed(3)})`;
+            ctx.fillStyle = `rgba(${ACCENT_BODY},${(a * 0.95).toFixed(3)})`;
             ctx.shadowColor = accent; ctx.shadowBlur = 8 * (p.depth - 0.72) * 3;
           } else {
-            ctx.fillStyle = `rgba(233,233,237,${(a * 0.55).toFixed(3)})`;
+            ctx.fillStyle = `rgba(${TEXT},${(a * 0.55).toFixed(3)})`;
             ctx.shadowBlur = 0;
           }
           ctx.fillText(chars[idx], p.x, p.y);

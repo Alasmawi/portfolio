@@ -17,7 +17,10 @@ export default function Hero() {
       id="hero"
       className="relative min-h-[88svh] overflow-hidden bg-void pt-16 sm:min-h-screen sm:min-h-[100svh]"
     >
-      <SyntaxRain size={14} density={0.68} dim tint="145,132,217" fade={RAIN_FADE} exclude={RAIN_EXCLUDE} />
+      {/* opacity 0.42, down from the 0.55 default: amber on near-black carries
+          much further than the blurple it replaced, and at the old value the rain
+          competed with the headline instead of sitting behind it. */}
+      <SyntaxRain size={14} density={0.68} opacity={0.42} dim fade={RAIN_FADE} exclude={RAIN_EXCLUDE} />
 
       {/* The cloud is the hero's only image and the one thing here with any
           character, so on a phone it gets room rather than a sliver — most of
@@ -30,7 +33,10 @@ export default function Hero() {
           reads top-down, then the cloud, then the status line. */}
       <div
         data-cloud
-        className="pointer-events-none absolute bottom-[9%] right-[-16px] h-[38%] w-[340px] sm:inset-y-0 sm:bottom-auto sm:right-[-60px] sm:top-0 sm:h-full sm:w-[560px] md:right-[-60px] md:w-[720px]"
+        /* Fixed px on the phone, not a percentage of the hero: the still is
+           captured at exactly these dimensions (scripts/make-cloud-poster.mjs),
+           and matching them means the baked framing is the framing you see. */
+        className="pointer-events-none absolute bottom-[7%] right-[-10px] h-[330px] w-[360px] sm:inset-y-0 sm:bottom-auto sm:right-[-60px] sm:top-0 sm:h-full sm:w-[560px] md:right-[-60px] md:w-[720px]"
       >
         <HeroCloudCanvas />
       </div>
@@ -41,7 +47,7 @@ export default function Hero() {
         className="pointer-events-none absolute inset-0"
         style={{
           background:
-            'radial-gradient(125% 46% at 20% 30%, rgba(15,17,28,.92), rgba(15,17,28,.45) 58%, rgba(15,17,28,0) 82%)',
+            'radial-gradient(125% 46% at 20% 30%, rgb(var(--void) / .92), rgb(var(--void) / .45) 58%, rgb(var(--void) / 0) 82%)',
         }}
       />
 
@@ -51,7 +57,7 @@ export default function Hero() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.1 }}
           className="max-w-xl"
-          style={{ textShadow: '0 1px 18px rgba(15,17,28,.9)' }}
+          style={{ textShadow: '0 1px 18px rgb(var(--void) / .9)' }}
         >
           {/* On a phone: name, one line about the work, two ways to act on it.
               That is the whole hero.
@@ -126,7 +132,7 @@ export default function Hero() {
           so the page reads as one surface rather than stacked slides. */}
       <div
         className="pointer-events-none absolute inset-x-0 bottom-0 h-[120px]"
-        style={{ background: 'linear-gradient(180deg, rgba(22,24,38,0) 0%, #161826 100%)' }}
+        style={{ background: 'linear-gradient(180deg, rgb(var(--bg) / 0) 0%, rgb(var(--bg)) 100%)' }}
       />
     </section>
   );

@@ -5,9 +5,22 @@
 // a card is actually seen against.
 //
 //   node scripts/check-contrast.mjs
-import config from '../tailwind.config.js';
+import { readFileSync } from 'node:fs';
 
-const c = config.theme.extend.colors;
+// Read the channel triplets out of index.css, which is where the palette lives
+// now — tailwind.config.js only maps names onto var() references.
+const css = readFileSync(new URL('../src/index.css', import.meta.url), 'utf8');
+const tok = (name) => {
+  const m = css.match(new RegExp(`--${name}:\\s*([0-9]+)\\s+([0-9]+)\\s+([0-9]+);`));
+  if (!m) throw new Error(`token --${name} not found in src/index.css`);
+  return '#' + m.slice(1, 4).map((n) => Number(n).toString(16).padStart(2, '0')).join('');
+};
+const c = {
+  base: { bg: tok('bg'), surface: tok('surface'), edge: tok('edge'), hairline: tok('hairline') },
+  void: tok('void'),
+  text: { primary: tok('text-primary'), muted: tok('text-muted'), dim: tok('text-dim') },
+  accent: { DEFAULT: tok('accent'), bright: tok('accent-bright'), body: tok('accent-body') },
+};
 const hx = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
 const to = (v) => '#' + v.map((x) => Math.round(x).toString(16).padStart(2, '0')).join('');
 const over = (fg, a, bg) => to(hx(fg).map((x, i) => x * a + hx(bg)[i] * (1 - a)));

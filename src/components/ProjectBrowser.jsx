@@ -44,14 +44,14 @@ const RAIN_FADE = [{ x1: 0.03, y1: 0.05, x2: 0.97, y2: 0.96, a: 0.3 }];
 // fourteen and buys a panel that holds still.
 const MEDIA_WELL =
   'flex h-[248px] w-full items-center justify-center rounded-lg bg-white/[0.03] ' +
-  'shadow-[inset_0_0_0_1px_rgba(233,233,237,0.09)] sm:h-[320px] md:h-[400px]';
+  'shadow-[inset_0_0_0_1px_rgb(var(--text-primary) / 0.09)] sm:h-[320px] md:h-[400px]';
 
 function LanguageDot({ language }) {
   if (!language) return null;
   return (
     <span
       className="inline-block h-2 w-2 shrink-0 rounded-full"
-      style={{ backgroundColor: LANGUAGE_COLORS[language] ?? '#83848f' }}
+      style={{ backgroundColor: LANGUAGE_COLORS[language] ?? 'rgb(var(--text-dim))' }}
       aria-hidden="true"
     />
   );
@@ -527,17 +527,17 @@ export default function ProjectBrowser() {
           The panel sitting on it does the revealing instead. */}
       <div>
         <div className="relative bg-void">
-          <SyntaxRain size={13} density={0.55} dim tint="145,132,217" fade={RAIN_FADE} />
+          <SyntaxRain size={13} density={0.55} dim fade={RAIN_FADE} />
           <div
             className="pointer-events-none absolute inset-0"
             style={{
               background:
-                'linear-gradient(180deg,#161826,rgba(15,17,28,.34) 14%,rgba(15,17,28,.34) 86%,#161826)',
+                'linear-gradient(180deg,rgb(var(--bg)),rgb(var(--void) / .34) 14%,rgb(var(--void) / .34) 86%,rgb(var(--bg)))',
             }}
           />
 
           <Reveal delay={0.05} className="relative block px-5 py-6 sm:px-10 sm:py-9 md:px-14">
-            <div className="mx-auto max-w-6xl overflow-hidden rounded-lg bg-void shadow-[0_0_0_1px_rgba(233,233,237,0.12),0_18px_44px_-20px_rgba(0,0,0,0.9)] md:flex">
+            <div className="mx-auto max-w-6xl overflow-hidden rounded-lg bg-void shadow-[0_0_0_1px_rgb(var(--text-primary) / 0.12),0_18px_44px_-20px_rgba(0,0,0,0.9)] md:flex">
               {/* mobile: one header line, then the chips.
 
                   This was three stacked control strips before any content
@@ -577,8 +577,8 @@ export default function ProjectBrowser() {
                       aria-current={p.id === selectedId ? 'true' : undefined}
                       className={`flex min-h-11 shrink-0 items-center gap-2 whitespace-nowrap rounded-md px-3 py-2 font-mono text-xs transition-colors ${
                         p.id === selectedId
-                          ? 'bg-accent/10 text-accent-bright shadow-[inset_0_0_0_1px_rgba(145,132,217,0.7)]'
-                          : 'text-text-muted shadow-[inset_0_0_0_1px_#6a6e80]'
+                          ? 'bg-accent/10 text-accent-bright shadow-[inset_0_0_0_1px_rgb(var(--accent) / 0.7)]'
+                          : 'text-text-muted shadow-[inset_0_0_0_1px_rgb(var(--edge))]'
                       }`}
                     >
                       <LanguageDot language={p.language} />
@@ -590,7 +590,7 @@ export default function ProjectBrowser() {
 
               {/* desktop: fixed-width sidebar */}
               <div className="hidden max-h-[620px] w-[264px] shrink-0 overflow-y-auto border-r border-white/[0.09] md:block">
-                <p className="sticky top-0 bg-void px-[18px] py-[13px] font-mono text-[11px] uppercase tracking-wider text-text-muted shadow-[inset_0_-1px_0_rgba(233,233,237,0.09)]">
+                <p className="sticky top-0 bg-void px-[18px] py-[13px] font-mono text-[11px] uppercase tracking-wider text-text-muted shadow-[inset_0_-1px_0_rgb(var(--text-primary) / 0.09)]">
                   // repositories ({PROJECTS.length})
                 </p>
                 <ul>

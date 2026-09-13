@@ -16,7 +16,8 @@ import cloudPoster from '../../assets/hero/cloud.webp';
 // plainer, which is a different thing from making it lighter.
 const LIVE_CLOUD = '(min-width: 768px) and (hover: hover)';
 
-export default function HeroCloudCanvas({ accent = '#9184d9', fill = 0.94, exposure = 0.95, className = '', style }) {
+// accent is left undefined so mountCloud resolves it from the palette token.
+export default function HeroCloudCanvas({ accent, fill = 0.94, exposure = 0.95, className = '', style }) {
   const canvasRef = useRef(null);
   const stillRef = useRef(null);
   // Read once, at mount. A phone does not cross this boundary mid-visit, and

@@ -16,7 +16,7 @@ export default function Education() {
               Two tracks, run in parallel for the last two years.
             </h2>
             <p className="whitespace-nowrap font-mono text-[11.5px] text-text-muted">
-              computer science · cloud · full-stack
+              a degree and a coding school, at the same time
             </p>
           </div>
         </Reveal>
@@ -28,7 +28,7 @@ export default function Education() {
               <Reveal key={entry.id} delay={0.1 + i * 0.05}>
                 <div
                   className={`grid grid-cols-[20px_1fr] gap-4 py-5 sm:grid-cols-[22px_1fr] sm:gap-5 md:py-[22px] ${
-                    !last ? 'shadow-[inset_0_-1px_0_rgba(233,233,237,0.07)]' : ''
+                    !last ? 'shadow-[inset_0_-1px_0_rgb(var(--text-primary) / 0.07)]' : ''
                   }`}
                 >
                   {/* Status rail: filled dot for the completed track, a live

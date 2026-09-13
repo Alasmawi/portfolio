@@ -29,12 +29,17 @@ const server = spawn('npx', ['vite', 'preview', '--port', String(PORT), '--stric
 await new Promise((r) => server.stdout.on('data', (b) => String(b).includes(`localhost:${PORT}`) && r()));
 
 const browser = await chromium.launch({ executablePath: EXECUTABLE });
-// Captured at the phone viewport, because that is the only place the still is
-// used: mountCloud fits the camera to its canvas aspect, so a capture taken at
-// desktop width frames the cloud differently from the box it has to drop into.
-// deviceScaleFactor 3 so the still is not the limiting factor on a 3x screen.
+// A desktop-width, fine-pointer context, because that is the only place the
+// live cloud mounts — below 768px HeroCloudCanvas renders this very still, and
+// capturing it would just copy the previous one.
+//
+// The wrapper is then resized to the phone box's exact dimensions before the
+// shot. mountCloud fits the camera to its canvas aspect and refits on resize,
+// so this frames the cloud the way the phone will see it while still rendering
+// the real scene. deviceScaleFactor 3 so the still is not the limiting factor.
+const PHONE_BOX = { w: 360, h: 330 };
 const context = await browser.newContext({
-  viewport: { width: 390, height: 844 },
+  viewport: { width: 900, height: 800 },
   deviceScaleFactor: 3,
 });
 const page = await context.newPage();
@@ -48,6 +53,13 @@ await page.waitForTimeout(6000);
 // the object on transparency rather than the object on the hero's ground.
 await page.addStyleTag({
   content: `
+    [data-cloud] {
+      inset: auto !important;
+      top: 40px !important;
+      left: 40px !important;
+      width: ${PHONE_BOX.w}px !important;
+      height: ${PHONE_BOX.h}px !important;
+    }
     #hero > *:not([data-cloud]) { visibility: hidden !important; }
     /* The top nav and the bottom tab bar are fixed, so they sit outside #hero
        and an element screenshot would otherwise capture them overlapping it. */
@@ -56,7 +68,7 @@ await page.addStyleTag({
     [data-cloud] { opacity: 1 !important; }
   `,
 });
-await page.waitForTimeout(400);
+await page.waitForTimeout(1500);
 
 const el = page.locator('[data-cloud]');
 const png = await el.screenshot({ omitBackground: true });
@@ -67,7 +79,7 @@ const webp = await page.evaluate(async (b64) => {
   img.src = `data:image/png;base64,${b64}`;
   await img.decode();
   const c = document.createElement('canvas');
-  const scale = Math.min(1, 640 / img.width);
+  const scale = Math.min(1, 680 / img.width);
   c.width = Math.round(img.width * scale);
   c.height = Math.round(img.height * scale);
   c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);

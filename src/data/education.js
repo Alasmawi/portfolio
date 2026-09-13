@@ -11,7 +11,8 @@ export const EDUCATION = [
   {
     id: 'uob',
     school: 'University of Bahrain',
-    color: '#C9A227',
+    // UoB's gold and the site accent are the same colour now.
+    color: 'rgb(var(--accent))',
     degree: 'B.Sc. Computer Science — Cloud Computing',
     period: '2022 — 2026',
     track: 'Cloud Computing track',
@@ -19,13 +20,18 @@ export const EDUCATION = [
       { value: '30', label: 'courses' },
       { value: '88', label: 'credit hours' },
     ],
-    description: 'Cloud computing track, benchmarked against AWS curriculum guidelines.',
+    // Said 'cloud computing track' where the degree title and the tag above
+    // it both already say it — three times in four lines. This says something
+    // the other two don't.
+    description: 'The track is built on the AWS Academy curriculum, so the coursework is the certification material.',
     coursework: true,
   },
   {
     id: 'reboot',
     school: 'Reboot Coding Institute',
-    color: '#1CCFC9',
+    // The one non-accent institution mark, shared with the diagram's second
+    // path so the site carries a single cool hue rather than two near-identical ones.
+    color: '#2FC2E8',
     degree: 'Full Stack Development — powered by 01Edu',
     period: '2024 — 2026',
     track: 'Cloud DevOps & Cybersecurity',

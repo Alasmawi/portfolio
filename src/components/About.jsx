@@ -26,7 +26,7 @@ export default function About() {
       <div
         className="pointer-events-none absolute inset-y-0 right-0 w-[200px] md:w-[420px]"
         style={{
-          background: 'linear-gradient(270deg, rgba(22,24,38,0), rgba(22,24,38,.7) 62%, rgba(22,24,38,.96))',
+          background: 'linear-gradient(270deg, rgb(var(--bg) / 0), rgb(var(--bg) / .7) 62%, rgb(var(--bg) / .96))',
         }}
       />
 
@@ -43,7 +43,7 @@ export default function About() {
                 className="absolute -bottom-1.5 left-0 right-0 h-0.5"
                 style={{
                   background:
-                    'linear-gradient(90deg, rgba(145,132,217,0), #9184d9 18%, #9184d9 82%, rgba(145,132,217,0))',
+                    'linear-gradient(90deg, rgb(var(--accent) / 0), rgb(var(--accent)) 18%, rgb(var(--accent)) 82%, rgb(var(--accent) / 0))',
                 }}
               />
             </span>{' '}
@@ -61,20 +61,39 @@ export default function About() {
               <div
                 className="pointer-events-none absolute -left-6 -right-6 top-6 -bottom-3.5"
                 style={{
-                  background: 'radial-gradient(50% 44% at 50% 62%, rgba(145,132,217,.22), rgba(145,132,217,0) 74%)',
+                  background: 'radial-gradient(50% 44% at 50% 62%, rgb(var(--accent) / .22), rgb(var(--accent) / 0) 74%)',
                 }}
               />
+              {/* No mixBlendMode. It was `lighten`, which takes the lighter of
+                  subject and ground per channel — so every part of the subject
+                  darker than the page was replaced by the page. The agal, the
+                  hair and the glasses frames were being erased. The file has a
+                  real alpha channel, so the blend was buying nothing to begin
+                  with.
+
+                  The mask handles the other half of the problem: the subject
+                  was already cropped at the shoulder in the source photo, so
+                  the cutout ends in two hard straight edges. Fading the last
+                  few percent of the right and bottom turns a clipped rectangle
+                  back into a portrait. */}
               <img
                 src={pfp}
                 alt="Abdulla Alasmawi"
                 className="relative block h-full w-full object-contain object-bottom"
-                style={{ mixBlendMode: 'lighten' }}
+                style={{
+                  maskImage:
+                    'linear-gradient(to right, #000 82%, transparent 99%), linear-gradient(to bottom, #000 88%, transparent 100%)',
+                  maskComposite: 'intersect',
+                  WebkitMaskImage:
+                    'linear-gradient(to right, #000 82%, transparent 99%), linear-gradient(to bottom, #000 88%, transparent 100%)',
+                  WebkitMaskComposite: 'source-in',
+                }}
               />
               <div
                 className="absolute bottom-0 left-1 right-1 h-px"
                 style={{
                   background:
-                    'linear-gradient(90deg, rgba(145,132,217,0), rgba(145,132,217,.55) 22%, rgba(145,132,217,.55) 78%, rgba(145,132,217,0))',
+                    'linear-gradient(90deg, rgb(var(--accent) / 0), rgb(var(--accent) / .55) 22%, rgb(var(--accent) / .55) 78%, rgb(var(--accent) / 0))',
                 }}
               />
             </div>
