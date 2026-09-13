@@ -871,7 +871,11 @@ export default function ProjectBrowser() {
               Projects
             </h2>
           </div>
-          <div className="mt-5 flex flex-wrap items-center gap-3">
+          {/* Wide screens only. On a phone this was a label plus eight
+              outlined pills sitting between the headline and the browser, and
+              the browser underneath shows every one of those tags again, per
+              project, where they mean something specific. */}
+          <div className="mt-5 hidden flex-wrap items-center gap-3 sm:flex">
             {/* Full-strength muted, not /70: at 10.5px the faded variant
                 measured 4.19:1, under the 4.5:1 AA floor. */}
             <span className="shrink-0 font-mono text-[10.5px] uppercase tracking-[0.16em] text-text-muted">

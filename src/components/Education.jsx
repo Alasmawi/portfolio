@@ -65,7 +65,12 @@ export default function Education() {
                       <p className="font-mono text-xs" style={{ color: entry.color }}>
                         {entry.school}
                       </p>
-                      {entry.track && (
+                      {/* Only when it adds something. UoB's track is "Cloud
+                          Computing track" under a degree titled "B.Sc. Computer
+                          Science — Cloud Computing", which made three mentions
+                          in four lines; Reboot's "Cloud DevOps & Cybersecurity"
+                          under "Full Stack Development" is genuinely new. */}
+                      {entry.track && !entry.degree.toLowerCase().includes(entry.track.toLowerCase().replace(/ track$/, '')) && (
                         <span
                           className="inline-flex items-center rounded border px-2.5 py-1 font-mono text-[10.5px] tracking-wide"
                           style={{
@@ -115,7 +120,14 @@ export default function Education() {
                       </div>
                     )}
 
-                    {entry.coursework && <CourseworkModule />}
+                  {/* Desktop only. On a phone this was a glass panel with a
+                      disclosure chevron wrapped around a four-segment bar — a
+                      lot of chrome for a breakdown nobody came for. The two
+                      figures above it, 30 courses and 88 credit hours, are the
+                      part that carries. */}
+                  <div className="hidden md:block">
+                      {entry.coursework && <CourseworkModule />}
+                  </div>
                     {entry.journey && <ProgramJourney color={entry.color} />}
                   </div>
                 </div>

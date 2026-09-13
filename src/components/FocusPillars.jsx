@@ -50,17 +50,15 @@ export default function FocusPillars() {
                   <span className="tabular-nums text-accent">{pillar.count}</span>{' '}
                   {pillar.count === 1 ? 'project' : 'projects'}
                 </p>
-                <div className="mt-3.5 flex flex-wrap gap-1.5">
-                  {pillar.tools.map((tool) => (
-                    <span
-                      key={tool}
-                      className="rounded-full bg-white/[0.09] px-2.5 py-1.5 font-mono text-[9.5px] uppercase tracking-[0.06em] text-text-primary/80"
-                      style={{ border: '1px solid rgba(255,255,255,.13)' }}
-                    >
-                      {tool}
-                    </span>
-                  ))}
-                </div>
+                {/* One line, not a pill each. Four cards carrying sixteen
+                    individually-outlined boxes was the densest thing on the
+                    phone — twenty of the page's forty-seven visible uppercase
+                    labels lived in this section alone. The stack is supporting
+                    detail here; the projects below are where it is load-bearing
+                    and where each one is a real tag. */}
+                <p className="mt-3 font-mono text-[11px] leading-relaxed text-text-dim">
+                  {pillar.tools.join(' · ')}
+                </p>
               </div>
             </Reveal>
           ))}
