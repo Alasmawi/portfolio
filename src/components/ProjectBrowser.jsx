@@ -244,17 +244,13 @@ function MediaTabs({ project }) {
                 setTab(id);
                 anchor();
               }}
+              /* Selected reads as a lit facet of the same glass, the way the
+                 nav marks its current link. It used to copy the primary
+                 button's rose fill, which made rose mean both "the one action
+                 on the page" and "this tab is selected". */
               className={`min-h-11 rounded-full px-4 font-mono text-[11px] uppercase tracking-[0.14em] transition-colors ${
-                on ? 'text-[#2b1016]' : 'text-text-primary/70 hover:text-text-primary'
+                on ? 'glass-control text-text-primary' : 'text-text-primary/70 hover:text-text-primary'
               }`}
-              style={
-                on
-                  ? {
-                      background: 'linear-gradient(160deg, #fbd0dc, #f6a8bf)',
-                      boxShadow: 'inset 0 1.5px 0 rgba(255,255,255,.85)',
-                    }
-                  : undefined
-              }
             >
               {label}
             </button>

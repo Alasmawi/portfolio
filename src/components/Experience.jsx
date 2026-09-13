@@ -66,7 +66,11 @@ export default function Experience() {
             "back to back, one overlapping" in a glance — the prose below only
             has to fill in what each involved. */}
         <Reveal delay={0.1}>
-          <div className="glass-pane mt-10 rounded-[26px] p-5 sm:p-7">
+          {/* Desktop only. Two internships is not enough data to need a chart,
+              and on a phone it cost ~400px to label every role three times —
+              once on its bar, once in the legend, once in the row below. At md
+              and up it fills a column that is otherwise empty. */}
+          <div className="glass-pane mt-10 hidden rounded-[26px] p-5 sm:p-7 md:block">
             <div className="relative mb-2.5 h-4 font-mono text-[10.5px] uppercase tracking-wider text-text-dim">
               {TICKS.map((t, i) => (
                 <span

@@ -81,9 +81,15 @@ export default function Nav({ active }) {
             e.preventDefault();
             go('contact');
           }}
-          className="btn btn-amber min-h-[40px] px-4 text-[13.5px] sm:min-h-[42px] sm:px-[22px] sm:text-sm"
+          /* Glass, not a second fill. The hero's "Get in touch" is on screen
+             at the same time as this, and two saturated fills in two different
+             colours, both meaning the same thing in different words, is the
+             loudest thing on a first view. One filled button per screen; this
+             is the secondary instance of the same action, so it takes the
+             secondary treatment and the same label. */
+          className="btn btn-ghost glass-control min-h-[40px] px-4 text-[13.5px] sm:min-h-[42px] sm:px-[22px] sm:text-sm"
         >
-          Say hello
+          Get in touch
         </a>
       </nav>
     </header>

@@ -15,9 +15,9 @@ export const EXPERIENCE = [
     end: '2026-06-30',
     status: 'completed',
     points: [
-      'Built a smart IoT/cloud monitoring solution for the Bahrain Ministry of Interior’s Police K9 Unit.',
+      'Built the IoT and cloud monitoring system for the Bahrain Ministry of Interior’s police K9 unit.',
       'Implemented anomaly detection on sensor data using Amazon Bedrock.',
-      'Shipped a centralized dashboard for real-time health and environment tracking.',
+      'Shipped the dashboard handlers use to see each dog’s vitals and kennel conditions live.',
     ],
     tags: ['AWS IoT Core', 'Amazon Bedrock', 'Lambda', 'DynamoDB'],
   },

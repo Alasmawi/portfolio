@@ -81,7 +81,10 @@ export default function Hero() {
             {/* Teal is the only cool colour left on the page and it is spent
                 entirely on this: the dot that says the status line is live
                 rather than printed. */}
-            <span className="glass-control inline-flex items-center gap-2.5 rounded-full px-[18px] py-[11px]">
+            {/* glass-pane, not glass-control. The control treatment — the
+                specular sweep, the refraction ring — is the system's way of
+                saying "you can operate this", and this is a status readout. */}
+            <span className="glass-pane inline-flex items-center gap-2.5 rounded-full px-[18px] py-[11px]">
               <span className="flex items-center gap-2.5 font-mono text-[10.5px] uppercase tracking-[0.14em] text-text-primary">
                 <span
                   className="signal-blip h-[7px] w-[7px] rounded-full bg-signal"
@@ -105,7 +108,7 @@ export default function Hero() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.7, delay: 0.25 }}
-          className="glass-pane relative h-[260px] overflow-hidden rounded-[28px] sm:h-[340px] md:h-[430px]"
+          className="glass-pane relative h-[230px] overflow-hidden rounded-[28px] sm:h-[300px] md:h-[380px]"
         >
           <div
             className="pointer-events-none absolute inset-0"
@@ -118,7 +121,10 @@ export default function Hero() {
           {/* data-cloud is what scripts/make-cloud-poster.mjs shoots: it hides
               everything in the hero except this box, so the still is the object
               on transparency at exactly the framing the pane gives it. */}
-          <div data-cloud className="absolute inset-0">
+          {/* Overhangs the pane, which crops it. mountCloud fits the object
+              inside its canvas with padding, so at inset-0 the cloud sat in the
+              middle of a large empty card taking up about a third of it. */}
+          <div data-cloud className="absolute -inset-[20%]">
             <HeroCloudCanvas />
           </div>
         </motion.div>

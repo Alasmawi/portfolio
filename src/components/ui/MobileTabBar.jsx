@@ -29,7 +29,10 @@ export default function MobileTabBar({ active }) {
     >
       <nav
         aria-label="Sections"
-        className="glass-control pointer-events-auto w-full max-w-[420px] rounded-[26px] px-1.5 py-1.5"
+        /* dock-dense: every other control sits over the page ground, but this
+           one always has body copy sliding underneath it. The extra tint is
+           what keeps the labels off the smear. */
+        className="glass-control dock-dense pointer-events-auto w-full max-w-[420px] rounded-[26px] px-1.5 py-1.5"
       >
         <ul className="grid grid-cols-5">
           {TABS.map(({ id, label, icon: Icon, cta }) => {

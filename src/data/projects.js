@@ -30,7 +30,7 @@ export const PROJECTS = [
     flagship: true,
     private: true,
     description:
-      'An end-to-end IoT + cloud platform for police K9 monitoring: real-time health and environmental sensors, AI-powered anomaly detection via Amazon Bedrock, a centralized dashboard, and kennel/handler management — built during the AWS Cloud Innovation Center internship for the Bahrain Ministry of Interior.',
+      'Sensors on a collar and in the kennel report a dog’s vitals and its environment over MQTT. Lambda applies the detection rules, Amazon Bedrock turns anything it flags into a plain-language explanation, and handlers see the lot on one dashboard alongside kennel and handler records. Built during the AWS Cloud Innovation Center internship for the Bahrain Ministry of Interior.',
     tags: ['AWS IoT Core', 'Amazon Bedrock', 'Lambda', 'DynamoDB', 'ESP32', 'React'],
     // Drawn (ui/K9Architecture.jsx), not a picture. Sits behind its own tab
     // next to the hardware gallery rather than stacked above it — see the note
@@ -93,7 +93,7 @@ export const PROJECTS = [
     tagline: 'how many people are in this frame?',
     language: 'Python',
     description:
-      'Real-time person detection and counting for monitored spaces. YOLOv8 behind a FastAPI service returns a count, bounding boxes, and per-detection confidences for an uploaded frame or a live webcam stream — then keeps every result queryable, with occupancy statistics, charts, zone alerts, and CSV/Excel export.',
+      'Real-time person detection and counting for monitored spaces. YOLOv8 behind a FastAPI service returns a count, bounding boxes, and per-detection confidences for an uploaded frame or a live webcam stream — then keeps every result queryable, with occupancy statistics, charts, zone alerts, and CSV and Excel export.',
     tags: ['Python', 'FastAPI', 'YOLOv8', 'OpenCV', 'React', 'SQLite'],
     githubUrl: 'https://github.com/Alasmawi/detecto',
     liveUrl: null,

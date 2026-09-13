@@ -118,6 +118,14 @@
       0 20px 42px -18px rgba(0, 0, 0, 0.82);
   }
 
+  /* The dock is the only control with the whole document scrolling under it,
+     so it carries more tint and more blur than a control sitting on the ground.
+     Same material, turned up. */
+  .dock-dense {
+    background: linear-gradient(150deg, rgba(255, 255, 255, 0.2), rgba(45, 35, 49, 0.62));
+    backdrop-filter: blur(22px) saturate(190%) brightness(1.04);
+  }
+
   /* The travelling highlight. A specular band crossing the object every ~18s,
      which is what stops the glass reading as a printed gradient. transform and
      opacity only, so it composites and never lays out. */

@@ -42,10 +42,13 @@ export default function CourseworkModule() {
               credit distribution
             </span>
           </div>
-          <div className="flex h-2.5 overflow-hidden rounded-full">
+          {/* Gapped, not butted together: the gap is what separates the four
+              areas now that they are one hue at four steps. */}
+          <div className="flex h-2.5 gap-[3px]">
             {byPillar.map((pillar) => (
               <div
                 key={pillar.id}
+                className="rounded-full"
                 style={{
                   width: `${(pillar.courses.length / total) * 100}%`,
                   backgroundColor: PILLAR_COLORS[pillar.id],

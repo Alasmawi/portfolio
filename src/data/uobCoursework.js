@@ -62,9 +62,14 @@ export const UOB_COURSEWORK = [
 //
 // Teal is deliberately absent: it is the status colour everywhere else on the
 // page, and spending it on a category here would make "live" stop meaning live.
+// One hue, four steps. This was amber, rose, violet and near-white — four
+// hues for a decorative summary bar, in a palette whose rule is one accent
+// that signals. A single-hue ramp reads as one gradient only when the segments
+// touch; CourseworkModule separates them by 3px of the pane behind, which
+// distinguishes them better than hue did, and each is named in the legend.
 export const PILLAR_COLORS = {
-  cloud: '#F2A93B',
-  ai: '#E07A9A',
-  fullstack: '#B08BD9',
-  cs: '#E7D8DE',
+  cloud: 'rgba(224, 122, 154, 1)',
+  ai: 'rgba(224, 122, 154, 0.74)',
+  fullstack: 'rgba(224, 122, 154, 0.5)',
+  cs: 'rgba(224, 122, 154, 0.3)',
 };

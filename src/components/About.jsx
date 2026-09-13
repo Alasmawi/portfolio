@@ -78,7 +78,23 @@ export default function About() {
                 src={pfp}
                 alt="Abdulla Alasmawi"
                 className="relative block h-full w-full object-contain object-bottom"
-                style={{ mixBlendMode: 'lighten' }}
+                /* No mixBlendMode. It was `lighten`, which takes the lighter
+                   of subject and ground per channel, so everything darker than
+                   the page — the agal, the hair, the glasses frames — was
+                   replaced by the page. The file has a real alpha channel, so
+                   the blend was buying nothing.
+
+                   The mask handles the other half: the subject is already
+                   cropped at the shoulder in the source photo, so the cutout
+                   ends in two hard straight edges. */
+                style={{
+                  maskImage:
+                    'linear-gradient(to right, #000 82%, transparent 99%), linear-gradient(to bottom, #000 88%, transparent 100%)',
+                  maskComposite: 'intersect',
+                  WebkitMaskImage:
+                    'linear-gradient(to right, #000 82%, transparent 99%), linear-gradient(to bottom, #000 88%, transparent 100%)',
+                  WebkitMaskComposite: 'source-in',
+                }}
               />
               <div
                 className="absolute bottom-0 left-1 right-1 h-px"
