@@ -101,7 +101,6 @@
        it is what keeps the pane reading as a lit surface rather than a hole. */
     border: 1px solid rgba(253, 243, 244, 0.14);
     backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
     box-shadow:
       inset 0 1px 0 rgba(255, 255, 255, 0.07),
       0 30px 62px -32px rgba(0, 0, 0, 0.85);
@@ -113,7 +112,6 @@
     background: linear-gradient(150deg, rgba(255, 255, 255, 0.17), rgba(255, 255, 255, 0.045));
     border: 1px solid rgba(255, 255, 255, 0.25);
     backdrop-filter: blur(11px) saturate(205%) brightness(1.07);
-    -webkit-backdrop-filter: blur(11px) saturate(205%) brightness(1.07);
     box-shadow:
       inset 0 1.5px 0 rgba(255, 255, 255, 0.55),
       inset 0 -1.5px 1px rgba(255, 255, 255, 0.14),
@@ -161,7 +159,6 @@
         box-sizing: border-box;
         pointer-events: none;
         backdrop-filter: blur(7px) saturate(250%) brightness(1.14);
-        -webkit-backdrop-filter: blur(7px) saturate(250%) brightness(1.14);
         mask:
           linear-gradient(#000, #000) content-box,
           linear-gradient(#000, #000);
@@ -177,6 +174,17 @@
     position: relative;
     z-index: 1;
   }
+
+  /* Note: the -webkit- prefix is NOT written by hand anywhere in this file.
+     Autoprefixer emits it, in the order the minifier needs.
+
+     Hand-writing `-webkit-backdrop-filter` immediately after the standard
+     property is what broke this: esbuild treats the two as duplicate
+     declarations of one property and keeps only the last, so every unprefixed
+     `backdrop-filter` was deleted from the production build. Chromium dropped
+     the -webkit- alias, so it applied no blur at all — the glass rendered as a
+     flat translucent tint in Chrome, Edge, Android and every in-app WebView,
+     and only ever looked correct in Safari. Let autoprefixer add it. */
 
   /* No backdrop-filter at all — older Firefox, and anything with the effect
      switched off for battery. Both classes fall back to an opaque-enough tint
