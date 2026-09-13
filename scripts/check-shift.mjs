@@ -30,7 +30,7 @@ await page.waitForTimeout(1200);
 await page.evaluate(() => document.getElementById('projects').scrollIntoView());
 await page.waitForTimeout(800);
 
-const chips = page.locator('#projects .chip-row > button');
+const chips = page.locator('#projects ul li button');
 const count = await chips.count();
 const tops = [];
 for (let i = 0; i < count; i++) {

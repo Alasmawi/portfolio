@@ -177,7 +177,7 @@ try {
     let walk = null;
     if (vp.name === 'mobile') {
       const clsBefore = await page.evaluate(() => window.__cls);
-      const chips = page.locator('#projects .chip-row > button');
+      const chips = page.locator('#projects ul li button');
       const count = await chips.count();
       for (let i = 0; i < count; i++) {
         await chips.nth(i).click();

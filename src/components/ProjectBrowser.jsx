@@ -1,11 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ExternalLink, Film, Lock, PlayCircle, Star } from 'lucide-react';
+import { ExternalLink, Film, LayoutGrid, List, Lock, PlayCircle, Star } from 'lucide-react';
 import Reveal from './ui/Reveal';
 import RingGallery from './ui/RingGallery';
 import HardwareStrip from './ui/HardwareStrip';
 import K9Architecture from './ui/K9Architecture';
-import ScrollCounter from './ui/ScrollCounter';
 import { GithubMark } from './ui/BrandIcons';
 import { LANGUAGE_COLORS, PROJECTS } from '../data/projects';
 
@@ -119,27 +118,47 @@ const WIDE_PANEL_PX = 560;
 // work out whether something has actually gone under it.
 const TAB_BAR_PX = 54;
 
-// Drives the trailing-edge mask on the chip row: the fade means "there is more
-// this way", so it has to come off once there isn't.
-function useScrolledToEnd(ref) {
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return undefined;
-    const update = () => {
-      const end = el.scrollLeft + el.clientWidth >= el.scrollWidth - 2;
-      if (end) el.setAttribute('data-end', '');
-      else el.removeAttribute('data-end');
-    };
-    update();
-    el.addEventListener('scroll', update, { passive: true });
-    const ro = new ResizeObserver(update);
-    ro.observe(el);
-    return () => {
-      el.removeEventListener('scroll', update);
-      ro.disconnect();
-    };
-  }, [ref]);
+// Grid or rows, remembered per visitor.
+//
+// Grid is the default: fourteen repositories shown as a wall of cards is the
+// shape of the thing — you can take in the whole body of work at once — where a
+// list makes you read fourteen names to find out what is there. Rows stay on
+// offer because once you know the names a list is faster to aim at, and it fits
+// far more of them on a phone screen at once.
+//
+// localStorage, not sessionStorage: a layout preference is the kind of thing a
+// returning visitor expects to still be set.
+const VIEW_KEY = 'projects-view';
+
+const VIEWS = [
+  { id: 'grid', label: 'Grid', Icon: LayoutGrid },
+  { id: 'rows', label: 'Rows', Icon: List },
+];
+
+function useProjectView() {
+  const [view, setView] = useState(() => {
+    if (typeof window === 'undefined') return 'grid';
+    try {
+      return localStorage.getItem(VIEW_KEY) === 'rows' ? 'rows' : 'grid';
+    } catch {
+      return 'grid';
+    }
+  });
+  const choose = useCallback((next) => {
+    setView(next);
+    try {
+      localStorage.setItem(VIEW_KEY, next);
+    } catch {
+      // Private mode. The choice still holds for this page view.
+    }
+  }, []);
+  return [view, choose];
 }
+
+// Every project has a still: the thirteen with a demo recording carry the
+// poster frame extracted from it, and K9 — which has no video — leads with the
+// first photo of the hardware.
+const thumbOf = (p) => p.poster ?? p.items?.[0]?.src ?? null;
 
 function useContainerAtLeast(min) {
   const ref = useRef(null);
@@ -328,6 +347,117 @@ function PreviewMedia({ project, playing }) {
   );
 }
 
+// The repository selector, in the two shapes it can take.
+//
+// This replaced a horizontal chip row on a phone and a 264px sidebar of rows on
+// a desktop — two different controls doing one job, neither of which could show
+// you the work. Both shapes now span the panel and both are available at every
+// width.
+function ProjectSelector({ view, selectedId, onSelect }) {
+  if (view === 'rows') {
+    return (
+      <ul className="px-2 pb-2">
+        {PROJECTS.map((p) => {
+          const on = p.id === selectedId;
+          return (
+            <li key={p.id}>
+              <button
+                type="button"
+                onClick={() => onSelect(p.id)}
+                aria-current={on ? 'true' : undefined}
+                className={`flex w-full items-start gap-2.5 rounded-xl px-3 py-2 text-left transition-colors sm:items-center ${
+                  on ? 'bg-white/[0.09] text-text-primary' : 'text-text-muted hover:bg-white/[0.04] hover:text-text-primary'
+                }`}
+              >
+                <span className="flex h-[22px] shrink-0 items-center sm:h-auto">
+                  {p.flagship ? (
+                    <Star size={12} className="shrink-0 text-accent" fill="currentColor" />
+                  ) : (
+                    <LanguageDot language={p.language} />
+                  )}
+                </span>
+                {/* The tagline is what makes a list of fourteen names worth
+                    reading, so it is never dropped — it wraps to a second line
+                    on a phone and sits inline from `sm` up. A rows view that
+                    shows only names is the thing the grid exists to fix. */}
+                <span className="flex min-w-0 flex-1 flex-col sm:flex-row sm:items-baseline sm:gap-2.5">
+                  <span className="truncate font-mono text-[13px] leading-[22px]">{p.name}</span>
+                  <span className="truncate text-[12.5px] leading-tight text-text-dim">
+                    {p.tagline}
+                  </span>
+                </span>
+                {p.private && <Lock size={11} className="mt-[5px] shrink-0 text-text-dim sm:mt-0" />}
+              </button>
+            </li>
+          );
+        })}
+      </ul>
+    );
+  }
+
+  return (
+    <ul className="grid grid-cols-2 gap-2.5 p-3 sm:grid-cols-3 lg:grid-cols-4">
+      {PROJECTS.map((p) => {
+        const on = p.id === selectedId;
+        const thumb = thumbOf(p);
+        return (
+          <li key={p.id}>
+            <button
+              type="button"
+              onClick={() => onSelect(p.id)}
+              aria-current={on ? 'true' : undefined}
+              className={`group flex w-full flex-col overflow-hidden rounded-2xl text-left transition-colors ${
+                on
+                  ? 'bg-accent/[0.14] shadow-[inset_0_0_0_1px_rgb(224_122_154_/_0.7)]'
+                  : 'bg-white/[0.045] shadow-[inset_0_0_0_1px_rgb(253_243_244_/_0.12)] hover:bg-white/[0.08]'
+              }`}
+            >
+              <span className="relative block aspect-[16/9] w-full overflow-hidden bg-black/25">
+                {/* Behind every thumbnail, not only the one project without a
+                    still. The images are lazy, so a card that has not fetched
+                    yet would otherwise be an empty black rectangle — half a
+                    grid of those reads as broken rather than as loading. */}
+                <span className="absolute inset-0 flex items-center justify-center text-text-dim/45">
+                  <Film size={18} />
+                </span>
+                {thumb && (
+                  <img
+                    src={thumb}
+                    alt=""
+                    loading="lazy"
+                    decoding="async"
+                    className="relative h-full w-full object-cover opacity-90 transition-opacity group-hover:opacity-100"
+                  />
+                )}
+                {p.flagship && (
+                  <span className="absolute left-1.5 top-1.5 rounded-full bg-black/55 p-1 text-accent backdrop-blur-sm">
+                    <Star size={10} fill="currentColor" />
+                  </span>
+                )}
+                {p.private && (
+                  <span className="absolute right-1.5 top-1.5 rounded-full bg-black/55 p-1 text-text-muted backdrop-blur-sm">
+                    <Lock size={10} />
+                  </span>
+                )}
+              </span>
+              <span className="flex min-w-0 items-center gap-2 px-2.5 pb-2.5 pt-2">
+                <LanguageDot language={p.language} />
+                <span
+                  className={`min-w-0 flex-1 truncate font-mono text-[12px] ${
+                    on ? 'text-accent-bright' : 'text-text-primary'
+                  }`}
+                >
+                  {p.name}
+                </span>
+              </span>
+            </button>
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+
 // Swipe-to-change-project on the preview pane, mobile's main way to browse
 // once you're already looking at one — the tab strip above is still there
 // for jumping straight to a specific project by name.
@@ -341,6 +471,7 @@ export default function ProjectBrowser() {
   // Whether the section is on screen. Read by the preview video, which fetches
   // nothing until it is true, and by the auto-advance clock below.
   const [inView, setInView] = useState(false);
+  const [view, setView] = useProjectView();
   const project = PROJECTS.find((p) => p.id === selectedId) ?? PROJECTS[0];
 
   const sectionRef = useRef(null);
@@ -361,31 +492,6 @@ export default function ProjectBrowser() {
   );
 
   const swipeRef = useRef(null);
-  const chipRowRef = useRef(null);
-  const selectedChipRef = useRef(null);
-  useScrolledToEnd(chipRowRef);
-
-  // A swipe on the preview changes the project, and the chip row is the thing
-  // that says which project you are on — so it has to follow.
-  //
-  // This scrolls the row, not the chip. scrollIntoView on the chip also scrolls
-  // every scrollable ancestor, including the document: on first mount it
-  // dragged the whole page down to the panel before the reader had seen the
-  // hero. Setting scrollLeft can only ever move the row.
-  const didMountRef = useRef(false);
-  useEffect(() => {
-    const row = chipRowRef.current;
-    const chip = selectedChipRef.current;
-    if (!row || !chip) return;
-    // Nothing to follow on the first render — the row already starts at the
-    // selected chip, which is the first one.
-    if (!didMountRef.current) {
-      didMountRef.current = true;
-      return;
-    }
-    const target = chip.offsetLeft - (row.clientWidth - chip.clientWidth) / 2;
-    row.scrollTo({ left: Math.max(0, target), behavior: 'smooth' });
-  }, [selectedId]);
 
   const step = useCallback(
     (delta) => {
@@ -530,85 +636,50 @@ export default function ProjectBrowser() {
       <div>
         <div className="relative">
           <Reveal delay={0.05} className="relative block px-5 py-6 sm:px-10 sm:py-9 md:px-14">
-            <div className="glass-pane mx-auto max-w-6xl overflow-hidden rounded-[26px] md:flex">
-              {/* mobile: one header line, then the chips.
-
-                  This was three stacked control strips before any content
-                  appeared — chips, then a counter row, then the hardware /
-                  architecture tabs. The counter now shares a line with the same
-                  "// repositories (14)" header the desktop sidebar carries, so
-                  the phone and the desktop say the same thing in the same
-                  words, and the panel opens on one strip instead of two.
-
-                  The swipe hint is gone with it. The counter and the fading
-                  right edge already say the row continues, and a permanent
-                  instruction for a gesture that is a shortcut — the chips do
-                  the same job, in the open — was not worth a row of its own. */}
-              <div className="md:hidden">
-                <div className="flex items-baseline justify-between gap-3 px-3 pt-2.5">
+            <div className="glass-pane mx-auto max-w-6xl overflow-hidden rounded-[26px]">
+              {/* One selector, full width, in whichever shape the reader
+                  picked. This was two different controls doing one job — a
+                  horizontal chip row on a phone and a 264px sidebar of rows on
+                  a desktop — and neither could show you the work itself, only
+                  a list of names. */}
+              <div className="border-b border-white/[0.08]">
+                <div className="flex items-center justify-between gap-3 px-3.5 pt-3">
                   <p className="font-mono text-[10.5px] uppercase tracking-wider text-text-muted">
                     // repositories ({PROJECTS.length})
                   </p>
-                  <ScrollCounter
-                    index={PROJECTS.findIndex((p) => p.id === selectedId)}
-                    total={PROJECTS.length}
-                  />
+                  <div
+                    role="group"
+                    aria-label="Repository layout"
+                    className="flex items-center gap-0.5 rounded-full bg-white/[0.06] p-0.5 shadow-[inset_0_0_0_1px_rgb(253_243_244_/_0.12)]"
+                  >
+                    {VIEWS.map(({ id, label, Icon }) => {
+                      const on = view === id;
+                      return (
+                        <button
+                          key={id}
+                          type="button"
+                          onClick={() => setView(id)}
+                          aria-pressed={on}
+                          /* An icon pair needs a name a screen reader can read
+                             and a tooltip a mouse can find; the label is not
+                             visible because the two shapes are legible as
+                             icons and a word each would double the control. */
+                          title={label}
+                          className={`flex h-8 w-9 items-center justify-center rounded-full transition-colors ${
+                            on
+                              ? 'bg-white/[0.14] text-text-primary'
+                              : 'text-text-muted hover:text-text-primary'
+                          }`}
+                        >
+                          <Icon size={14} />
+                          <span className="sr-only">{label}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
 
-                {/* The rings are inset shadows rather than borders so the
-                    chip's box doesn't grow by 2px when it becomes selected,
-                    but they are still a component boundary — hence base.edge's
-                    value (3.72:1 on this ground) rather than the hairline these
-                    used to carry at 1.33:1. */}
-                <div ref={chipRowRef} className="chip-row flex gap-2 overflow-x-auto p-3">
-                  {PROJECTS.map((p) => (
-                    <button
-                      key={p.id}
-                      type="button"
-                      ref={p.id === selectedId ? selectedChipRef : null}
-                      onClick={() => select(p.id)}
-                      aria-current={p.id === selectedId ? 'true' : undefined}
-                      className={`flex min-h-11 shrink-0 items-center gap-2 whitespace-nowrap rounded-full px-3 py-2 font-mono text-xs transition-colors ${
-                        p.id === selectedId
-                          ? 'bg-accent/15 text-accent-bright shadow-[inset_0_0_0_1px_rgba(224,122,154,0.7)]'
-                          : 'text-text-muted shadow-[inset_0_0_0_1px_#7a6b74]'
-                      }`}
-                    >
-                      <LanguageDot language={p.language} />
-                      {p.name}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* desktop: fixed-width sidebar */}
-              <div className="hidden max-h-[620px] w-[264px] shrink-0 overflow-y-auto border-r border-white/[0.09] md:block">
-                <p className="sticky top-0 bg-[#1e1722]/95 px-[18px] py-[13px] font-mono text-[11px] uppercase tracking-wider text-text-muted shadow-[inset_0_-1px_0_rgba(253,243,244,0.09)]">
-                  // repositories ({PROJECTS.length})
-                </p>
-                <ul>
-                  {PROJECTS.map((p) => (
-                    <li key={p.id}>
-                      <button
-                        type="button"
-                        onClick={() => select(p.id)}
-                        className={`flex w-full items-center gap-2 border-l-2 px-[18px] py-[11px] text-left transition-colors ${
-                          p.id === selectedId
-                            ? 'border-l-accent text-text-primary'
-                            : 'border-l-transparent text-text-muted hover:bg-white/[0.03] hover:text-text-primary'
-                        }`}
-                      >
-                        {p.flagship ? (
-                          <Star size={12} className="shrink-0 text-accent" fill="currentColor" />
-                        ) : (
-                          <LanguageDot language={p.language} />
-                        )}
-                        <span className="min-w-0 flex-1 truncate font-mono text-xs">{p.name}</span>
-                        {p.private && <Lock size={11} className="shrink-0 text-text-dim" />}
-                      </button>
-                    </li>
-                  ))}
-                </ul>
+                <ProjectSelector view={view} selectedId={selectedId} onSelect={select} />
               </div>
 
               {/* preview pane.
@@ -622,7 +693,7 @@ export default function ProjectBrowser() {
                   handler below does its own angle check, which is what actually
                   keeps a vertical fling from being read as a project change. */}
               <div
-                className="flex-1 p-[22px] sm:p-6"
+                className="p-[22px] sm:p-6"
                 onPointerDown={onSwipeDown}
                 onPointerUp={onSwipeUp}
                 onPointerCancel={() => {
