@@ -34,8 +34,8 @@ export default function Nav({ active }) {
             aria-hidden="true"
             className="h-[9px] w-[9px] shrink-0 rounded-full"
             style={{
-              background: 'linear-gradient(135deg, #fbd7a4, #e07a9a)',
-              boxShadow: '0 0 10px rgba(224,122,154,.85), inset 0 1px 1px rgba(255,255,255,.7)',
+              background: 'linear-gradient(135deg, #fbd7a4, #e2607e)',
+              boxShadow: '0 0 10px rgba(226,96,126,.85), inset 0 1px 1px rgba(255,255,255,.7)',
             }}
           />
           alasmawi.dev

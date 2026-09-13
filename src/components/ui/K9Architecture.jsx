@@ -58,7 +58,7 @@ export default function K9Architecture() {
           aria-hidden="true"
         >
           <span className="inline-flex items-center gap-1.5">
-            <span className="h-0 w-4 border-t border-dashed" style={{ borderColor: '#e07a9a' }} />
+            <span className="h-0 w-4 border-t border-dashed" style={{ borderColor: '#e2607e' }} />
             telemetry
           </span>
           <span className="inline-flex items-center gap-1.5">

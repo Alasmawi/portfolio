@@ -1,6 +1,16 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ExternalLink, Film, LayoutGrid, List, Lock, PlayCircle, Star } from 'lucide-react';
+import {
+  ExternalLink,
+  Film,
+  LayoutGrid,
+  Lock,
+  PlayCircle,
+  Star,
+  Terminal as TerminalIcon,
+  X,
+} from 'lucide-react';
 import Reveal from './ui/Reveal';
 import RingGallery from './ui/RingGallery';
 import HardwareStrip from './ui/HardwareStrip';
@@ -40,7 +50,7 @@ const RECURRING_STACK = (() => {
 // fourteen and buys a panel that holds still.
 const MEDIA_WELL =
   'flex h-[248px] w-full items-center justify-center rounded-lg bg-white/[0.03] ' +
-  'shadow-[inset_0_0_0_1px_rgba(253,243,244,0.09)] sm:h-[320px] md:h-[400px]';
+  'shadow-[inset_0_0_0_1px_rgba(251,238,240,0.09)] sm:h-[320px] md:h-[400px]';
 
 function LanguageDot({ language }) {
   if (!language) return null;
@@ -123,8 +133,9 @@ const TAB_BAR_PX = 54;
 // Grid is the default: fourteen repositories shown as a wall of cards is the
 // shape of the thing — you can take in the whole body of work at once — where a
 // list makes you read fourteen names to find out what is there. Rows stay on
-// offer because once you know the names a list is faster to aim at, and it fits
-// far more of them on a phone screen at once.
+// offer as a terminal listing, which is faster to aim at once you know the
+// names, fits far more of them on a phone at once, and is the same metaphor the
+// section has carried since it called itself ~/projects.
 //
 // localStorage, not sessionStorage: a layout preference is the kind of thing a
 // returning visitor expects to still be set.
@@ -132,14 +143,14 @@ const VIEW_KEY = 'projects-view';
 
 const VIEWS = [
   { id: 'grid', label: 'Grid', Icon: LayoutGrid },
-  { id: 'rows', label: 'Rows', Icon: List },
+  { id: 'terminal', label: 'Terminal', Icon: TerminalIcon },
 ];
 
 function useProjectView() {
   const [view, setView] = useState(() => {
     if (typeof window === 'undefined') return 'grid';
     try {
-      return localStorage.getItem(VIEW_KEY) === 'rows' ? 'rows' : 'grid';
+      return localStorage.getItem(VIEW_KEY) === 'terminal' ? 'terminal' : 'grid';
     } catch {
       return 'grid';
     }
@@ -347,6 +358,192 @@ function PreviewMedia({ project, playing }) {
   );
 }
 
+// The project, opened.
+//
+// A modal rather than a pane under the selector: the grid is the thing worth
+// looking at, and a permanent detail block below it pushed the grid off screen
+// and made every card tap a scroll hunt for what had changed. A dialog puts the
+// project in front of the reader and gives it back when they are done.
+function ProjectModal({ project, playing, onClose }) {
+  const panelRef = useRef(null);
+
+  useEffect(() => {
+    if (!project) return undefined;
+
+    const onKey = (e) => {
+      if (e.key === 'Escape') {
+        onClose();
+        return;
+      }
+      if (e.key !== 'Tab') return;
+      // Focus stays inside the dialog while it is open, which is what makes it
+      // a dialog rather than a panel that happens to float.
+      const focusable = panelRef.current?.querySelectorAll(
+        'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      );
+      if (!focusable?.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
+
+    const opener = document.activeElement;
+    document.addEventListener('keydown', onKey);
+    // The page behind must not scroll under the dialog.
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    panelRef.current?.focus();
+
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      document.body.style.overflow = prevOverflow;
+      // Back to the card that opened it, so a keyboard reader does not lose
+      // their place in the grid.
+      if (opener instanceof HTMLElement) opener.focus();
+    };
+  }, [project, onClose]);
+
+  // Portalled to <body>. `main` carries `relative z-10`, which makes it a
+  // stacking context — a dialog rendered inside it is capped at main's level no
+  // matter how high its own z-index goes, so the fixed nav pill and the dock
+  // (siblings of main, at z-40 and z-50) painted straight over the top of it.
+  return createPortal(
+    <AnimatePresence>
+      {project && (
+        <motion.div
+          className="fixed inset-0 z-[60] flex items-end justify-center p-0 sm:items-center sm:p-6"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.18 }}
+        >
+          <button
+            type="button"
+            aria-label="Close project"
+            onClick={onClose}
+            className="absolute inset-0 h-full w-full cursor-default bg-void/70 backdrop-blur-[3px]"
+          />
+          <motion.div
+            ref={panelRef}
+            role="dialog"
+            aria-modal="true"
+            aria-label={project.name}
+            tabIndex={-1}
+            initial={{ opacity: 0, y: 28, scale: 0.985 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 20, scale: 0.99 }}
+            transition={{ duration: 0.26, ease: [0.16, 1, 0.3, 1] }}
+            className="glass-pane relative max-h-[88vh] w-full max-w-3xl overflow-y-auto rounded-t-[26px] outline-none sm:rounded-[26px]"
+          >
+            <div className="sticky top-0 z-10 flex items-center justify-between gap-3 bg-base-bg/80 px-5 py-3 backdrop-blur-md sm:px-7">
+              <p className="min-w-0 truncate font-mono text-[12px] text-text-muted">
+                ~/projects/{project.id}
+              </p>
+              <button
+                type="button"
+                onClick={onClose}
+                aria-label="Close"
+                className="glass-control flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-text-primary"
+              >
+                <X size={15} />
+              </button>
+            </div>
+      <div className="px-5 pb-6 pt-1 sm:px-7 sm:pb-7">
+        <AnimatePresence mode="popLayout">
+          <motion.div
+            key={project.id}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <PreviewMedia project={project} playing={playing} />
+
+            <div className="mt-5 flex flex-wrap items-start justify-between gap-4">
+              <div>
+                <div className="flex items-center gap-2">
+                  {project.flagship && (
+                    <span className="tag-outline text-[10.5px] uppercase tracking-wider">
+                      flagship
+                    </span>
+                  )}
+                  {project.private && (
+                    <span className="flex items-center gap-1 rounded border border-base-hairline px-2 py-0.5 font-mono text-[10.5px] uppercase tracking-wider text-text-dim">
+                      <Lock size={10} /> private repo
+                    </span>
+                  )}
+                </div>
+                <h3 className="mt-2 text-[27px] font-medium leading-tight tracking-tight text-text-primary">
+                  {project.name}
+                </h3>
+                <p className="mt-0.5 font-mono text-xs text-accent-body">{project.tagline}</p>
+              </div>
+
+              <div className="flex items-center gap-2">
+                {project.githubUrl ? (
+                  <a
+                    href={project.githubUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    aria-label={`${project.name} on GitHub`}
+                    className="btn btn-ghost glass-control min-h-9 text-xs"
+                  >
+                    <GithubMark size={14} />
+                    <span>source</span>
+                    <ExternalLink size={11} />
+                  </a>
+                ) : (
+                  <span className="flex items-center gap-2 rounded-md border border-base-edge px-3 py-2 font-mono text-xs text-text-dim">
+                    <PlayCircle size={14} />
+                    internship project
+                  </span>
+                )}
+                {project.liveUrl && (
+                  <a
+                    href={project.liveUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    aria-label={`${project.name} live site`}
+                    className="btn btn-ghost glass-control min-h-9 text-xs"
+                  >
+                    <PlayCircle size={14} />
+                    <span>live</span>
+                    <ExternalLink size={11} />
+                  </a>
+                )}
+              </div>
+            </div>
+
+            <div className="mt-4 max-w-2xl">
+              <p className="text-[15px] leading-relaxed text-text-primary/85">
+                {project.description}
+              </p>
+            </div>
+
+            <div className="mt-4 flex flex-wrap gap-1.5">
+              {project.tags.map((tag) => (
+                <span key={tag} className="tag-outline text-[11.5px]">
+                  {tag}
+                </span>
+              ))}
+            </div>
+          </motion.div>
+        </AnimatePresence>
+      </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>,
+    document.body
+  );
+}
+
 // The repository selector, in the two shapes it can take.
 //
 // This replaced a horizontal chip row on a phone and a 264px sidebar of rows on
@@ -354,44 +551,63 @@ function PreviewMedia({ project, playing }) {
 // you the work. Both shapes now span the panel and both are available at every
 // width.
 function ProjectSelector({ view, selectedId, onSelect }) {
-  if (view === 'rows') {
+  if (view === 'terminal') {
     return (
-      <ul className="px-2 pb-2">
-        {PROJECTS.map((p) => {
-          const on = p.id === selectedId;
-          return (
-            <li key={p.id}>
-              <button
-                type="button"
-                onClick={() => onSelect(p.id)}
-                aria-current={on ? 'true' : undefined}
-                className={`flex w-full items-start gap-2.5 rounded-xl px-3 py-2 text-left transition-colors sm:items-center ${
-                  on ? 'bg-white/[0.09] text-text-primary' : 'text-text-muted hover:bg-white/[0.04] hover:text-text-primary'
-                }`}
-              >
-                <span className="flex h-[22px] shrink-0 items-center sm:h-auto">
-                  {p.flagship ? (
-                    <Star size={12} className="shrink-0 text-accent" fill="currentColor" />
-                  ) : (
-                    <LanguageDot language={p.language} />
-                  )}
-                </span>
-                {/* The tagline is what makes a list of fourteen names worth
-                    reading, so it is never dropped — it wraps to a second line
-                    on a phone and sits inline from `sm` up. A rows view that
-                    shows only names is the thing the grid exists to fix. */}
-                <span className="flex min-w-0 flex-1 flex-col sm:flex-row sm:items-baseline sm:gap-2.5">
-                  <span className="truncate font-mono text-[13px] leading-[22px]">{p.name}</span>
-                  <span className="truncate text-[12.5px] leading-tight text-text-dim">
-                    {p.tagline}
+      <div className="px-3 pb-3 pt-1 font-mono text-[12.5px] leading-[1.5]">
+        {/* The command is the section's own header said out loud. It is not a
+            prompt you can type into, so it is aria-hidden and the list below
+            carries the semantics. */}
+        <p className="select-none px-2 pb-1.5 text-text-dim" aria-hidden="true">
+          <span className="text-accent">$</span> ls ~/projects
+        </p>
+        <ul>
+          {PROJECTS.map((p) => {
+            const on = p.id === selectedId;
+            return (
+              <li key={p.id}>
+                <button
+                  type="button"
+                  onClick={() => onSelect(p.id)}
+                  aria-current={on ? 'true' : undefined}
+                  className={`flex w-full items-baseline gap-2 rounded px-2 py-[5px] text-left transition-colors ${
+                    on
+                      ? 'bg-accent/[0.16] text-accent-bright'
+                      : 'text-text-muted hover:bg-white/[0.05] hover:text-text-primary'
+                  }`}
+                >
+                  {/* A fixed-width mode column, the way ls -l opens. `d` for the
+                      one with a hardware gallery behind it, `-` for a plain
+                      repo, and the private ones lose their read bits — which is
+                      a truer way to say "private" than a padlock. */}
+                  <span className="shrink-0 tabular-nums text-text-dim/80">
+                    {p.items?.length ? 'd' : '-'}
+                    {p.private ? 'rw-------' : 'rw-r--r--'}
                   </span>
-                </span>
-                {p.private && <Lock size={11} className="mt-[5px] shrink-0 text-text-dim sm:mt-0" />}
-              </button>
-            </li>
-          );
-        })}
-      </ul>
+                  <span className="shrink-0" style={{ color: LANGUAGE_COLORS[p.language] ?? undefined }}>
+                    {p.flagship ? '*' : ' '}
+                  </span>
+                  <span className="min-w-0 flex-1 truncate">
+                    {p.name}
+                    <span className="hidden text-text-dim sm:inline">
+                      {'  '}
+                      {p.tagline}
+                    </span>
+                  </span>
+                </button>
+                {/* On a phone the tagline gets its own indented line rather than
+                    being dropped — a listing of fourteen bare names is what the
+                    grid exists to fix. */}
+                <p className="truncate pb-1 pl-2 text-[11.5px] text-text-dim sm:hidden">
+                  {p.tagline}
+                </p>
+              </li>
+            );
+          })}
+        </ul>
+        <p className="select-none px-2 pt-1.5 text-text-dim" aria-hidden="true">
+          <span className="text-accent">$</span> <span className="terminal-caret">_</span>
+        </p>
+      </div>
     );
   }
 
@@ -426,7 +642,11 @@ function ProjectSelector({ view, selectedId, onSelect }) {
                     alt=""
                     loading="lazy"
                     decoding="async"
-                    className="relative h-full w-full object-cover opacity-90 transition-opacity group-hover:opacity-100"
+                    /* object-top, not centre. These are screenshots of running apps and
+                       the part worth seeing — the header, the first rows of real
+                       content — is at the top of the frame; a centre crop lands on
+                       empty canvas for about half of them. */
+                    className="relative h-full w-full object-cover object-top opacity-90 transition-opacity group-hover:opacity-100"
                   />
                 )}
                 {p.flagship && (
@@ -458,21 +678,18 @@ function ProjectSelector({ view, selectedId, onSelect }) {
   );
 }
 
-// Swipe-to-change-project on the preview pane, mobile's main way to browse
-// once you're already looking at one — the tab strip above is still there
-// for jumping straight to a specific project by name.
-const SWIPE_THRESHOLD_PX = 50;
-
 export default function ProjectBrowser() {
   const [selectedId, setSelectedId] = useState(PROJECTS[0].id);
   // Phones get the first three lines of a description with the rest behind a
   // tap. The full text is always in the DOM — this clamps, it doesn't truncate.
-  const [descOpen, setDescOpen] = useState(false);
   // Whether the section is on screen. Read by the preview video, which fetches
   // nothing until it is true, and by the auto-advance clock below.
   const [inView, setInView] = useState(false);
   const [view, setView] = useProjectView();
-  const project = PROJECTS.find((p) => p.id === selectedId) ?? PROJECTS[0];
+  // null when the dialog is shut. Separate from selectedId so the grid keeps
+  // showing which project you last looked at after you close it.
+  const [openId, setOpenId] = useState(null);
+  const openProject = openId ? PROJECTS.find((p) => p.id === openId) : null;
 
   const sectionRef = useRef(null);
   // Activity is tracked in a ref rather than state: pointermove fires
@@ -482,46 +699,17 @@ export default function ProjectBrowser() {
     lastActivityRef.current = Date.now();
   }, []);
 
+  // Selecting a project opens it. The selector's job is to choose; the dialog's
+  // job is to show.
   const select = useCallback(
     (id) => {
       setSelectedId(id);
-      setDescOpen(false);
+      setOpenId(id);
       nudgeIdle();
     },
     [nudgeIdle]
   );
-
-  const swipeRef = useRef(null);
-
-  const step = useCallback(
-    (delta) => {
-      const i = PROJECTS.findIndex((p) => p.id === selectedId);
-      const next = PROJECTS[(i + delta + PROJECTS.length) % PROJECTS.length];
-      if (next) select(next.id);
-    },
-    [selectedId, select]
-  );
-
-  const onSwipeDown = useCallback((e) => {
-    swipeRef.current = { x: e.clientX, y: e.clientY };
-  }, []);
-
-  const onSwipeUp = useCallback(
-    (e) => {
-      const start = swipeRef.current;
-      swipeRef.current = null;
-      if (!start) return;
-      const dx = e.clientX - start.x;
-      const dy = e.clientY - start.y;
-      // Require a clearly horizontal gesture so a vertical scroll/fling
-      // through the preview pane is never mistaken for a project change.
-      if (Math.abs(dx) < SWIPE_THRESHOLD_PX || Math.abs(dx) < Math.abs(dy) * 1.5) {
-        return;
-      }
-      step(dx < 0 ? 1 : -1);
-    },
-    [step]
-  );
+  const closeModal = useCallback(() => setOpenId(null), []);
 
   // Separate from the auto-advance effect below, which does not run under
   // reduced motion. The preview video reads this to decide whether to fetch
@@ -601,9 +789,6 @@ export default function ProjectBrowser() {
             <h2 className="text-3xl font-medium tracking-tight text-text-primary md:text-[38px]">
               Projects
             </h2>
-            <p className="whitespace-nowrap font-mono text-[11.5px] text-text-muted">
-              ~/projects — live from github.com/Alasmawi
-            </p>
           </div>
           <div className="mt-5 flex flex-wrap items-center gap-3">
             {/* Full-strength muted, not /70: at 10.5px the faded variant
@@ -619,9 +804,6 @@ export default function ProjectBrowser() {
                 </span>
               ))}
             </div>
-            <p className="hidden font-mono text-[11px] text-text-dim md:block">
-              per-repo stack sits on the repo itself →
-            </p>
           </div>
         </Reveal>
       </div>
@@ -692,113 +874,12 @@ export default function ProjectBrowser() {
                   anyway: nothing on the page scrolls sideways. The swipe
                   handler below does its own angle check, which is what actually
                   keeps a vertical fling from being read as a project change. */}
-              <div
-                className="p-[22px] sm:p-6"
-                onPointerDown={onSwipeDown}
-                onPointerUp={onSwipeUp}
-                onPointerCancel={() => {
-                  swipeRef.current = null;
-                }}
-              >
-                <AnimatePresence mode="popLayout">
-                  <motion.div
-                    key={project.id}
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -8 }}
-                    transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-                  >
-                    <PreviewMedia project={project} playing={inView} />
-
-                    <div className="mt-5 flex flex-wrap items-start justify-between gap-4">
-                      <div>
-                        <div className="flex items-center gap-2">
-                          {project.flagship && (
-                            <span className="tag-outline text-[10.5px] uppercase tracking-wider">
-                              flagship
-                            </span>
-                          )}
-                          {project.private && (
-                            <span className="flex items-center gap-1 rounded border border-base-hairline px-2 py-0.5 font-mono text-[10.5px] uppercase tracking-wider text-text-dim">
-                              <Lock size={10} /> private repo
-                            </span>
-                          )}
-                        </div>
-                        <h3 className="mt-2 text-[27px] font-medium leading-tight tracking-tight text-text-primary">
-                          {project.name}
-                        </h3>
-                        <p className="mt-0.5 font-mono text-xs text-accent-body">{project.tagline}</p>
-                      </div>
-
-                      <div className="flex items-center gap-2">
-                        {project.githubUrl ? (
-                          <a
-                            href={project.githubUrl}
-                            target="_blank"
-                            rel="noreferrer"
-                            aria-label={`${project.name} on GitHub`}
-                            className="btn btn-ghost glass-control min-h-9 text-xs"
-                          >
-                            <GithubMark size={14} />
-                            <span>source</span>
-                            <ExternalLink size={11} />
-                          </a>
-                        ) : (
-                          <span className="flex items-center gap-2 rounded-md border border-base-edge px-3 py-2 font-mono text-xs text-text-dim">
-                            <PlayCircle size={14} />
-                            internship project
-                          </span>
-                        )}
-                        {project.liveUrl && (
-                          <a
-                            href={project.liveUrl}
-                            target="_blank"
-                            rel="noreferrer"
-                            aria-label={`${project.name} live site`}
-                            className="btn btn-ghost glass-control min-h-9 text-xs"
-                          >
-                            <PlayCircle size={14} />
-                            <span>live</span>
-                            <ExternalLink size={11} />
-                          </a>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="mt-4 max-w-2xl">
-                      <p
-                        id={`desc-${project.id}`}
-                        className={`text-[15px] leading-relaxed text-text-primary/80 ${
-                          descOpen ? '' : 'line-clamp-3 sm:line-clamp-none'
-                        }`}
-                      >
-                        {project.description}
-                      </p>
-                      <button
-                        type="button"
-                        onClick={() => setDescOpen((v) => !v)}
-                        aria-expanded={descOpen}
-                        aria-controls={`desc-${project.id}`}
-                        className="mt-1.5 min-h-6 py-1 font-mono text-[11px] uppercase tracking-[0.12em] text-accent-bright sm:hidden"
-                      >
-                        {descOpen ? 'Less' : 'More'}
-                      </button>
-                    </div>
-
-                    <div className="mt-4 flex flex-wrap gap-1.5">
-                      {project.tags.map((tag) => (
-                        <span key={tag} className="tag-outline text-[11.5px]">
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                  </motion.div>
-                </AnimatePresence>
-              </div>
             </div>
           </Reveal>
         </div>
       </div>
+
+      <ProjectModal project={openProject} playing={inView && !!openProject} onClose={closeModal} />
     </section>
   );
 }

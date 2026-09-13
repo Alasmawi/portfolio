@@ -5,7 +5,7 @@
 @layer base {
   html {
     scroll-behavior: smooth;
-    background-color: #17121a;
+    background-color: #1c0810;
     /* Stops iOS's rubber-band at the ends of the page.
 
        The bottom dock is position: fixed, and iOS does not hold fixed elements
@@ -39,16 +39,16 @@
     /* Two grounds, still. The page ground is flat; the atmosphere layer paints
        the orbs and the grid over it once, for the whole document, rather than
        each section carrying its own gradient. */
-    background: #17121a;
+    background: #1c0810;
   }
 
   ::selection {
     background: rgba(224, 122, 154, 0.32);
-    color: #fdf3f4;
+    color: #fbeef0;
   }
 
   :focus-visible {
-    outline: 2px solid #f6a8bf;
+    outline: 2px solid #f09db0;
     outline-offset: 2px;
   }
 
@@ -56,14 +56,14 @@
     width: 10px;
   }
   ::-webkit-scrollbar-track {
-    background: #0d0a0f;
+    background: #120509;
   }
   ::-webkit-scrollbar-thumb {
-    background: #4b3f4d;
+    background: #866a73;
     border-radius: 6px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: #7a6b74;
+    background: #866a73;
   }
 }
 
@@ -216,7 +216,19 @@
     }
   }
 
-  /* — rules — */
+  /* The terminal listing's caret. Blinks like a shell's, stops for anyone who
+   has asked motion to stop. */
+.terminal-caret {
+  animation: blink 1.15s step-end infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .terminal-caret {
+    animation: none;
+  }
+}
+
+/* — rules — */
   /* Freestanding rules fade to transparent at both ends instead of stopping
      cleanly. Box outlines and short accent marks stay solid; this is only for
      rules with nothing anchoring their ends. */
@@ -238,20 +250,20 @@
      quietest thing on the screen, and the primary action should not be. Rose
      for "talk to me", amber for the one call to action in the nav.
 
-     #2b1016 measures 9.48:1 on the rose gradient's darker stop and 8.51:1 on
+     #2b0a12 measures 9.48:1 on the rose gradient's darker stop and 8.51:1 on
      the amber's, so the label clears AA at its worst point on either. */
   .btn {
     @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-transparent px-5 font-sans text-sm font-medium transition-transform;
   }
   .btn-primary {
-    color: #2b1016;
-    background: linear-gradient(160deg, #fbd0dc, #f6a8bf);
+    color: #2b0a12;
+    background: linear-gradient(160deg, #fbd3dc, #f09db0);
     box-shadow:
       inset 0 2px 0 rgba(255, 255, 255, 0.85),
       0 18px 38px -14px rgba(224, 122, 154, 0.85);
   }
   .btn-amber {
-    color: #2b1016;
+    color: #2b0a12;
     background: linear-gradient(160deg, #fbd7a4, #f0a448);
     box-shadow:
       inset 0 1.5px 0 rgba(255, 255, 255, 0.85),
@@ -340,13 +352,60 @@
 
    `contain: strict` keeps the layer out of the rest of the page's layout and
    paint work, and the animations are transform-only for the same reason. */
+/* Liquid, not a pan.
+   
+   The orbs used to translate and scale on one 2-keyframe cycle, which reads as
+   a picture sliding about behind glass. A liquid ground needs the shape itself
+   to change, so each orb also morphs its border-radius on a longer, coprime
+   period — the silhouette swells and slackens while it drifts, and because the
+   two periods never line up the loop has no visible seam.
+   
+   border-radius animates on the compositor alongside transform and neither
+   touches layout, so this is still one fixed, contained layer that never
+   repaints on scroll. */
 @keyframes orb-drift {
-  0%,
+  0% {
+    transform: translate3d(-5%, -3%, 0) scale(1);
+  }
+  33% {
+    transform: translate3d(4%, 4%, 0) scale(1.09);
+  }
+  66% {
+    transform: translate3d(-2%, 6%, 0) scale(0.97);
+  }
   100% {
-    transform: translate3d(-4%, -3%, 0) scale(1);
+    transform: translate3d(-5%, -3%, 0) scale(1);
+  }
+}
+
+@keyframes orb-morph {
+  0% {
+    border-radius: 58% 42% 47% 53% / 51% 46% 54% 49%;
+  }
+  25% {
+    border-radius: 44% 56% 62% 38% / 59% 55% 45% 41%;
   }
   50% {
-    transform: translate3d(6%, 5%, 0) scale(1.08);
+    border-radius: 53% 47% 38% 62% / 43% 61% 39% 57%;
+  }
+  75% {
+    border-radius: 62% 38% 55% 45% / 48% 40% 60% 52%;
+  }
+  100% {
+    border-radius: 58% 42% 47% 53% / 51% 46% 54% 49%;
+  }
+}
+
+.atmosphere-orb {
+  animation-name: orb-drift, orb-morph;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  will-change: transform, border-radius;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .atmosphere-orb {
+    animation: none;
   }
 }
 
@@ -481,7 +540,7 @@
 }
 
 .react-flow__attribution a[href] {
-  color: #9c8f96;
+  color: #a98d95;
   font-family: 'JetBrains Mono', ui-monospace, monospace;
   font-size: 10.5px;
   letter-spacing: 0.04em;

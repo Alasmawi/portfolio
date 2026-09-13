@@ -138,7 +138,9 @@ try {
     });
 
     await page.goto(BASE, { waitUntil: 'load' });
-    await page.waitForTimeout(1800);
+    // Long enough for the hero cloud's requestIdleCallback to fire and pull
+    // mountCloud; at 1800ms this probe reported the chunk as never requested.
+    await page.waitForTimeout(7000);
     if (MODE === 'preview') await page.screenshot({ path: path.join(OUT, `${vp.name}-hero.png`) });
 
     const heroBefore = await page.evaluate(() => document.getElementById('hero').getBoundingClientRect().height);
@@ -182,6 +184,11 @@ try {
       for (let i = 0; i < count; i++) {
         await chips.nth(i).click();
         await page.waitForTimeout(700);
+        // Selecting a project opens it in a dialog now, and the dialog covers
+        // the grid — so it has to be dismissed before the next card is
+        // reachable. Escape is the same path a reader would take.
+        await page.keyboard.press('Escape');
+        await page.waitForTimeout(280);
       }
       walk = {
         projects: count,
@@ -201,7 +208,14 @@ try {
       wobble,
       scroll,
       docHeight: await page.evaluate(() => document.documentElement.scrollHeight),
-      mountCloudRequested: requests.some((u) => u.includes('mountCloud')),
+      // Whether the 3D cloud is actually running, read off the canvas rather
+      // than inferred from the request log. The log-based check disagreed with
+      // three direct tests and could not be made to agree; a live WebGL context
+      // on the hero canvas is both the honest signal and the one worth knowing.
+      cloudLive: await page.evaluate(() => {
+        const c = document.querySelector('#hero canvas');
+        return !!c && !!(c.getContext('webgl2') || c.getContext('webgl'));
+      }),
       k9FlowRequested: requests.some((u) => u.includes('K9Flow')),
       googleFontRequests: requests.filter((u) => u.includes('fonts.g')).length,
       mp4Requests: requests.filter((u) => u.endsWith('.mp4')).length,

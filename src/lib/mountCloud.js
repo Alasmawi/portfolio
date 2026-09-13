@@ -11,10 +11,18 @@ import * as THREE from 'three';
    turned every reflection mauve. They are dusk plum now, so the only saturated
    colour coming off the object is the accent's own. */
 export function mountCloud(canvas, opts = {}) {
-  const accent = opts.accent || '#e07a9a';
+  const accent = opts.accent || '#e2607e';
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+  // Both knobs are turned down on a phone by HeroCloudCanvas: MSAA on a soft
+  // contour object is nearly invisible, and pixel ratio 1 instead of 2 is a
+  // quarter of the fragments.
+  const maxPixelRatio = opts.maxPixelRatio ?? 2;
+  const renderer = new THREE.WebGLRenderer({
+    canvas,
+    antialias: opts.antialias ?? true,
+    alpha: true,
+  });
   renderer.setClearColor(0x000000, 0);
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = opts.exposure ?? 0.95;
@@ -152,8 +160,8 @@ export function mountCloud(canvas, opts = {}) {
   grad.width = 16; grad.height = 256;
   const g2 = grad.getContext('2d');
   const lin = g2.createLinearGradient(0, 0, 0, 256);
-  lin.addColorStop(0.00, '#2a1520'); lin.addColorStop(0.42, accent);
-  lin.addColorStop(0.60, '#3a2029'); lin.addColorStop(1.00, '#0d0a0f');
+  lin.addColorStop(0.00, '#2c0f1a'); lin.addColorStop(0.42, accent);
+  lin.addColorStop(0.60, '#4e2e39'); lin.addColorStop(1.00, '#120509');
   g2.fillStyle = lin; g2.fillRect(0, 0, 16, 256);
   const envTex = new THREE.CanvasTexture(grad);
   envTex.mapping = THREE.EquirectangularReflectionMapping;
@@ -249,7 +257,7 @@ export function mountCloud(canvas, opts = {}) {
   function resize() {
     const w = canvas.clientWidth, h = canvas.clientHeight;
     if (!w || !h) return;
-    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    renderer.setPixelRatio(Math.min(devicePixelRatio, maxPixelRatio));
     renderer.setSize(w, h, false);
     camera.aspect = w / h;
     camera.fov = w / h < 1 ? 44 : 32;

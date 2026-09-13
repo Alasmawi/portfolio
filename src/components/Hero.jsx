@@ -114,13 +114,10 @@ export default function Hero() {
             className="pointer-events-none absolute inset-0"
             style={{
               background:
-                'radial-gradient(120% 90% at 50% 20%, rgba(224,122,154,.16), rgba(224,122,154,0) 70%)',
+                'radial-gradient(120% 90% at 50% 20%, rgba(226,96,126,.16), rgba(226,96,126,0) 70%)',
             }}
             aria-hidden="true"
           />
-          {/* data-cloud is what scripts/make-cloud-poster.mjs shoots: it hides
-              everything in the hero except this box, so the still is the object
-              on transparency at exactly the framing the pane gives it. */}
           {/* Overhangs the pane, which crops it. mountCloud fits the object
               inside its canvas with padding, so at inset-0 the cloud sat in the
               middle of a large empty card taking up about a third of it. */}

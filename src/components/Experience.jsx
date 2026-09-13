@@ -29,7 +29,7 @@ function Bar({ start, end, color, muted = false, indent = false }) {
   const width = Math.max((frac(end) - frac(start)) * 100, 1.5);
   return (
     <div className={`relative h-2.5 rounded ${indent ? 'ml-4' : ''}`}>
-      <div className="absolute inset-0 rounded shadow-[inset_0_0_0_1px_rgba(253,243,244,0.09)]" />
+      <div className="absolute inset-0 rounded shadow-[inset_0_0_0_1px_rgba(251,238,240,0.09)]" />
       <div
         className="absolute top-0 bottom-0 rounded"
         style={{
@@ -55,9 +55,6 @@ export default function Experience() {
             <h2 className="max-w-[26ch] text-3xl font-medium tracking-tight text-text-primary md:text-[38px]">
               Two internships, back to back, through {YEAR}.
             </h2>
-            <p className="whitespace-nowrap font-mono text-[11.5px] text-text-muted">
-              Cloud first, then security
-            </p>
           </div>
         </Reveal>
 

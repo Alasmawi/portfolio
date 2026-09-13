@@ -76,7 +76,7 @@
       const speed = this._n('speed', 0.5);
       const twist = this._n('twist', 0.011);
       const alpha = this._n('opacity', 0.5);
-      const accent = this.getAttribute('accent') || '#e07a9a';
+      const accent = this.getAttribute('accent') || '#e2607e';
       const rungEvery = Math.max(0, Math.round(this._n('rungs', 3)));
       const chars = (SETS[this.getAttribute('glyphs')] || SETS.mixed).split('');
       ctx.clearRect(0, 0, w, h);
@@ -104,9 +104,9 @@
           const g = ctx.createLinearGradient(a.x, a.y, b.x, b.y);
           const ra = alpha * 0.28 * (0.35 + 0.65 * a.depth);
           const rb = alpha * 0.28 * (0.35 + 0.65 * b.depth);
-          g.addColorStop(0, `rgba(224,122,154,${ra.toFixed(3)})`);
-          g.addColorStop(0.5, `rgba(224,122,154,${(Math.max(ra, rb) * 0.5).toFixed(3)})`);
-          g.addColorStop(1, `rgba(224,122,154,${rb.toFixed(3)})`);
+          g.addColorStop(0, `rgba(226,96,126,${ra.toFixed(3)})`);
+          g.addColorStop(0.5, `rgba(226,96,126,${(Math.max(ra, rb) * 0.5).toFixed(3)})`);
+          g.addColorStop(1, `rgba(226,96,126,${rb.toFixed(3)})`);
           ctx.strokeStyle = g; ctx.lineWidth = 1;
           ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
         }
@@ -122,7 +122,7 @@
             ctx.fillStyle = `rgba(185,177,236,${(a * 0.95).toFixed(3)})`;
             ctx.shadowColor = accent; ctx.shadowBlur = 8 * (p.depth - 0.72) * 3;
           } else {
-            ctx.fillStyle = `rgba(253,243,244,${(a * 0.55).toFixed(3)})`;
+            ctx.fillStyle = `rgba(251,238,240,${(a * 0.55).toFixed(3)})`;
             ctx.shadowBlur = 0;
           }
           ctx.fillText(chars[idx], p.x, p.y);

@@ -36,9 +36,6 @@ export default function FocusPillars() {
             <h2 className="max-w-[24ch] text-3xl font-medium tracking-tight text-text-primary md:text-[38px]">
               Four things this site is about.
             </h2>
-            <p className="whitespace-nowrap font-mono text-[10.5px] uppercase tracking-[0.14em] text-text-muted">
-              {PROJECTS.length} repos · {FOCUS_PILLARS.length} pillars
-            </p>
           </div>
         </Reveal>
 

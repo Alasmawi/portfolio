@@ -1,100 +1,85 @@
-import { useEffect, useRef, useState } from 'react';
-import cloudPoster from '../../assets/hero/cloud.webp';
+import { useEffect, useRef } from 'react';
 
-// The live cloud is three.js: 136 kB gzip, a WebGL context with antialiasing at
-// up to 2x pixel ratio, and a PMREM environment bake — 42% of all the
-// JavaScript on the site, for one decorative object.
+// The hero cloud, live everywhere.
 //
-// What that spend buys is drift and pointer parallax. A phone has no pointer,
-// and the drift is slow enough that most visitors never see a full cycle, so on
-// a phone it is 136 kB for a picture. It gets the picture instead: a still of
-// the same object, rendered by the same code at build time
-// (scripts/make-cloud-poster.mjs) and captured at the phone's own framing.
+// It used to be a build-time still below 768px, on the argument that three.js
+// is 136 kB gzip and a phone has no pointer to parallax against. That argument
+// traded the wrong thing away: the cloud is the only object on the site with
+// any depth to it, and a flat recolouring of a render is visibly not the render
+// — it reads as a picture of the thing rather than the thing.
 //
-// Deliberately not "hide it on mobile". The cloud is the hero's one piece of
-// imagery and it reads clearly at 390px; dropping it would make the hero
-// plainer, which is a different thing from making it lighter.
-const LIVE_CLOUD = '(min-width: 768px) and (hover: hover)';
+// So the phone gets the real scene, turned down to suit it:
+//   · pixel ratio 1 rather than 2 — a quarter of the fragments
+//   · no antialiasing, which on a soft contour object is nearly invisible
+//   · the context is created when the hero scrolls into view and destroyed when
+//     it leaves, so it costs nothing for the rest of a 7000px page
+//
+// The module is still a dynamic import behind requestIdleCallback, so it never
+// competes with first paint.
+const COARSE = '(hover: none), (max-width: 767px)';
 
-export default function HeroCloudCanvas({ accent = '#e07a9a', fill = 0.94, exposure = 0.95, className = '', style }) {
+export default function HeroCloudCanvas({ accent = '#e2607e', fill = 0.94, exposure = 0.95, className = '', style }) {
   const canvasRef = useRef(null);
-  const stillRef = useRef(null);
-  // Read once, at mount. A phone does not cross this boundary mid-visit, and
-  // re-deciding on resize would mean tearing a WebGL context up and down while
-  // someone drags a desktop window.
-  const [live] = useState(
-    () => typeof window !== 'undefined' && window.matchMedia(LIVE_CLOUD).matches
-  );
-
-  // Parallax on the still. The live cloud answers the pointer; a phone has no
-  // pointer, so it answers the scroll instead — it drifts up more slowly than
-  // the copy beside it, which is what stops it reading as a sticker on a
-  // background. Written to a custom property and applied inside the same
-  // transform as the drift keyframes, so the two don't fight over `transform`.
-  useEffect(() => {
-    if (live) return undefined;
-    const el = stillRef.current;
-    if (!el) return undefined;
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return undefined;
-
-    let frame = 0;
-    const onScroll = () => {
-      if (frame) return;
-      frame = requestAnimationFrame(() => {
-        frame = 0;
-        // Only while the hero is still on screen; past that it is not visible
-        // and the offset would grow without bound.
-        const y = Math.min(window.scrollY, window.innerHeight);
-        el.style.setProperty('--cloud-parallax', `${(y * 0.18).toFixed(1)}px`);
-      });
-    };
-    onScroll();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => {
-      window.removeEventListener('scroll', onScroll);
-      if (frame) cancelAnimationFrame(frame);
-    };
-  }, [live]);
 
   useEffect(() => {
-    if (!live) return undefined;
     const canvas = canvasRef.current;
     if (!canvas) return undefined;
+
+    const lean = window.matchMedia(COARSE).matches;
     let destroy;
     let cancelled = false;
-    // Built off the main thread's critical path: the cloud is decorative,
-    // so it waits for idle time rather than competing with first paint.
-    const schedule = window.requestIdleCallback || ((fn) => setTimeout(fn, 200));
+    let handle = 0;
+    // The timeout is not optional. requestIdleCallback with no deadline can be
+    // deferred for as long as the main thread stays busy, and on a page with
+    // this much going on it sometimes never fires at all — which leaves the
+    // hero holding an empty canvas. 1500ms keeps it off the critical path
+    // while guaranteeing it runs.
+    const schedule = window.requestIdleCallback
+      ? (fn) => window.requestIdleCallback(fn, { timeout: 1500 })
+      : (fn) => setTimeout(fn, 200);
     const cancelSchedule = window.cancelIdleCallback || clearTimeout;
-    const handle = schedule(() => {
-      if (cancelled) return;
-      import('../../lib/mountCloud.js').then(({ mountCloud }) => {
-        if (cancelled) return;
-        destroy = mountCloud(canvas, { accent, fill, exposure });
+
+    const mount = () => {
+      if (cancelled || destroy) return;
+      handle = schedule(() => {
+        if (cancelled || destroy) return;
+        import('../../lib/mountCloud.js').then(({ mountCloud }) => {
+          if (cancelled || destroy) return;
+          destroy = mountCloud(canvas, {
+            accent,
+            fill,
+            exposure,
+            // A phone renders the same scene with the expensive knobs down.
+            maxPixelRatio: lean ? 1 : 2,
+            antialias: !lean,
+          });
+        });
       });
-    });
+    };
+
+    const unmount = () => {
+      cancelSchedule(handle);
+      if (destroy) {
+        destroy();
+        destroy = undefined;
+      }
+    };
+
+    // Only alive while the hero is on screen. A WebGL context held open behind
+    // six other sections is pure cost.
+    const io = new IntersectionObserver(
+      ([e]) => (e.isIntersecting ? mount() : unmount()),
+      { rootMargin: '200px' }
+    );
+    io.observe(canvas);
+
     return () => {
       cancelled = true;
-      cancelSchedule(handle);
-      if (destroy) destroy();
+      io.disconnect();
+      unmount();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [live]);
-
-  if (!live) {
-    return (
-      <img
-        ref={stillRef}
-        src={cloudPoster}
-        alt=""
-        aria-hidden="true"
-        // Matches how the canvas fills the same box, so the still drops into
-        // the wrapper Hero already positions without moving anything.
-        className={`cloud-still ${className}`}
-        style={{ display: 'block', width: '100%', height: '100%', objectFit: 'contain', ...style }}
-      />
-    );
-  }
+  }, []);
 
   return (
     <canvas

@@ -53,7 +53,7 @@ export default function About() {
                 className="absolute -bottom-1.5 left-0 right-0 h-0.5"
                 style={{
                   background:
-                    'linear-gradient(90deg, rgba(224,122,154,0), #e07a9a 18%, #e07a9a 82%, rgba(224,122,154,0))',
+                    'linear-gradient(90deg, rgba(226,96,126,0), #e2607e 18%, #e2607e 82%, rgba(226,96,126,0))',
                 }}
               />
             </span>{' '}
@@ -71,7 +71,7 @@ export default function About() {
               <div
                 className="pointer-events-none absolute -left-6 -right-6 top-6 -bottom-3.5"
                 style={{
-                  background: 'radial-gradient(50% 44% at 50% 62%, rgba(224,122,154,.22), rgba(224,122,154,0) 74%)',
+                  background: 'radial-gradient(50% 44% at 50% 62%, rgba(226,96,126,.22), rgba(226,96,126,0) 74%)',
                 }}
               />
               <img
@@ -100,7 +100,7 @@ export default function About() {
                 className="absolute bottom-0 left-1 right-1 h-px"
                 style={{
                   background:
-                    'linear-gradient(90deg, rgba(224,122,154,0), rgba(224,122,154,.55) 22%, rgba(224,122,154,.55) 78%, rgba(224,122,154,0))',
+                    'linear-gradient(90deg, rgba(226,96,126,0), rgba(226,96,126,.55) 22%, rgba(226,96,126,.55) 78%, rgba(226,96,126,0))',
                 }}
               />
             </div>

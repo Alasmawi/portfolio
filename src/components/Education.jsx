@@ -15,9 +15,6 @@ export default function Education() {
             <h2 className="max-w-[26ch] text-3xl font-medium tracking-tight text-text-primary md:text-[38px]">
               Two tracks, run in parallel for the last two years.
             </h2>
-            <p className="whitespace-nowrap font-mono text-[11.5px] text-text-muted">
-              A degree and a coding school, at the same time
-            </p>
           </div>
         </Reveal>
 
