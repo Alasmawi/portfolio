@@ -56,7 +56,7 @@ export default function Experience() {
               Two internships, back to back, through {YEAR}.
             </h2>
             <p className="whitespace-nowrap font-mono text-[11.5px] text-text-muted">
-              {YEAR} · cloud, then security
+              Cloud first, then security
             </p>
           </div>
         </Reveal>

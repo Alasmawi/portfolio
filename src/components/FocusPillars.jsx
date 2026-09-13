@@ -1,15 +1,23 @@
 import Reveal from './ui/Reveal';
 import { FOCUS_PILLARS } from '../data/focusPillars';
 import { PROJECTS } from '../data/projects';
-import { PILLAR_COLORS } from '../data/uobCoursework';
 
 // The four things the site is about, counted rather than claimed.
 //
 // The count is derived from projects.js — each project carries the pillars it
 // belongs to — so a pillar can never advertise work that isn't in the list
-// underneath it. It is also the honest ordering: Cloud is one project, and
-// putting "01" on the pillar the whole hero is about is better than rounding it
-// up to a paragraph about breadth.
+// underneath it.
+//
+// The count is a caption, not the figure. It used to be a 52px numeral, which
+// made the largest number on the card the most important thing on it — so
+// Full-Stack read as the headline at 08 and Cloud Computing, which is what the
+// hero and the flagship project are both about, read as the runner-up at 01.
+// The hierarchy argued against the positioning. The name is the figure now and
+// the count sits under it, which is also what the number actually is: a
+// footnote saying "and here is the evidence, in the list below".
+//
+// Zero-padding is gone with it. 01 / 03 / 08 down a column reads as an ordered
+// list with items missing, not as three counts.
 //
 // The blurb from focusPillars.js is deliberately not here. This section leads
 // with a figure and captions it with the stack; the prose version of the same
@@ -37,23 +45,13 @@ export default function FocusPillars() {
         <div className="mt-6 grid gap-4 sm:grid-cols-2 md:mt-7 md:grid-cols-4">
           {COUNTS.map((pillar, i) => (
             <Reveal key={pillar.id} delay={0.05 + i * 0.05} className="h-full">
-              <div className="glass-pane flex h-full flex-col rounded-[24px] p-5">
-                <div className="flex items-baseline justify-between gap-3">
-                  {/* The number is the figure. Two digits, always — 01 and 08
-                      are the same shape, so the four cards line up as a set
-                      rather than as four differently-weighted headings. */}
-                  <span
-                    className="text-[52px] font-medium leading-none tracking-[-0.04em] tabular-nums"
-                    style={{ color: PILLAR_COLORS[pillar.id] }}
-                  >
-                    {String(pillar.count).padStart(2, '0')}
-                  </span>
-                  <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-text-muted">
-                    {pillar.count === 1 ? 'project' : 'projects'}
-                  </span>
-                </div>
-                <p className="mt-4 text-[19px] font-medium leading-tight text-text-primary">
+              <div className="glass-pane flex h-full flex-col rounded-[24px] p-[18px] sm:p-5">
+                <p className="text-[21px] font-medium leading-tight tracking-[-0.015em] text-text-primary">
                   {pillar.label}
+                </p>
+                <p className="mt-1.5 font-mono text-[10.5px] uppercase tracking-[0.12em] text-text-muted">
+                  <span className="tabular-nums text-accent">{pillar.count}</span>{' '}
+                  {pillar.count === 1 ? 'project' : 'projects'}
                 </p>
                 <div className="mt-3.5 flex flex-wrap gap-1.5">
                   {pillar.tools.map((tool) => (

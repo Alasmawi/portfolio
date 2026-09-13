@@ -16,7 +16,7 @@ export default function Education() {
               Two tracks, run in parallel for the last two years.
             </h2>
             <p className="whitespace-nowrap font-mono text-[11.5px] text-text-muted">
-              computer science · cloud · full-stack
+              A degree and a coding school, at the same time
             </p>
           </div>
         </Reveal>

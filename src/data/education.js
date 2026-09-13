@@ -19,7 +19,10 @@ export const EDUCATION = [
       { value: '30', label: 'courses' },
       { value: '88', label: 'credit hours' },
     ],
-    description: 'Cloud computing track, benchmarked against AWS curriculum guidelines.',
+    // Said "cloud computing track" where the degree title above it and the
+    // tag beside it both already say it — three times in four lines. This says
+    // something the other two don't.
+    description: 'The track is built on the AWS Academy curriculum, so the coursework is the certification material.',
     coursework: true,
   },
   {

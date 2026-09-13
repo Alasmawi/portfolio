@@ -130,7 +130,11 @@ export default function About() {
               </div>
             </div>
             <div className="mt-7">
-              <a href="#contact" className="btn btn-primary px-6">
+              {/* Glass, not a third rose fill. The hero opens with the filled
+                  version of this exact action and Contact closes with it; this one
+                  sits between them and only has to be reachable. Two filled
+                  buttons were visible together at the About/Contact boundary. */}
+              <a href="#contact" className="btn btn-ghost glass-control px-6">
                 Get in touch
               </a>
             </div>
