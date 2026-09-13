@@ -2,13 +2,17 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
+  ChevronRight,
   ExternalLink,
+  FileCode2,
   Film,
+  Folder,
+  FolderOpen,
+  FolderTree,
   LayoutGrid,
   Lock,
   PlayCircle,
   Star,
-  Terminal as TerminalIcon,
   X,
 } from 'lucide-react';
 import Reveal from './ui/Reveal';
@@ -143,14 +147,43 @@ const VIEW_KEY = 'projects-view';
 
 const VIEWS = [
   { id: 'grid', label: 'Grid', Icon: LayoutGrid },
-  { id: 'terminal', label: 'Terminal', Icon: TerminalIcon },
+  { id: 'files', label: 'Explorer', Icon: FolderTree },
 ];
+
+// The four pillars, as directories. A project can belong to more than one, so
+// it is filed under the first — a tree where the same repo appears three times
+// is a worse map than one where it appears once.
+const FOLDERS = [
+  { id: 'cloud', name: 'cloud' },
+  { id: 'ai', name: 'ai' },
+  { id: 'fullstack', name: 'full-stack' },
+  { id: 'cs', name: 'computer-science' },
+];
+
+const EXT = { Go: 'go', Rust: 'rs', Python: 'py', JavaScript: 'js', TypeScript: 'ts', Shell: 'sh' };
+
+// The id, not the display name: ids are already kebab-case, so they read as
+// filenames where "K9 Pavlov System" and "Brain-Book" do not. The display name
+// is what the card and the dialog show.
+//
+// k9-pavlov carries no language — it is a system rather than a repo in one
+// tongue — so it stays extensionless, the way a file without one looks in a
+// real tree.
+const fileName = (p) => (EXT[p.language] ? `${p.id}.${EXT[p.language]}` : p.id);
+
+const TREE = FOLDERS.map((f) => ({
+  ...f,
+  children: PROJECTS.filter((p) => p.pillars?.[0] === f.id),
+})).filter((f) => f.children.length);
 
 function useProjectView() {
   const [view, setView] = useState(() => {
     if (typeof window === 'undefined') return 'grid';
     try {
-      return localStorage.getItem(VIEW_KEY) === 'terminal' ? 'terminal' : 'grid';
+      // 'terminal' is the previous name for this view; anyone carrying it in
+      // storage gets the explorer rather than being bounced back to the grid.
+      const saved = localStorage.getItem(VIEW_KEY);
+      return saved === 'files' || saved === 'terminal' ? 'files' : 'grid';
     } catch {
       return 'grid';
     }
@@ -544,6 +577,110 @@ function ProjectModal({ project, playing, onClose }) {
   );
 }
 
+// The explorer, the way an editor draws one.
+//
+// The repo-browser metaphor the section already carries, made literal: the four
+// pillars are directories, the projects are the files in them, and the row
+// treatment is the one every developer looking at this page reads without being
+// taught — a twisty, a folder that opens, a file icon tinted by language, and
+// an indent guide running down each level.
+//
+// Folders are open on arrival. A tree that starts collapsed hides the whole
+// point of showing a tree.
+function FileTree({ selectedId, onSelect }) {
+  const [closed, setClosed] = useState(() => new Set());
+  const toggle = (id) =>
+    setClosed((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+
+  return (
+    <div className="px-2 pb-3 pt-1 font-mono text-[12.5px]">
+      <p className="flex items-center gap-1.5 px-2 py-1 text-[10.5px] uppercase tracking-[0.14em] text-text-dim">
+        <FolderTree size={12} />
+        ~/projects
+      </p>
+
+      <ul role="tree" aria-label="Projects by area">
+        {TREE.map((folder) => {
+          const open = !closed.has(folder.id);
+          return (
+            <li key={folder.id} role="none">
+              <button
+                type="button"
+                role="treeitem"
+                aria-expanded={open}
+                onClick={() => toggle(folder.id)}
+                className="flex w-full items-center gap-1.5 rounded px-2 py-[5px] text-left text-text-muted transition-colors hover:bg-white/[0.05] hover:text-text-primary"
+              >
+                <ChevronRight
+                  size={13}
+                  className={`shrink-0 transition-transform duration-150 ${open ? 'rotate-90' : ''}`}
+                />
+                {open ? (
+                  <FolderOpen size={13} className="shrink-0 text-accent/80" />
+                ) : (
+                  <Folder size={13} className="shrink-0 text-accent/80" />
+                )}
+                <span className="truncate">{folder.name}</span>
+                <span className="ml-auto shrink-0 tabular-nums text-[11px] text-text-dim">
+                  {folder.children.length}
+                </span>
+              </button>
+
+              {open && (
+                /* The indent guide. One hairline per level, offset to sit under
+                   the twisty above it, exactly where an editor puts it. */
+                <ul role="group" className="ml-[13px] border-l border-white/[0.1] pl-1.5">
+                  {folder.children.map((p) => {
+                    const on = p.id === selectedId;
+                    return (
+                      <li key={p.id} role="none">
+                        <button
+                          type="button"
+                          role="treeitem"
+                          aria-selected={on}
+                          onClick={() => onSelect(p.id)}
+                          className={`flex w-full items-center gap-1.5 rounded-r px-2 py-[5px] text-left transition-colors ${
+                            on
+                              ? 'bg-accent/[0.16] text-accent-bright'
+                              : 'text-text-muted hover:bg-white/[0.05] hover:text-text-primary'
+                          }`}
+                        >
+                          <FileCode2
+                            size={13}
+                            className="shrink-0"
+                            style={{ color: LANGUAGE_COLORS[p.language] ?? undefined }}
+                          />
+                          <span className="truncate">{fileName(p)}</span>
+                          {p.flagship && (
+                            <Star size={10} className="shrink-0 text-accent" fill="currentColor" />
+                          )}
+                          {p.private && <Lock size={10} className="shrink-0 text-text-dim" />}
+                          {/* The tagline is what makes a tree of fourteen
+                              filenames worth reading. It takes whatever room is
+                              left and is dropped on the narrowest screens,
+                              where the filename already fills the row. */}
+                          <span className="ml-2 hidden min-w-0 flex-1 truncate text-[11.5px] text-text-dim sm:block">
+                            {p.tagline}
+                          </span>
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  );
+}
+
 // The repository selector, in the two shapes it can take.
 //
 // This replaced a horizontal chip row on a phone and a 264px sidebar of rows on
@@ -551,64 +688,8 @@ function ProjectModal({ project, playing, onClose }) {
 // you the work. Both shapes now span the panel and both are available at every
 // width.
 function ProjectSelector({ view, selectedId, onSelect }) {
-  if (view === 'terminal') {
-    return (
-      <div className="px-3 pb-3 pt-1 font-mono text-[12.5px] leading-[1.5]">
-        {/* The command is the section's own header said out loud. It is not a
-            prompt you can type into, so it is aria-hidden and the list below
-            carries the semantics. */}
-        <p className="select-none px-2 pb-1.5 text-text-dim" aria-hidden="true">
-          <span className="text-accent">$</span> ls ~/projects
-        </p>
-        <ul>
-          {PROJECTS.map((p) => {
-            const on = p.id === selectedId;
-            return (
-              <li key={p.id}>
-                <button
-                  type="button"
-                  onClick={() => onSelect(p.id)}
-                  aria-current={on ? 'true' : undefined}
-                  className={`flex w-full items-baseline gap-2 rounded px-2 py-[5px] text-left transition-colors ${
-                    on
-                      ? 'bg-accent/[0.16] text-accent-bright'
-                      : 'text-text-muted hover:bg-white/[0.05] hover:text-text-primary'
-                  }`}
-                >
-                  {/* A fixed-width mode column, the way ls -l opens. `d` for the
-                      one with a hardware gallery behind it, `-` for a plain
-                      repo, and the private ones lose their read bits — which is
-                      a truer way to say "private" than a padlock. */}
-                  <span className="shrink-0 tabular-nums text-text-dim/80">
-                    {p.items?.length ? 'd' : '-'}
-                    {p.private ? 'rw-------' : 'rw-r--r--'}
-                  </span>
-                  <span className="shrink-0" style={{ color: LANGUAGE_COLORS[p.language] ?? undefined }}>
-                    {p.flagship ? '*' : ' '}
-                  </span>
-                  <span className="min-w-0 flex-1 truncate">
-                    {p.name}
-                    <span className="hidden text-text-dim sm:inline">
-                      {'  '}
-                      {p.tagline}
-                    </span>
-                  </span>
-                </button>
-                {/* On a phone the tagline gets its own indented line rather than
-                    being dropped — a listing of fourteen bare names is what the
-                    grid exists to fix. */}
-                <p className="truncate pb-1 pl-2 text-[11.5px] text-text-dim sm:hidden">
-                  {p.tagline}
-                </p>
-              </li>
-            );
-          })}
-        </ul>
-        <p className="select-none px-2 pt-1.5 text-text-dim" aria-hidden="true">
-          <span className="text-accent">$</span> <span className="terminal-caret">_</span>
-        </p>
-      </div>
-    );
+  if (view === 'files') {
+    return <FileTree selectedId={selectedId} onSelect={onSelect} />;
   }
 
   return (
