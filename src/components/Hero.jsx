@@ -24,7 +24,7 @@ export default function Hero() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.1 }}
-          style={{ textShadow: '0 2px 34px rgba(23,18,26,.75)' }}
+          style={{ textShadow: '0 2px 34px rgb(18 5 9 / .75)' }}
         >
           {/* On a phone: name, one line about the work, two ways to act on it.
               That is the whole hero. The K9 line comes back from `sm` up, where

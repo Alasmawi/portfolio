@@ -68,8 +68,8 @@ export const UOB_COURSEWORK = [
 // touch; CourseworkModule separates them by 3px of the pane behind, which
 // distinguishes them better than hue did, and each is named in the legend.
 export const PILLAR_COLORS = {
-  cloud: 'rgba(224, 122, 154, 1)',
-  ai: 'rgba(224, 122, 154, 0.74)',
-  fullstack: 'rgba(224, 122, 154, 0.5)',
-  cs: 'rgba(224, 122, 154, 0.3)',
+  cloud: 'rgb(226 96 126 / 1)',
+  ai: 'rgb(226 96 126 / 0.74)',
+  fullstack: 'rgb(226 96 126 / 0.5)',
+  cs: 'rgb(226 96 126 / 0.3)',
 };

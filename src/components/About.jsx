@@ -36,7 +36,7 @@ export default function About() {
           // that band had a visible vertical edge — the grid and the orb light
           // simply stopped. It only has to take the helix down far enough for
           // the copy to win, which .62 does.
-          background: 'linear-gradient(270deg, rgba(23,18,26,0), rgba(23,18,26,.38) 62%, rgba(23,18,26,.62))',
+          background: 'linear-gradient(270deg, rgb(18 5 9 / 0), rgb(18 5 9 / .38) 62%, rgb(18 5 9 / .62))',
         }}
       />
 

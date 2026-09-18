@@ -84,7 +84,7 @@ const ServiceNode = memo(({ data }) => {
         data.sub ? 'gap-2.5 px-3 py-2.5' : 'gap-2 px-2.5 py-2'
       }`}
       style={{
-        background: 'rgba(13,10,15,.94)',
+        background: 'rgb(18 5 9 / .94)',
         border: `1px solid ${color}66`,
         width: data.w,
       }}
