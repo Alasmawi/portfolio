@@ -1,6 +1,6 @@
 # Portfolio — Abdulla Alasmawi
 
-A single-page portfolio site built with React, Vite, Tailwind CSS and Framer Motion, served at `/v2`. Systems-diagram furniture — mono labels, status dots, a GitHub-style repo browser, a real architecture diagram — on a warm dusk ground under glass.
+A single-page portfolio site built with React, Vite, Tailwind CSS and Framer Motion, served at `/v2`. Systems-diagram furniture — mono labels, status dots, a repository browser that switches between a grid of covers and a file tree, a real architecture diagram — on a burgundy ground under liquid glass.
 
 Live sections: Hero, Focus, Projects (browsable, video/architecture previews), Experience, Education, About, Contact.
 
@@ -20,14 +20,19 @@ The cost sits with the control — a nested `backdrop-filter` behind a composite
 
 **The atmosphere.** `Atmosphere.jsx` paints four drifting orbs and a 72px grid in one `position: fixed`, `contain: strict` layer for the whole document, instead of each section carrying its own gradients. Fixed means it never repaints on scroll, and the parallax comes free. Two of the four orbs are desktop-only.
 
-Palette: ground `#17121a`, deeper `#0d0a0f`, cream `#fdf3f4`, rose `#e07a9a` (the accent), amber `#f0a448` (calls to action, and the gateway in the K9 diagram), teal `#4fd1c5` (status, nothing else). `node scripts/check-contrast.mjs` reads the tokens out of `tailwind.config.js` and fails if any pairing drops below its WCAG floor.
+**The rhythm.** Sections don't set their own padding. `.section`, `.section-inner` and `.section-body` in `src/index.css` carry the whole vertical and horizontal scale, and every section opens with the same `SectionHeading` component.
+
+Palette: ground `#1c0810`, deeper `#120509`, surface `#2c0f1a`, cream `#fbeef0`, rose `#e2607e` (the accent — burgundy is the ground and cannot signal, so rose does), amber `#f0a448` (the gateway in the K9 diagram), teal `#4fd1c5` (status, nothing else). `tailwind.config.js` holds the values and `:root` in `src/index.css` mirrors them for hand-written CSS. `node scripts/check-contrast.mjs` reads the tokens out of `tailwind.config.js` and fails if any pairing drops below its WCAG floor; `node scripts/check-tokens.mjs` fails if the two lists drift apart.
+
+Contributor guidance — the glass rule in full, the copy rules, the accessibility floor and the traps this project has already hit — is in [CLAUDE.md](CLAUDE.md).
 
 ## Stack
 
 - React (functional components, hooks)
 - Vite
 - Tailwind CSS (custom theme in `tailwind.config.js`)
-- Framer Motion (scroll reveals, project-browser transitions)
+- Framer Motion (scroll reveals, the sliding nav highlight, the project modal)
+- three.js (the hero cloud) and @xyflow/react (the K9 diagram), both lazy
 - lucide-react (icons)
 
 ## Local development
@@ -53,7 +58,8 @@ src/
     Education.jsx, About.jsx, Contact.jsx, Nav.jsx
     ui/
       Atmosphere.jsx       — the fixed orb + grid layer behind the whole page
-      HeroCloudCanvas.jsx  — three.js cloud on desktop, a build-time still on phones
+      HeroCloudCanvas.jsx  — the live three.js cloud, mounted when it scrolls into view
+      SectionHeading.jsx   — the eyebrow + headline every section opens with
       MobileTabBar.jsx     — the floating glass dock (phones only)
       K9Architecture.jsx, K9Flow.jsx  — the sensors → AWS diagram (lazy)
       RingGallery.jsx, HardwareStrip.jsx  — the K9 hardware photos
@@ -61,13 +67,15 @@ src/
       ScrollCounter.jsx, Reveal.jsx, BrandIcons.jsx
   data/
     projects.js       — every project shown in the Projects browser
-    focusPillars.js   — the four pillars; project counts are derived from projects.js
+    focusPillars.js   — the four pillars; `pillars` in projects.js links each project to them
     experience.js, education.js, uobCoursework.js, rebootJourney.js, navLinks.js
   lib/
     mountCloud.js     — the hero cloud's three.js scene
+    glassPointer.js   — the pointer highlight on every .glass-control
     dna-helix.js      — the custom element in About
 public/
   video/         — project preview clips, referenced from data/projects.js
+  video/posters/ — a still from each clip, used as the grid cover and the poster
 ```
 
 ### Adding or updating a project
@@ -77,18 +85,20 @@ Edit `src/data/projects.js` — each entry is one object:
 ```js
 {
   id: 'my-project',
+  pillars: ['fullstack'],    // ids from data/focusPillars.js; drives the file-tree folders
   name: 'My Project',
   tagline: 'one line description',
-  language: 'Go',            // used for the language dot; add new colors to LANGUAGE_COLORS
+  language: 'Go',            // the language dot; add new colours to LANGUAGE_COLORS
   description: '...',
   tags: ['Go', 'Docker'],
   githubUrl: 'https://github.com/Alasmawi/my-project',
-  liveUrl: null,              // optional
-  gif: '/gifs/my-project.gif', // drop the file in public/gifs/, or leave null for a "preview coming soon" placeholder
+  liveUrl: null,             // optional
+  video: asset('/video/my-project.mp4'),
+  poster: asset('/video/posters/my-project.webp'),
 }
 ```
 
-No layout changes are needed — the Projects section reads this array directly. GIFs are shown at their native aspect ratio (never cropped); keep individual files under ~5 MB where possible for fast loads.
+No layout changes are needed — the Projects section reads this array directly, and the section heading counts it. Drop the clip in `public/video/` and run `node scripts/make-posters.mjs` to extract the still; `asset()` applies the `/v2` base path, which Vite does not rewrite for runtime strings. A project with no clip falls back to a placeholder rather than an empty frame.
 
 ## Deploying to Vercel
 
