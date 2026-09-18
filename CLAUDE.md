@@ -24,7 +24,7 @@ scaffolding. They are fast and they all read the real source, not a copy.
 ```bash
 node scripts/check-tokens.mjs     # :root in index.css == tailwind.config.js, and no retired hexes
 node scripts/check-contrast.mjs   # every token pairing against its WCAG floor
-node scripts/check-shift.mjs      # cumulative layout shift
+node scripts/check-shift.mjs      # the lazy covers reserve their boxes; the dialog doesn't move the page
 node scripts/shots.mjs            # screenshots at 390 / 768 / 1440 + runtime probes
 ```
 
@@ -156,6 +156,15 @@ hero grew under the reader's thumb on the first flick of every visit.
 
 **`overscroll-behavior-y: none` on `html`** is what keeps the fixed dock welded
 to the bottom edge on iOS. Removing it un-sticks the primary navigation.
+
+**`rect.top + window.scrollY` lies while a smooth scroll is easing.** `html` has
+`scroll-behavior: smooth`, so a probe can read a rect from one frame against a
+scroll position from another and report a layout shift that is not happening.
+Walk `offsetTop` instead — it needs no scroll position.
+
+**Probes rot faster than the page.** Three of the check scripts have at some
+point measured an element that had been deleted and reported a clean pass.
+When a layout changes, open the script that measures it in the same commit.
 
 ## Environment limits when verifying
 
