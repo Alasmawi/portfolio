@@ -15,6 +15,7 @@ import {
   Star,
   X,
 } from 'lucide-react';
+import SectionHeading from './ui/SectionHeading';
 import Reveal from './ui/Reveal';
 import RingGallery from './ui/RingGallery';
 import HardwareStrip from './ui/HardwareStrip';
@@ -31,6 +32,16 @@ const IDLE_TICK_MS = 1000;
 // Stack tags shared across ≥2 real repos, most-shipped first. Derived from
 // projects.js rather than hand-picked, so it can't drift into inventory that
 // doesn't match what's actually in the list below it.
+// The count in the section heading, spelled. A sentence opening with a numeral
+// reads as a list item, and this one is a sentence. Falls back to digits past
+// twenty, which is the point at which spelling it out reads worse than not.
+const NUMBERS = [
+  'Zero', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten',
+  'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen',
+  'Nineteen', 'Twenty',
+];
+const spellCount = (n) => NUMBERS[n] ?? String(n);
+
 const RECURRING_STACK = (() => {
   const counts = new Map();
   for (const p of PROJECTS) {
@@ -705,11 +716,11 @@ function ProjectSelector({ view, selectedId, onSelect }) {
               aria-current={on ? 'true' : undefined}
               className={`group flex w-full flex-col overflow-hidden rounded-2xl text-left transition-colors ${
                 on
-                  ? 'bg-accent/[0.14] shadow-[inset_0_0_0_1px_rgb(224_122_154_/_0.7)]'
-                  : 'bg-white/[0.045] shadow-[inset_0_0_0_1px_rgb(253_243_244_/_0.12)] hover:bg-white/[0.08]'
+                  ? 'bg-accent/[0.14] shadow-[inset_0_0_0_1px_rgb(226_96_126_/_0.7)]'
+                  : 'bg-white/[0.045] shadow-[inset_0_0_0_1px_rgb(251_238_240_/_0.12)] hover:bg-white/[0.08]'
               }`}
             >
-              <span className="relative block aspect-[16/9] w-full overflow-hidden bg-black/25">
+              <span className="relative isolate block aspect-[16/9] w-full overflow-hidden bg-black/25">
                 {/* Behind every thumbnail, not only the one project without a
                     still. The images are lazy, so a card that has not fetched
                     yet would otherwise be an empty black rectangle — half a
@@ -727,9 +738,42 @@ function ProjectSelector({ view, selectedId, onSelect }) {
                        the part worth seeing — the header, the first rows of real
                        content — is at the top of the frame; a centre crop lands on
                        empty canvas for about half of them. */
-                    className="relative h-full w-full object-cover object-top opacity-90 transition-opacity group-hover:opacity-100"
+                    className="relative h-full w-full object-cover object-top saturate-[.78] transition duration-300 group-hover:saturate-100"
                   />
                 )}
+                {/* The grade.
+
+                    These covers are frames from the projects themselves, so
+                    they arrive in whatever colour the project happened to be:
+                    guidely is a white documentation UI, rt is a grey render,
+                    smart-road is flat green. Fourteen of those in a grid on a
+                    burgundy ground read as fourteen unrelated windows rather
+                    than as one body of work, and the bright ones glare hard
+                    enough to pull the eye off whatever you were reading.
+
+                    A multiply of the page's own two grounds puts them all in
+                    the same key without touching the files. It lifts on hover
+                    and on keyboard focus, so the true colours are one pointer
+                    away and the modal shows them ungraded. */}
+                <span
+                  aria-hidden="true"
+                  className="pointer-events-none absolute inset-0 mix-blend-multiply transition-opacity duration-300 group-hover:opacity-40 group-focus-visible:opacity-40"
+                  style={{
+                    background:
+                      'linear-gradient(180deg, rgb(44 15 26 / .42), rgb(18 5 9 / .72))',
+                  }}
+                />
+                {/* Over the multiply, not under it: a little of the ground's
+                    own rose put back as light, so a graded cover reads as lit
+                    rather than merely darkened. */}
+                <span
+                  aria-hidden="true"
+                  className="pointer-events-none absolute inset-0 opacity-70 transition-opacity duration-300 group-hover:opacity-0"
+                  style={{
+                    background:
+                      'radial-gradient(120% 80% at 50% 0%, rgb(226 96 126 / .16), rgb(226 96 126 / 0) 68%)',
+                  }}
+                />
                 {p.flagship && (
                   <span className="absolute left-1.5 top-1.5 rounded-full bg-black/55 p-1 text-accent backdrop-blur-sm">
                     <Star size={10} fill="currentColor" />
@@ -860,22 +904,23 @@ export default function ProjectBrowser() {
   }, [nudgeIdle]);
 
   return (
-    <section id="projects" ref={sectionRef} className="relative">
-      <div className="mx-auto max-w-6xl px-5 pb-6 pt-11 sm:px-10 sm:pb-8 sm:pt-14 md:px-14 md:pb-10 md:pt-20">
-        <Reveal>
-          <p className="mb-4 font-mono text-[11px] uppercase tracking-[0.18em] text-text-muted">
-            // [ projects ]
-          </p>
-          <div className="flex flex-wrap items-end justify-between gap-6">
-            <h2 className="text-3xl font-medium tracking-tight text-text-primary md:text-[38px]">
-              Projects
-            </h2>
-          </div>
-          {/* Wide screens only. On a phone this was a label plus eight
-              outlined pills sitting between the headline and the browser, and
-              the browser underneath shows every one of those tags again, per
-              project, where they mean something specific. */}
-          <div className="mt-5 hidden flex-wrap items-center gap-3 sm:flex">
+    <section id="projects" ref={sectionRef} className="section">
+      <div className="section-inner">
+        {/* The heading was the single word "Projects" under an eyebrow reading
+            "// [ projects ]" — the same word twice, in a column where every
+            other section opens with a sentence. It names the thing directly
+            under it instead: the stack row, and then the browser. */}
+        <SectionHeading
+          label="projects"
+          title={`${spellCount(PROJECTS.length)} projects, and the stack that keeps showing up.`}
+        />
+
+        {/* Wide screens only. On a phone this was a label plus eight
+            outlined pills sitting between the headline and the browser, and
+            the browser underneath shows every one of those tags again, per
+            project, where they mean something specific. */}
+        <Reveal delay={0.05}>
+          <div className="mt-6 hidden flex-wrap items-center gap-3 sm:flex">
             {/* Full-strength muted, not /70: at 10.5px the faded variant
                 measured 4.19:1, under the 4.5:1 AA floor. */}
             <span className="shrink-0 font-mono text-[10.5px] uppercase tracking-[0.16em] text-text-muted">
@@ -891,19 +936,21 @@ export default function ProjectBrowser() {
             </div>
           </div>
         </Reveal>
-      </div>
 
-      {/* The browser is a pane on the page's own surface. It used to float on a
-          full-bleed band of `void` with a canvas of falling glyphs behind it,
-          faded top and bottom to hide where the band started — a second ground,
-          a per-frame canvas and two gradients, all to stop one panel looking
-          pasted on. The atmosphere layer behind the document does that for
-          every section at once, so the band and the rain are gone and what is
-          left is the panel. */}
-      <div>
-        <div className="relative">
-          <Reveal delay={0.05} className="relative block px-5 py-6 sm:px-10 sm:py-9 md:px-14">
-            <div className="glass-pane mx-auto max-w-6xl overflow-hidden rounded-[26px]">
+        {/* The browser is a pane on the page's own surface. It used to float on a
+            full-bleed band of `void` with a canvas of falling glyphs behind it,
+            faded top and bottom to hide where the band started — a second ground,
+            a per-frame canvas and two gradients, all to stop one panel looking
+            pasted on. The atmosphere layer behind the document does that for
+            every section at once, so the band and the rain are gone and what is
+            left is the panel.
+
+            It also used to sit in a centred container of its own inside a
+            full-width gutter, which put its left edge 56px outside the heading
+            above it — the one horizontal misalignment on the page. Both hang
+            off `.section-inner` now. */}
+        <Reveal delay={0.1}>
+          <div className="section-body glass-pane overflow-hidden rounded-[26px]">
               {/* One selector, full width, in whichever shape the reader
                   picked. This was two different controls doing one job — a
                   horizontal chip row on a phone and a 264px sidebar of rows on
@@ -917,7 +964,7 @@ export default function ProjectBrowser() {
                   <div
                     role="group"
                     aria-label="Repository layout"
-                    className="flex items-center gap-0.5 rounded-full bg-white/[0.06] p-0.5 shadow-[inset_0_0_0_1px_rgb(253_243_244_/_0.12)]"
+                    className="flex items-center gap-0.5 rounded-full bg-white/[0.06] p-0.5 shadow-[inset_0_0_0_1px_rgb(251_238_240_/_0.12)]"
                   >
                     {VIEWS.map(({ id, label, Icon }) => {
                       const on = view === id;
@@ -959,9 +1006,8 @@ export default function ProjectBrowser() {
                   anyway: nothing on the page scrolls sideways. The swipe
                   handler below does its own angle check, which is what actually
                   keeps a vertical fling from being read as a project change. */}
-            </div>
-          </Reveal>
-        </div>
+          </div>
+        </Reveal>
       </div>
 
       <ProjectModal project={openProject} playing={inView && !!openProject} onClose={closeModal} />

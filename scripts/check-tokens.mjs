@@ -44,9 +44,11 @@ const RETIRED = [
   ['13,10,15', 'old deep ground, rgb()'],
   ['13, 10, 15', 'old deep ground, rgb()'],
   ['#e07a9a', 'old rose accent'],
+  ['224_122_154', 'old rose accent, Tailwind arbitrary value'],
   ['224,122,154', 'old rose accent, rgb()'],
   ['224, 122, 154', 'old rose accent, rgb()'],
   ['#fdf3f4', 'old cream'],
+  ['253_243_244', 'old cream, Tailwind arbitrary value'],
   ['253,243,244', 'old cream, rgb()'],
   ['253, 243, 244', 'old cream, rgb()'],
 ];

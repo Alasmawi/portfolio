@@ -1,9 +1,10 @@
 import Reveal from './ui/Reveal';
+import SectionHeading from './ui/SectionHeading';
 import pfp from '../assets/pfp-nobg.webp';
 
 export default function About() {
   return (
-    <section id="about" className="relative overflow-hidden px-5 py-11 sm:px-10 sm:py-14 md:px-14 md:py-20">
+    <section id="about" className="section overflow-hidden">
       {/* The custom element positions *itself* — its script writes inline
           `position:absolute; inset:0` whenever its parent is positioned, which
           beats any utility class we'd put on the element. So the rail geometry
@@ -40,32 +41,30 @@ export default function About() {
         }}
       />
 
-      <div className="relative mx-auto max-w-6xl">
-        <Reveal>
-          <p className="mb-5 font-mono text-[11px] uppercase tracking-[0.18em] text-text-muted">
-            // [ about ]
-          </p>
-          <h2 className="max-w-[22ch] text-4xl font-medium leading-[1.08] tracking-tight text-text-primary md:text-[46px]">
-            I like the problems that{' '}
-            <span className="relative whitespace-nowrap">
-              don&apos;t
-              <span
-                className="absolute -bottom-1.5 left-0 right-0 h-0.5"
-                style={{
-                  background:
-                    'linear-gradient(90deg, rgba(226,96,126,0), #e2607e 18%, #e2607e 82%, rgba(226,96,126,0))',
-                }}
-              />
-            </span>{' '}
-            get to fail.
-          </h2>
-          <p className="mt-5 max-w-[50ch] text-base leading-relaxed text-text-primary/84 md:text-[16px]">
-            A schema that still makes sense in a year. An API that stays cheap when traffic triples.
-            That&apos;s the work.
-          </p>
-        </Reveal>
+      <div className="section-inner relative">
+        <SectionHeading
+          label="about"
+          size="lead"
+          title={
+            <>
+              I like the problems that{' '}
+              <span className="relative whitespace-nowrap">
+                don&apos;t
+                <span
+                  className="absolute -bottom-1.5 left-0 right-0 h-0.5"
+                  style={{
+                    background:
+                      'linear-gradient(90deg, rgb(226 96 126 / 0), var(--accent) 18%, var(--accent) 82%, rgb(226 96 126 / 0))',
+                  }}
+                />
+              </span>{' '}
+              get to fail.
+            </>
+          }
+          lede="A schema that still makes sense in a year. An API that stays cheap when traffic triples. That's the work."
+        />
 
-        <div className="mt-9 grid gap-9 md:mt-11 md:max-w-[900px] md:grid-cols-[220px_1fr] md:items-start">
+        <div className="section-body grid gap-9 md:max-w-[900px] md:grid-cols-[220px_1fr] md:items-start">
           <Reveal delay={0.1}>
             <div className="relative mx-auto h-[300px] w-[240px] sm:h-[260px] sm:w-[200px] md:mx-0 md:h-[270px] md:w-full">
               <div

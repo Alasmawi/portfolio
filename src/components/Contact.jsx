@@ -2,6 +2,7 @@ import { useCallback, useRef, useState } from 'react';
 import { Check, Copy, Mail, Phone } from 'lucide-react';
 import { GithubMark, LinkedinMark } from './ui/BrandIcons';
 import Reveal from './ui/Reveal';
+import SectionHeading from './ui/SectionHeading';
 
 const EMAIL = 'asmawiabdulla0@gmail.com';
 
@@ -84,20 +85,15 @@ export default function Contact() {
   }, []);
 
   return (
-    <section id="contact" className="relative px-5 pb-9 pt-11 sm:px-10 sm:pt-14 md:px-14 md:pb-14 md:pt-20">
-      <div className="mx-auto max-w-6xl">
+    <section id="contact" className="section">
+      <div className="section-inner">
         <div className="grid gap-10 md:grid-cols-[1fr_auto] md:items-start md:gap-16">
-          <Reveal>
-            <p className="mb-5 font-mono text-[11.5px] uppercase tracking-[0.18em] text-text-muted">
-              // [ contact ]
-            </p>
-            <h2 className="max-w-[20ch] text-3xl font-medium leading-[1.1] tracking-tight text-text-primary md:text-[38px]">
-              Tell me what you are trying to measure.
-            </h2>
-            <p className="mt-5 max-w-[48ch] text-[14.5px] leading-relaxed text-text-primary/66">
-              I reply to most things within a day. If it involves sensors, a gateway, or AWS, send
-              the constraint you are stuck on rather than the job title.
-            </p>
+          <div>
+            <SectionHeading
+              label="contact"
+              title="Tell me what you are trying to measure."
+              lede="I reply to most things within a day. If it involves sensors, a gateway, or AWS, send the constraint you are stuck on rather than the job title."
+            />
 
             {/* The address, in the open, next to the form rather than only in
                 the footer below it. Send needs a mail client; this needs
@@ -123,7 +119,7 @@ export default function Contact() {
                 </span>
               </button>
             </div>
-          </Reveal>
+          </div>
 
           <Reveal delay={0.1}>
             <form

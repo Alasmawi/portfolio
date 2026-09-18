@@ -1,4 +1,5 @@
 import Reveal from './ui/Reveal';
+import SectionHeading from './ui/SectionHeading';
 import { EXPERIENCE, K9_CROSS_REF } from '../data/experience';
 
 const YEAR = 2026;
@@ -45,18 +46,12 @@ function Bar({ start, end, color, muted = false, indent = false }) {
 
 export default function Experience() {
   return (
-    <section id="experience" className="relative px-5 py-11 sm:px-10 sm:py-14 md:px-14 md:py-20">
-      <div className="mx-auto max-w-6xl">
-        <Reveal>
-          <p className="mb-4 font-mono text-[11px] uppercase tracking-[0.18em] text-text-muted">
-            // [ experience ]
-          </p>
-          <div className="flex flex-wrap items-end justify-between gap-6">
-            <h2 className="max-w-[26ch] text-3xl font-medium tracking-tight text-text-primary md:text-[38px]">
-              Two internships, back to back, through {YEAR}.
-            </h2>
-          </div>
-        </Reveal>
+    <section id="experience" className="section">
+      <div className="section-inner">
+        <SectionHeading
+          label="experience"
+          title={`Two internships, back to back, through ${YEAR}.`}
+        />
 
         {/* The year, as a figure. The two internships and the K9 deliverable
             hanging off the first one are three bars on one axis, which says
@@ -67,7 +62,7 @@ export default function Experience() {
               and on a phone it cost ~400px to label every role three times —
               once on its bar, once in the legend, once in the row below. At md
               and up it fills a column that is otherwise empty. */}
-          <div className="glass-pane mt-10 hidden rounded-[26px] p-5 sm:p-7 md:block">
+          <div className="glass-pane section-body hidden rounded-[26px] p-5 sm:p-7 md:block">
             <div className="relative mb-2.5 h-4 font-mono text-[10.5px] uppercase tracking-wider text-text-dim">
               {TICKS.map((t, i) => (
                 <span

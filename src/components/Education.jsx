@@ -1,27 +1,22 @@
 import Reveal from './ui/Reveal';
+import SectionHeading from './ui/SectionHeading';
 import CourseworkModule from './ui/CourseworkModule';
 import ProgramJourney from './ui/ProgramJourney';
 import { EDUCATION } from '../data/education';
 
 export default function Education() {
   return (
-    <section id="education" className="relative px-5 py-11 sm:px-10 sm:py-14 md:px-14 md:py-20">
-      <div className="mx-auto max-w-6xl">
-        <Reveal>
-          <p className="mb-4 font-mono text-[11px] uppercase tracking-[0.18em] text-text-muted">
-            // [ education ]
-          </p>
-          <div className="flex flex-wrap items-end justify-between gap-6">
-            <h2 className="max-w-[26ch] text-3xl font-medium tracking-tight text-text-primary md:text-[38px]">
-              Two tracks, run in parallel for the last two years.
-            </h2>
-          </div>
-        </Reveal>
+    <section id="education" className="section">
+      <div className="section-inner">
+        <SectionHeading
+          label="education"
+          title="Two tracks, run in parallel for the last two years."
+        />
 
         {/* A pane per track rather than rows split by an inset rule. The two
             run in parallel and are read as a pair, which two panes say and a
             divided list does not. */}
-        <div className="mt-8 grid gap-4 md:mt-10">
+        <div className="section-body grid gap-4">
           {EDUCATION.map((entry, i) => {
             return (
               <Reveal key={entry.id} delay={0.1 + i * 0.05}>

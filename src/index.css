@@ -105,6 +105,33 @@
 }
 
 @layer components {
+  /* ——— the page's vertical rhythm ————————————————————————————————————
+     One scale, three classes, and nothing sets its own padding.
+
+     Before this, every section had picked its own: `py-11 sm:py-14 md:py-20`
+     in three of them, `pb-9 pt-11 sm:pb-10 sm:pt-14 md:pb-12 md:pt-16` in
+     Focus, something else again in Projects and Contact. Adjacent sections
+     therefore sat 128px apart in one place and 160px in the next, on a page
+     where nothing draws a line between them — so the only thing telling a
+     reader one section has ended is the size of the gap, and the gap was
+     telling them different things in different places.
+
+     64px of padding a side at md, so 128px between two sections. Projects
+     also has a horizontal half to this: its browser pane used to sit in its
+     own centred container, which put it 56px to the left of its own heading.
+     `.section-inner` is the one container, and everything inside a section
+     hangs off it. */
+  .section {
+    @apply relative px-5 py-12 sm:px-10 sm:py-14 md:px-14 md:py-16;
+  }
+  .section-inner {
+    @apply mx-auto max-w-6xl;
+  }
+  /* The gap between a section's heading block and whatever it introduces. */
+  .section-body {
+    @apply mt-8 md:mt-10;
+  }
+
   .mono-label {
     @apply font-mono text-xs uppercase tracking-[0.14em] text-text-muted;
   }

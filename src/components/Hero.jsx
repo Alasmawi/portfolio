@@ -17,7 +17,7 @@ export default function Hero() {
   return (
     <section
       id="hero"
-      className="relative px-5 pb-12 pt-[104px] sm:px-10 sm:pb-16 sm:pt-[128px] md:min-h-[86svh] md:px-14 md:pt-[140px]"
+      className="relative px-5 pb-12 pt-[104px] sm:px-10 sm:pb-16 sm:pt-[128px] md:min-h-[76svh] md:px-14 md:pt-[140px]"
     >
       <div className="mx-auto grid max-w-6xl items-center gap-9 md:grid-cols-[1fr_minmax(320px,470px)] md:gap-12">
         <motion.div
@@ -108,7 +108,7 @@ export default function Hero() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.7, delay: 0.25 }}
-          className="glass-pane relative h-[230px] overflow-hidden rounded-[28px] sm:h-[300px] md:h-[380px]"
+          className="glass-pane relative h-[248px] overflow-hidden rounded-[28px] sm:h-[320px] md:h-[400px]"
         >
           <div
             className="pointer-events-none absolute inset-0"
@@ -118,10 +118,14 @@ export default function Hero() {
             }}
             aria-hidden="true"
           />
-          {/* Overhangs the pane, which crops it. mountCloud fits the object
-              inside its canvas with padding, so at inset-0 the cloud sat in the
-              middle of a large empty card taking up about a third of it. */}
-          <div data-cloud className="absolute -inset-[20%]">
+          {/* Overhangs the pane, which crops it. mountCloud fits the *whole*
+              system inside its canvas — the main cloud, the three satellites
+              orbiting it and the reflection below — so the main body, which is
+              the thing you are meant to see, comes out about a third of the
+              frame. The overhang scales it up and lets the pane crop the empty
+              corners. Wider than it is tall, because the empty margin is wider
+              than it is tall: the reflection uses the vertical room. */}
+          <div data-cloud className="absolute -inset-x-[34%] -inset-y-[24%]">
             <HeroCloudCanvas />
           </div>
         </motion.div>
