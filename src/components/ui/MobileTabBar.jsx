@@ -1,3 +1,4 @@
+import { motion } from 'framer-motion';
 import { Mail } from 'lucide-react';
 import { LINKS } from '../../data/navLinks';
 import { scrollToSection } from '../../lib/scrollToSection';
@@ -51,23 +52,37 @@ export default function MobileTabBar({ active }) {
                   className={`relative flex min-h-[54px] flex-col items-center justify-center gap-1 rounded-[20px] transition-colors ${
                     on ? 'text-text-primary' : cta ? 'text-accent-bright' : 'text-text-muted'
                   }`}
-                  /* The active tab is a lit facet of the dock's own glass — the
-                     same white wash and top stroke the nav pill uses for its
-                     selected link — instead of the accent underline the old bar
-                     drew. On an object this small a coloured rule reads as a
-                     defect in the glass; a highlight reads as a pressed key. */
-                  style={
-                    on
-                      ? {
-                          background: 'rgba(255,255,255,.18)',
-                          boxShadow: 'inset 0 1px 0 rgba(255,255,255,.5)',
-                        }
-                      : undefined
-                  }
                 >
-                  <Icon size={18} strokeWidth={1.75} aria-hidden="true" />
-                  <span className="font-mono text-[10px] uppercase tracking-[0.06em]">
-                    {label}
+                  {/* The active tab is a lit facet of the dock's own glass — the
+                      same white wash and top stroke the nav pill uses for its
+                      selected link — instead of the accent underline the old bar
+                      drew. On an object this small a coloured rule reads as a
+                      defect in the glass; a highlight reads as a pressed key.
+
+                      It is one element that moves between tabs rather than five
+                      that switch on and off. Scrolling the page walks the
+                      highlight along the dock, which is the dock agreeing with
+                      the scroll; five independent fades read as five separate
+                      things blinking. `layoutId` is Framer Motion's shared
+                      layout: the same node is reparented and the transform
+                      between the two boxes is interpolated on the compositor. */}
+                  {on && (
+                    <motion.span
+                      layoutId="dock-active"
+                      aria-hidden="true"
+                      className="absolute inset-0 rounded-[20px]"
+                      style={{
+                        background: 'rgb(255 255 255 / .18)',
+                        boxShadow: 'inset 0 1px 0 rgb(255 255 255 / .5)',
+                      }}
+                      transition={{ type: 'spring', stiffness: 420, damping: 38, mass: 0.7 }}
+                    />
+                  )}
+                  <span className="relative flex flex-col items-center gap-1">
+                    <Icon size={18} strokeWidth={1.75} aria-hidden="true" />
+                    <span className="font-mono text-[10px] uppercase tracking-[0.06em]">
+                      {label}
+                    </span>
                   </span>
                 </a>
               </li>

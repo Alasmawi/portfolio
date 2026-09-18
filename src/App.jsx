@@ -1,3 +1,5 @@
+import { useEffect } from 'react';
+import { MotionConfig } from 'framer-motion';
 import useActiveSection from './hooks/useActiveSection';
 import { SECTION_IDS } from './data/navLinks';
 import Nav from './components/Nav';
@@ -10,6 +12,7 @@ import About from './components/About';
 import Contact from './components/Contact';
 import MobileTabBar from './components/ui/MobileTabBar';
 import Atmosphere from './components/ui/Atmosphere';
+import { startGlassPointer } from './lib/glassPointer';
 
 // No loading curtain. The old one held the whole page — scroll locked, clicks
 // swallowed — until `document.fonts.ready` and the headshot had settled, with
@@ -25,8 +28,22 @@ export default function App() {
   // lists is observed once here and the answer handed down.
   const active = useActiveSection(SECTION_IDS, 'projects');
 
+  // The pointer's reflection on the glass. One delegated listener for every
+  // control on the page — see lib/glassPointer.js for why it lives here rather
+  // than in each control.
+  useEffect(startGlassPointer, []);
+
   return (
-    <>
+    /* reducedMotion="user" is the global switch for everything Framer animates:
+       the section reveals, the two navigations' sliding highlight, the modal.
+       Each of those used to be responsible for reading the preference itself,
+       which meant the ones that didn't simply ignored it — the nav highlight
+       and the modal both animated regardless. Framer drops transform and layout
+       animations under it and keeps opacity, which is the right split: a fade
+       is not what motion sensitivity is about. The CSS-driven effects — the
+       orbs, the specular sweep, the status blips — carry their own
+       prefers-reduced-motion blocks in index.css. */
+    <MotionConfig reducedMotion="user">
       {/* The page's ground light — one fixed layer for the whole document
           rather than a set of blurred orbs per section. */}
       <Atmosphere />
@@ -46,6 +63,6 @@ export default function App() {
         <Contact />
       </main>
       <MobileTabBar active={active} />
-    </>
+    </MotionConfig>
   );
 }

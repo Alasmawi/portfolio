@@ -1,3 +1,4 @@
+import { motion } from 'framer-motion';
 import { LINKS } from '../data/navLinks';
 import { scrollToSection } from '../lib/scrollToSection';
 
@@ -53,24 +54,35 @@ export default function Nav({ active }) {
                 go(id);
               }}
               aria-current={active === id ? 'true' : undefined}
-              className={`flex min-h-11 items-center rounded-full px-3.5 text-[13.5px] transition-colors ${
+              className={`relative flex min-h-11 items-center rounded-full px-3.5 text-[13.5px] transition-colors ${
                 active === id
                   ? 'text-text-primary'
                   : 'text-text-primary/70 hover:text-text-primary'
               }`}
-              // The selected link is a lit facet of the same glass rather than
-              // a differently coloured chip: a white wash plus the same top
-              // stroke the pill itself carries.
-              style={
-                active === id
-                  ? {
-                      background: 'rgba(255,255,255,.18)',
-                      boxShadow: 'inset 0 1px 0 rgba(255,255,255,.5)',
-                    }
-                  : undefined
-              }
             >
-              {label}
+              {/* The selected link is a lit facet of the same glass rather than
+                  a differently coloured chip: a white wash plus the same top
+                  stroke the pill itself carries.
+
+                  One element, moved, not four switched. The highlight follows
+                  the reader down the page instead of blinking from link to
+                  link, which is the difference between the nav tracking the
+                  scroll and the nav reacting to it. Same `layoutId` idea as the
+                  phone dock, and the same spring, so the two navigations move
+                  identically. */}
+              {active === id && (
+                <motion.span
+                  layoutId="nav-active"
+                  aria-hidden="true"
+                  className="absolute inset-0 rounded-full"
+                  style={{
+                    background: 'rgb(255 255 255 / .18)',
+                    boxShadow: 'inset 0 1px 0 rgb(255 255 255 / .5)',
+                  }}
+                  transition={{ type: 'spring', stiffness: 420, damping: 38, mass: 0.7 }}
+                />
+              )}
+              <span className="relative">{label}</span>
             </a>
           ))}
         </div>

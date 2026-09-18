@@ -1,3 +1,13 @@
+/* --glint has to be a registered <number> for the transition above to
+   interpolate; unregistered custom properties switch rather than ease. Where
+   @property is unsupported the highlight snaps on and off, which is the right
+   degradation for a hover effect. */
+@property --glint {
+  syntax: '<number>';
+  inherits: false;
+  initial-value: 0;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -132,10 +142,6 @@
     @apply mt-8 md:mt-10;
   }
 
-  .mono-label {
-    @apply font-mono text-xs uppercase tracking-[0.14em] text-text-muted;
-  }
-
   /* ——— glass, and the rule that splits it ———————————————————————————
      Two effects, one job each. This is the whole finding from the redesign
      exploration, written down as two classes so it can't drift back into one:
@@ -173,7 +179,26 @@
   .glass-control {
     position: relative;
     overflow: hidden;
-    background: linear-gradient(150deg, rgba(255, 255, 255, 0.17), rgba(255, 255, 255, 0.045));
+    /* Two layers. The gradient is the material; the radial in front of it is
+       the pointer's own reflection, positioned by lib/glassPointer.js through
+       --gx/--gy and faded by --glint. It parks at 0 opacity, so on a phone —
+       where nothing sets those properties — the control is exactly what it was.
+
+       Painting it into background-image rather than a third pseudo-element
+       keeps it off the compositor's element count: ::before is the refraction
+       ring and ::after the travelling band, and a control that needed three
+       stacked layers to look lit would not be worth the look. */
+    --gx: 50%;
+    --gy: 50%;
+    --glint: 0;
+    background:
+      radial-gradient(
+        130px circle at var(--gx) var(--gy),
+        rgb(255 255 255 / calc(0.22 * var(--glint))),
+        rgb(255 255 255 / 0) 72%
+      ),
+      linear-gradient(150deg, rgba(255, 255, 255, 0.17), rgba(255, 255, 255, 0.045));
+    transition: --glint 220ms ease-out;
     border: 1px solid rgba(255, 255, 255, 0.25);
     backdrop-filter: blur(11px) saturate(205%) brightness(1.07);
     box-shadow:
@@ -280,18 +305,6 @@
     }
   }
 
-  /* The terminal listing's caret. Blinks like a shell's, stops for anyone who
-   has asked motion to stop. */
-.terminal-caret {
-  animation: blink 1.15s step-end infinite;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .terminal-caret {
-    animation: none;
-  }
-}
-
 /* — rules — */
   /* Freestanding rules fade to transparent at both ends instead of stopping
      cleanly. Box outlines and short accent marks stay solid; this is only for
@@ -317,7 +330,14 @@
      #2b0a12 measures 9.48:1 on the rose gradient's darker stop and 8.51:1 on
      the amber's, so the label clears AA at its worst point on either. */
   .btn {
-    @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-transparent px-5 font-sans text-sm font-medium transition-transform;
+    @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-transparent px-5 font-sans text-sm font-medium;
+    /* Written out rather than `transition-transform`, because a ghost button is
+       also a .glass-control and the shorthand from whichever rule comes last
+       wins outright — `transition-transform` here would drop the pointer
+       highlight's fade on exactly the controls a pointer spends most time on. */
+    transition:
+      transform 150ms ease,
+      --glint 220ms ease-out;
   }
   .btn-primary {
     color: var(--on-fill);
@@ -326,15 +346,7 @@
       inset 0 2px 0 rgba(255, 255, 255, 0.85),
       0 18px 38px -14px rgb(226 96 126 / 0.85);
   }
-  .btn-amber {
-    color: var(--on-fill);
-    background: linear-gradient(160deg, var(--amber-bright), var(--amber));
-    box-shadow:
-      inset 0 1.5px 0 rgba(255, 255, 255, 0.85),
-      0 12px 26px -10px rgba(240, 164, 72, 0.85);
-  }
-  .btn-primary:hover,
-  .btn-amber:hover {
+  .btn-primary:hover {
     transform: translateY(-1px);
   }
   /* The secondary button is a glass control, so it holds its own beside a
@@ -350,34 +362,9 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .btn-primary:hover,
-    .btn-amber:hover {
+    .btn-primary:hover {
       transform: none;
     }
-  }
-
-  /* — horizontal chip row — */
-  /* The project selector. Fourteen chips in a 390px column shows about three,
-     and nothing said the other eleven existed: no snap, no counter, no edge
-     treatment. Snap so a flick lands on a chip rather than between two, and a
-     mask that fades the trailing edge so the row visibly continues.
-
-     The fade is removed once the row is scrolled to its end (data-end), because
-     a permanent gradient is a lie about there being more. */
-  .chip-row {
-    scroll-snap-type: x proximity;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-    mask-image: linear-gradient(to right, #000 calc(100% - 44px), transparent);
-  }
-  .chip-row::-webkit-scrollbar {
-    display: none;
-  }
-  .chip-row[data-end] {
-    mask-image: none;
-  }
-  .chip-row > * {
-    scroll-snap-align: center;
   }
 
   /* — tags — */
@@ -510,82 +497,6 @@
 @media (prefers-reduced-motion: reduce) {
   .signal-blip {
     animation: none;
-  }
-}
-
-/* — hero cloud, still frame — */
-/* On a phone the cloud is a build-time still of the three.js object rather than
-   the live scene (see HeroCloudCanvas). A still of a thing that used to move
-   reads as broken, so it keeps a slow drift: a long vertical float against a
-   slight scale, on different periods so the two never sync into an obvious
-   loop. Transform-only, so it composites on the GPU and never lays out. */
-@keyframes cloud-drift {
-  0%,
-  100% {
-    transform: translate3d(0, calc(var(--cloud-parallax, 0px) * -1), 0) scale(1);
-  }
-  50% {
-    transform: translate3d(-6px, calc(-14px - var(--cloud-parallax, 0px)), 0) scale(1.035);
-  }
-}
-
-@keyframes cloud-glow {
-  0%,
-  100% {
-    opacity: 0.82;
-  }
-  50% {
-    opacity: 1;
-  }
-}
-
-.cloud-still {
-  --cloud-parallax: 0px;
-  animation: cloud-drift 19s ease-in-out infinite, cloud-glow 11s ease-in-out infinite;
-  will-change: transform, opacity;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .cloud-still {
-    animation: none;
-    opacity: 0.92;
-  }
-}
-
-/* Hero ridge nodes: a hard on/off blink rather than a drift, to keep the
-   header's motion sharp. step-end gives it a switching feel, not a fade. */
-@keyframes sharp-node-blink {
-  0%,
-  62% {
-    opacity: 1;
-  }
-  63%,
-  74% {
-    opacity: 0.25;
-  }
-  75%,
-  100% {
-    opacity: 1;
-  }
-}
-
-.sharp-node {
-  animation: sharp-node-blink 4.2s step-end infinite;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .sharp-node {
-    animation: none;
-  }
-}
-
-/* Experience: the "current" bar's sheen sweep. */
-@keyframes rail-sheen {
-  0% {
-    transform: translateX(-40%);
-  }
-  100% {
-    transform: translateX(140%);
   }
 }
 
