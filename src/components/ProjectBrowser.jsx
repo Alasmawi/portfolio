@@ -909,10 +909,16 @@ export default function ProjectBrowser() {
         {/* The heading was the single word "Projects" under an eyebrow reading
             "// [ projects ]" — the same word twice, in a column where every
             other section opens with a sentence. It names the thing directly
-            under it instead: the stack row, and then the browser. */}
+            under it instead: the browser, and the two shapes it takes.
+
+            Not "and the stack that keeps showing up", which was the first
+            attempt. That clause names the recurring-stack row below, and the
+            row is `hidden sm:flex` — so on a phone the headline pointed at
+            something that wasn't on screen, and took a third line to do it.
+            The view toggle it names now is there at every width. */}
         <SectionHeading
           label="projects"
-          title={`${spellCount(PROJECTS.length)} projects, and the stack that keeps showing up.`}
+          title={`${spellCount(PROJECTS.length)} projects, two ways to browse them.`}
         />
 
         {/* Wide screens only. On a phone this was a label plus eight
