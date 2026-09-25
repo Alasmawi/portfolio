@@ -1,119 +1,65 @@
 import { useState } from 'react';
-import { motion } from 'framer-motion';
-import ExpandTile from './ExpandTile';
-import { FOCUS_PILLARS } from '../../data/focusPillars';
-import { UOB_COURSEWORK, PILLAR_COLORS } from '../../data/uobCoursework';
+import { UOB_COURSEWORK } from '../../data/uobCoursework';
 
-const container = {
-  hidden: {},
-  show: { transition: { staggerChildren: 0.06 } },
-};
-const card = {
-  hidden: { opacity: 0, y: 6, scale: 0.97 },
-  show: { opacity: 1, y: 0, scale: 1 },
-};
+// The degree's IT coursework, grouped and named. This replaced a segmented bar
+// with no labels on its segments — four shades of one colour that said "there
+// are four groups" and nothing about what was in them.
+//
+// Each group shows its first few courses; one toggle opens every group at once,
+// so nothing is hidden behind more than one tap.
+const GROUPS = [
+  { id: 'cloud', label: 'Cloud & networking' },
+  { id: 'fullstack', label: 'Software & data' },
+  { id: 'cs', label: 'CS foundations' },
+  { id: 'ai', label: 'AI & maths' },
+];
+const PREVIEW = 3;
 
-// University-specific, not a generic tag cloud: the default state is a
-// segmented bar (glanceable, visual-first — nothing to read until you
-// choose to). Expanding doesn't drop into a course-by-course list either —
-// it's four per-pillar stat cards (count first, course names folded into a
-// small caption underneath), so the unit you're scanning is "how much of
-// each area" rather than a wall of rows. Each card's own caption is
-// truncated to a few names plus "+N more" — with 27 courses now, showing
-// every title inline would be exactly the text-heavy list this format was
-// built to avoid — but tapping a card reveals its full list, so nothing is
-// permanently hidden, just deferred behind one more tap.
-export default function CourseworkModule() {
-  const total = UOB_COURSEWORK.length;
-  const byPillar = FOCUS_PILLARS.map((pillar) => ({
-    ...pillar,
-    courses: UOB_COURSEWORK.filter((c) => c.pillar === pillar.id),
-  })).filter((p) => p.courses.length > 0);
-  const [openPillar, setOpenPillar] = useState(null);
+export default function CourseworkModule({ color }) {
+  const [all, setAll] = useState(false);
+  const groups = GROUPS.map((g) => ({
+    ...g,
+    courses: UOB_COURSEWORK.filter((c) => c.pillar === g.id),
+  })).filter((g) => g.courses.length);
 
   return (
-    <ExpandTile
-      className="mt-4"
-      trigger={
-        <div className="w-full">
-          <div className="mb-2 flex items-center justify-between">
-            {/* text-muted, not text-dim: at 10px, dim measured 4.36:1. */}
-            <span className="font-mono text-[10.5px] uppercase tracking-wider text-text-muted">
-              credit distribution
-            </span>
-          </div>
-          {/* Gapped, not butted together: the gap is what separates the four
-              areas now that they are one hue at four steps. */}
-          <div className="flex h-2.5 gap-[3px]">
-            {byPillar.map((pillar) => (
-              <div
-                key={pillar.id}
-                className="rounded-full"
-                style={{
-                  width: `${(pillar.courses.length / total) * 100}%`,
-                  backgroundColor: PILLAR_COLORS[pillar.id],
-                }}
-              />
-            ))}
-          </div>
-        </div>
-      }
-    >
-      <motion.div
-        variants={container}
-        initial="hidden"
-        animate="show"
-        className="grid grid-cols-2 gap-2.5 pt-3"
-      >
-        {byPillar.map((pillar) => {
-          const isOpen = openPillar === pillar.id;
+    <div className="mt-6 border-t border-white/[0.08] pt-5">
+      <div className="flex items-center justify-between gap-3">
+        <p className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-text-muted">Coursework</p>
+        <button
+          type="button"
+          onClick={() => setAll((v) => !v)}
+          aria-expanded={all}
+          className="min-h-8 rounded-full px-3 font-mono text-[11px] text-text-primary/80 transition-colors hover:text-text-primary"
+          style={{ boxShadow: `inset 0 0 0 1px ${color}55` }}
+        >
+          {all ? 'Show fewer' : `Show all ${UOB_COURSEWORK.length}`}
+        </button>
+      </div>
+      <div className="mt-4 grid gap-4 sm:grid-cols-2">
+        {groups.map((g) => {
+          const shown = all ? g.courses : g.courses.slice(0, PREVIEW);
+          const hidden = g.courses.length - shown.length;
           return (
-            <motion.button
-              key={pillar.id}
-              type="button"
-              variants={card}
-              transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-              onClick={() => setOpenPillar(isOpen ? null : pillar.id)}
-              className="rounded-xl bg-white/[0.05] p-3 text-left"
-            >
-              <div className="flex items-baseline gap-1.5">
-                <span
-                  className="text-2xl font-semibold"
-                  style={{ color: PILLAR_COLORS[pillar.id] }}
-                >
-                  {pillar.courses.length}
+            <div key={g.id}>
+              <p className="flex items-baseline gap-2 text-[13px] font-medium text-text-primary">
+                {g.label}
+                <span className="font-mono text-[11px] font-normal tabular-nums" style={{ color }}>
+                  {g.courses.length}
                 </span>
-                <span className="font-mono text-[10.5px] uppercase tracking-wider text-text-dim">
-                  {pillar.courses.length === 1 ? 'course' : 'courses'}
-                </span>
-              </div>
-              <p className="mt-1 text-xs text-text-primary">{pillar.label}</p>
-
-              {isOpen ? (
-                <ul className="mt-1.5 space-y-1">
-                  {pillar.courses.map((c) => (
-                    <li
-                      key={c.code}
-                      className="flex items-baseline justify-between gap-2 text-[10.5px] leading-snug"
-                    >
-                      <span className="text-text-dim">{c.title}</span>
-                      <span className="shrink-0 font-mono text-text-dim">{c.code}</span>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="mt-1.5 text-[10.5px] leading-snug text-text-dim">
-                  {pillar.courses
-                    .slice(0, 3)
-                    .map((c) => c.title)
-                    .join(', ')}
-                  {pillar.courses.length > 3 && ` +${pillar.courses.length - 3} more`}
-                </p>
-              )}
-            </motion.button>
+              </p>
+              <ul className="mt-1.5 space-y-1">
+                {shown.map((c) => (
+                  <li key={c.code} className="text-[13px] leading-snug text-text-primary/70">
+                    {c.title}
+                  </li>
+                ))}
+                {hidden > 0 && <li className="font-mono text-[11px] text-text-dim">+{hidden} more</li>}
+              </ul>
+            </div>
           );
         })}
-      </motion.div>
-    </ExpandTile>
+      </div>
+    </div>
   );
 }

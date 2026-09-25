@@ -1,139 +1,186 @@
 import Reveal from './ui/Reveal';
+import SectionHeader, { FRAME, SECTION_PAD } from './ui/SectionHeader';
 import CourseworkModule from './ui/CourseworkModule';
 import ProgramJourney from './ui/ProgramJourney';
 import { EDUCATION } from '../data/education';
+import { REBOOT_JOURNEY } from '../data/rebootJourney';
+
+const AXIS_FROM = Math.min(...EDUCATION.map((e) => e.from));
+const AXIS_TO = Math.max(...EDUCATION.map((e) => e.to));
+const YEARS = Array.from({ length: AXIS_TO - AXIS_FROM + 1 }, (_, i) => AXIS_FROM + i);
+const pct = (year) => ((year - AXIS_FROM) / (AXIS_TO - AXIS_FROM)) * 100;
+const OVERLAP_FROM = Math.max(...EDUCATION.map((e) => e.from));
+
+// The headline's claim — two tracks, in parallel — drawn. Two lanes on one
+// axis of years, with the stretch where both ran shaded, and Reboot's lane
+// split into its two phases so the current one can carry the live marker.
+function ParallelTracks() {
+  const totalMonths = REBOOT_JOURNEY.reduce((n, s) => n + s.months, 0);
+  return (
+    <div className="glass-pane mt-9 rounded-[26px] p-5 sm:p-7" aria-hidden="true">
+      <div className="relative">
+        <div
+          className="absolute inset-y-0 rounded-xl bg-white/[0.035]"
+          style={{ left: `${pct(OVERLAP_FROM)}%`, right: 0 }}
+        >
+          <span className="absolute -top-0.5 right-2 font-mono text-[10px] uppercase tracking-[0.14em] text-text-dim">
+            both at once
+          </span>
+        </div>
+
+        <div className="relative grid gap-5 pb-2 pt-6">
+          {EDUCATION.map((e) => (
+            <div key={e.id}>
+              <p className="mb-2 flex flex-wrap items-baseline gap-x-2 font-mono text-[11px]">
+                <span style={{ color: e.color }}>{e.short}</span>
+                <span className="text-text-muted">{e.degree}</span>
+              </p>
+              <div className="relative h-3">
+                <div className="absolute inset-0 rounded-full shadow-[inset_0_0_0_1px_rgba(251,238,240,0.08)]" />
+                {e.journey ? (
+                  <div
+                    className="absolute inset-y-0 flex gap-[3px]"
+                    style={{ left: `${pct(e.from)}%`, width: `${pct(e.to) - pct(e.from)}%` }}
+                  >
+                    {REBOOT_JOURNEY.map((s) => (
+                      <div
+                        key={s.id}
+                        className="relative h-full rounded-full"
+                        style={{
+                          width: `${(s.months / totalMonths) * 100}%`,
+                          backgroundColor: s.status === 'active' ? `${e.color}cc` : `${e.color}55`,
+                        }}
+                      >
+                        {s.status === 'active' && (
+                          <span
+                            className="absolute right-0 top-1/2 h-2.5 w-2.5 -translate-y-1/2 translate-x-1/2 animate-pulse-slow rounded-full"
+                            style={{ backgroundColor: e.color, boxShadow: `0 0 12px ${e.color}` }}
+                          />
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div
+                    className="absolute inset-y-0 rounded-full"
+                    style={{
+                      left: `${pct(e.from)}%`,
+                      width: `${pct(e.to) - pct(e.from)}%`,
+                      backgroundColor: `${e.color}99`,
+                    }}
+                  />
+                )}
+              </div>
+              {e.journey && (
+                <div
+                  className="relative mt-1.5 flex gap-[3px] font-mono text-[10px] text-text-dim"
+                  style={{ marginLeft: `${pct(e.from)}%` }}
+                >
+                  {REBOOT_JOURNEY.map((s) => (
+                    <span key={s.id} style={{ width: `${(s.months / totalMonths) * 100}%` }} className="truncate">
+                      {s.phase}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="relative mt-3 h-4 font-mono text-[10.5px] text-text-dim">
+        {YEARS.map((y, i) => (
+          <span
+            key={y}
+            className={`absolute ${i === 0 ? '' : i === YEARS.length - 1 ? '-translate-x-full' : '-translate-x-1/2'}`}
+            style={{ left: `${pct(y)}%` }}
+          >
+            {y}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 export default function Education() {
   return (
-    <section id="education" className="relative px-5 py-11 sm:px-10 sm:py-14 md:px-14 md:py-20">
-      <div className="mx-auto max-w-6xl">
-        <Reveal>
-          <p className="mb-4 font-mono text-[11px] uppercase tracking-[0.18em] text-text-muted">
-            // [ education ]
-          </p>
-          <div className="flex flex-wrap items-end justify-between gap-6">
-            <h2 className="max-w-[26ch] text-3xl font-medium tracking-tight text-text-primary md:text-[38px]">
-              Two tracks, run in parallel for the last two years.
-            </h2>
-          </div>
+    <section id="education" className={`relative py-12 sm:py-16 md:py-20 ${SECTION_PAD}`}>
+      <div className={FRAME}>
+        <SectionHeader
+          index="05"
+          eyebrow="Education"
+          title="Two tracks, run in parallel."
+          lead="A Computer Science degree on the cloud computing track, and for its last two years a project-based full-stack program alongside it."
+        />
+
+        <Reveal delay={0.08}>
+          <ParallelTracks />
         </Reveal>
 
-        {/* A pane per track rather than rows split by an inset rule. The two
-            run in parallel and are read as a pair, which two panes say and a
-            divided list does not. */}
-        <div className="mt-8 grid gap-4 md:mt-10">
-          {EDUCATION.map((entry, i) => {
-            return (
-              <Reveal key={entry.id} delay={0.1 + i * 0.05}>
-                <div className="glass-pane grid grid-cols-[20px_1fr] gap-4 rounded-[26px] p-5 sm:grid-cols-[22px_1fr] sm:gap-5 sm:p-6">
-                  {/* Status rail: filled dot for the completed track, a live
-                      pulsing ring for the one still running. */}
-                  <div className="flex flex-col items-center gap-2 pt-1">
-                    {entry.current ? (
-                      <span className="relative flex h-[10px] w-[10px] shrink-0">
-                        <span
-                          className="absolute inline-flex h-full w-full animate-ping rounded-full opacity-60"
-                          style={{ backgroundColor: entry.color }}
-                        />
-                        <span
-                          className="relative inline-flex h-[10px] w-[10px] rounded-full"
-                          style={{ backgroundColor: entry.color }}
-                        />
-                      </span>
-                    ) : (
-                      <span
-                        className="h-[10px] w-[10px] shrink-0 rounded-full"
-                        style={{ backgroundColor: entry.color }}
-                      />
-                    )}
-                    <span
-                      className="w-px flex-1"
-                      style={{ background: `linear-gradient(180deg, ${entry.color}66, transparent)` }}
-                    />
-                  </div>
-
-                  <div>
-                    <div className="flex flex-wrap items-baseline justify-between gap-x-5 gap-y-1">
-                      <p className="text-lg font-medium text-text-primary">{entry.degree}</p>
-                      <p className="whitespace-nowrap font-mono text-[11.5px] text-text-muted">
-                        {entry.period}
-                      </p>
-                    </div>
-
-                    {/* Accent meta row: institution, specialisation, and live state */}
-                    <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-2">
-                      <p className="font-mono text-xs" style={{ color: entry.color }}>
-                        {entry.school}
-                      </p>
-                      {/* Only when it adds something. UoB's track is "Cloud
-                          Computing track" under a degree titled "B.Sc. Computer
-                          Science — Cloud Computing", which made three mentions
-                          in four lines; Reboot's "Cloud DevOps & Cybersecurity"
-                          under "Full Stack Development" is genuinely new. */}
-                      {entry.track && !entry.degree.toLowerCase().includes(entry.track.toLowerCase().replace(/ track$/, '')) && (
-                        <span
-                          className="inline-flex items-center rounded border px-2.5 py-1 font-mono text-[10.5px] tracking-wide"
-                          style={{
-                            color: entry.color,
-                            borderColor: `${entry.color}66`,
-                            backgroundColor: `${entry.color}14`,
-                          }}
-                        >
-                          {entry.track}
-                        </span>
-                      )}
-                      {entry.current && (
-                        <span
-                          className="inline-flex items-center gap-1.5 font-mono text-[10.5px] uppercase tracking-[0.14em]"
-                          style={{ color: entry.color }}
-                        >
-                          <span
-                            className="h-[5px] w-[5px] animate-pulse-slow rounded-full"
-                            style={{ backgroundColor: entry.color }}
-                          />
-                          in progress
-                        </span>
-                      )}
-                    </div>
-
-                    <p className="mt-3 max-w-[62ch] text-[14px] leading-relaxed text-text-primary/70">
-                      {entry.description}
-                    </p>
-
-                    {/* Real figures, not ornament — course and credit counts come
-                        from the coursework data, phase counts from the 01Edu plan. */}
-                    {entry.stats && (
-                      <div className="mt-4 flex flex-wrap gap-x-8 gap-y-3">
-                        {entry.stats.map((s) => (
-                          <div key={s.label} className="flex items-baseline gap-1.5">
-                            <span
-                              className="font-mono text-2xl font-medium tabular-nums"
-                              style={{ color: entry.color }}
-                            >
-                              {s.value}
-                            </span>
-                            <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-text-muted">
-                              {s.label}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-
-                  {/* Desktop only. On a phone this was a glass panel with a
-                      disclosure chevron wrapped around a four-segment bar — a
-                      lot of chrome for a breakdown nobody came for. The two
-                      figures above it, 30 courses and 88 credit hours, are the
-                      part that carries. */}
-                  <div className="hidden md:block">
-                      {entry.coursework && <CourseworkModule />}
-                  </div>
-                    {entry.journey && <ProgramJourney color={entry.color} />}
-                  </div>
+        <div className="mt-4 grid gap-4 lg:grid-cols-2">
+          {EDUCATION.map((entry, i) => (
+            <Reveal key={entry.id} delay={0.1 + i * 0.05} className="h-full">
+              <article className="glass-pane flex h-full flex-col rounded-[26px] p-5 sm:p-7">
+                <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+                  <p className="font-mono text-[12px]" style={{ color: entry.color }}>
+                    {entry.school}
+                  </p>
+                  <p className="font-mono text-[11.5px] text-text-muted">{entry.period}</p>
                 </div>
-              </Reveal>
-            );
-          })}
+                <h3 className="mt-3 text-[22px] font-medium leading-snug tracking-tight text-text-primary">
+                  {entry.degree}
+                </h3>
+                <div className="mt-2 flex flex-wrap items-center gap-2.5">
+                  <span
+                    className="inline-flex items-center rounded-full border px-2.5 py-1 font-mono text-[11px]"
+                    style={{ color: entry.color, borderColor: `${entry.color}66`, backgroundColor: `${entry.color}14` }}
+                  >
+                    {entry.track}
+                  </span>
+                  {entry.current && (
+                    <span
+                      className="inline-flex items-center gap-1.5 font-mono text-[10.5px] uppercase tracking-[0.14em]"
+                      style={{ color: entry.color }}
+                    >
+                      <span className="h-[5px] w-[5px] animate-pulse-slow rounded-full" style={{ backgroundColor: entry.color }} />
+                      in progress
+                    </span>
+                  )}
+                </div>
+
+                <ul className="mt-4 space-y-2">
+                  {entry.points.map((p) => (
+                    <li key={p} className="flex gap-2.5 text-[14.5px] leading-relaxed text-text-primary/80">
+                      <span className="mt-[9px] h-1 w-1 shrink-0 rounded-full" style={{ backgroundColor: entry.color }} />
+                      {p}
+                    </li>
+                  ))}
+                </ul>
+
+                <div className="mt-5 flex flex-wrap gap-x-8 gap-y-3">
+                  {entry.stats.map((s) => (
+                    <div key={s.label} className="flex items-baseline gap-1.5">
+                      <span className="font-mono text-2xl font-medium tabular-nums" style={{ color: entry.color }}>
+                        {s.value}
+                      </span>
+                      <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-text-muted">
+                        {s.label}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+
+                {entry.coursework && <CourseworkModule color={entry.color} />}
+                {entry.journey && (
+                  <div className="mt-6 border-t border-white/[0.08] pt-5">
+                    <p className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-text-muted">Phases</p>
+                    <ProgramJourney color={entry.color} />
+                  </div>
+                )}
+              </article>
+            </Reveal>
+          ))}
         </div>
       </div>
     </section>

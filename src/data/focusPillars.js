@@ -1,35 +1,55 @@
-// The four things the site is actually about, replacing the old
-// Cloud/IoT/Backend framing. This is the single source of truth: Hero's
-// focus panel reads it directly, and each project in projects.js carries a
-// `pillars` array of these ids so the two stay linked without duplicating
-// the taxonomy anywhere.
+// The four kinds of work the site is about, in the order the headline puts
+// them: full-stack first, cloud as the depth under it. Each project in
+// projects.js carries a `pillars` array of these ids, and the UoB coursework is
+// filed under them too, so one taxonomy runs through the whole page.
+//
+// `proof` is the evidence, named rather than counted. A count made the pillar
+// with the fewest repos look weakest, which for Cloud was backwards: its
+// evidence is two internships, not a pile of repos. Each item either opens a
+// project (`project`) or jumps to a section (`href`).
 export const FOCUS_PILLARS = [
   {
-    id: 'cloud',
-    label: 'Cloud Computing',
+    id: 'fullstack',
+    label: 'Full-stack products',
     blurb:
-      'AWS end to end — IoT Core, Lambda, DynamoDB, S3. K9 Pavlov\u2019s whole backend runs on it, and I\u2019m working toward the Solutions Architect Associate cert next.',
-    tools: ['AWS', 'Lambda', 'DynamoDB', 'IoT Core', 'S3'],
+      'The interface, the API, the data model and the deploy, owned as one piece of work rather than handed across a wall.',
+    proof: [
+      { label: 'Bayyan', project: 'bayyan' },
+      { label: 'Brain-Book', project: 'brain-book' },
+      { label: 'K9 dashboard', project: 'k9-pavlov' },
+    ],
+  },
+  {
+    id: 'cloud',
+    label: 'Cloud on AWS',
+    blurb:
+      'Serverless backends and IoT ingestion on AWS, and moving production systems between AWS and on-premises without losing data.',
+    proof: [
+      { label: 'K9 backend', project: 'k9-pavlov' },
+      { label: 'RDS → on-prem migration', href: '#experience' },
+      { label: 'DRS replication fix', href: '#experience' },
+    ],
   },
   {
     id: 'ai',
-    label: 'AI',
+    label: 'Applied AI',
     blurb:
-      'Amazon Bedrock for anomaly detection in K9 Pavlov, YOLOv8 for real-time person counting in detecto, and retrieval-augmented answers with sources attached in guidely.',
-    tools: ['Amazon Bedrock', 'YOLOv8', 'RAG', 'FAISS'],
-  },
-  {
-    id: 'fullstack',
-    label: 'Full-Stack Development',
-    blurb:
-      'React front ends, Go and Python back ends, real-time features built on raw WebSockets rather than a framework doing the hard part for me.',
-    tools: ['React', 'Go', 'Python', 'WebSockets'],
+      'Models put to work inside products — retrieval, detection, anomaly explanations — with the evidence shown to whoever relies on the answer.',
+    proof: [
+      { label: 'Guidely', project: 'guidely' },
+      { label: 'Detecto', project: 'detecto' },
+      { label: 'Bedrock in K9', project: 'k9-pavlov' },
+    ],
   },
   {
     id: 'cs',
-    label: 'Computer Science',
+    label: 'Systems from scratch',
     blurb:
-      'First-principles work: an HTTP server, a Unix shell, a ray tracer \u2014 each built from scratch, no framework or standard library shortcut doing the hard part.',
-    tools: ['Systems Programming', 'Networking', 'Algorithms'],
+      'An HTTP server on epoll, a Unix shell, a ray tracer: built without a framework, to know what the frameworks are doing for me.',
+    proof: [
+      { label: 'localhost', project: 'localhost' },
+      { label: '0-shell', project: '0-shell' },
+      { label: 'rt', project: 'rt' },
+    ],
   },
 ];

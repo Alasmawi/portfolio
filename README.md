@@ -1,8 +1,10 @@
 # Portfolio — Abdulla Alasmawi
 
-A single-page portfolio site built with React, Vite, Tailwind CSS and Framer Motion, served at `/v2`. Systems-diagram furniture — mono labels, status dots, a GitHub-style repo browser, a real architecture diagram — on a warm dusk ground under glass.
+A single-page portfolio built with React, Vite, Tailwind CSS and Framer Motion, served at the root of alasmawi.dev. Systems-diagram furniture — mono labels, status dots, a trace-style data path in the hero, drawn architecture diagrams — on a warm dusk ground under glass.
 
-Live sections: Hero, Focus, Projects (browsable, video/architecture previews), Experience, Education, About, Contact.
+Sections, in order: Hero, What I do, Work, Experience, Skills, Education, About, Contact. The previous site is kept, frozen, at `/v1`; `/v2/*` (where this build lived while it was being finished) redirects permanently to `/`.
+
+The CV (`public/Abdulla_Alasmawi_CV.pdf`) carries the same roles, bullets, projects and skills as `src/data/`. Change one, change the other.
 
 ## Design system
 
@@ -17,6 +19,8 @@ Two things carry the look, and both are in `src/index.css`.
 | Recipe | thick tint, `saturate(205%) brightness(1.07)`, masked inner ring, specular top stroke, travelling highlight | one `blur(14px)`, low tint, hairline edge, no rim |
 
 The cost sits with the control — a nested `backdrop-filter` behind a composited mask — so its ring renders only where the mask primitive is supported and only on pointer devices at `md` and up. Everything falls back to an opaque tint where `backdrop-filter` is missing entirely.
+
+**The hero's data path.** `ui/HeroTrace.jsx` draws one real flow through K9 Pavlov, Bayyan and Guidely in turn, as a trace waterfall, from `src/data/traces.js`. Bar positions set order and overlap only; the panel prints no timings.
 
 **The atmosphere.** `Atmosphere.jsx` paints four drifting orbs and a 72px grid in one `position: fixed`, `contain: strict` layer for the whole document, instead of each section carrying its own gradients. Fixed means it never repaints on scroll, and the parallax comes free. Two of the four orbs are desktop-only.
 
@@ -49,26 +53,43 @@ npm run preview   # serve the production build locally
 ```
 src/
   components/
-    Hero.jsx, FocusPillars.jsx, ProjectBrowser.jsx, Experience.jsx,
+    Hero.jsx, FocusPillars.jsx, ProjectBrowser.jsx, Experience.jsx, Skills.jsx,
     Education.jsx, About.jsx, Contact.jsx, Nav.jsx
     ui/
+      SectionHeader.jsx    — the shared section header, and the frame every section sits in
+      HeroTrace.jsx        — the hero's data-path panel
       Atmosphere.jsx       — the fixed orb + grid layer behind the whole page
-      HeroCloudCanvas.jsx  — three.js cloud on desktop, a build-time still on phones
-      MobileTabBar.jsx     — the floating glass dock (phones only)
+      MobileTabBar.jsx     — the floating glass dock (below lg)
       K9Architecture.jsx, K9Flow.jsx  — the sensors → AWS diagram (lazy)
+      BayyanArchitecture.jsx          — Bayyan's deployment diagram
       RingGallery.jsx, HardwareStrip.jsx  — the K9 hardware photos
-      CourseworkModule.jsx, ProgramJourney.jsx, ExpandTile.jsx
-      ScrollCounter.jsx, Reveal.jsx, BrandIcons.jsx
+      CourseworkModule.jsx, ProgramJourney.jsx, Reveal.jsx, BrandIcons.jsx
   data/
-    projects.js       — every project shown in the Projects browser
-    focusPillars.js   — the four pillars; project counts are derived from projects.js
-    experience.js, education.js, uobCoursework.js, rebootJourney.js, navLinks.js
+    projects.js       — every project; `featured` ones get the large cards
+    experience.js     — roles, bullets, and the project each role produced
+    skills.js         — the toolbox, grouped as on the CV
+    focusPillars.js   — the four kinds of work and the evidence for each
+    traces.js         — the hero's data paths
+    education.js, uobCoursework.js, rebootJourney.js, navLinks.js
   lib/
-    mountCloud.js     — the hero cloud's three.js scene
-    dna-helix.js      — the custom element in About
+    openProject.js    — opens a project's dialog from anywhere on the page
 public/
-  video/         — project preview clips, referenced from data/projects.js
+  Abdulla_Alasmawi_CV.pdf   — the CV behind every "Download CV" link
+  video/                    — project preview clips, referenced from data/projects.js
+scripts/
+  build-site.sh        — builds the site and adds the frozen /v1
+  make-og.mjs          — renders public/og.png, the link-preview card
+  make-bayyan-cover.mjs — renders Bayyan's drawn card cover
+  make-posters.mjs, check-contrast.mjs, check-shift.mjs, shots.mjs
 ```
+
+## Contact form
+
+Messages are sent through [Web3Forms](https://web3forms.com). Create an access key there with the inbox you want messages delivered to, then add it in Vercel under **Settings → Environment Variables** as `VITE_WEB3FORMS_KEY` and redeploy. The key is public by design — it can only send to that one inbox. Without it, Send falls back to opening a drafted email in the visitor's mail app.
+
+### Bayyan screenshots
+
+Bayyan is an internal system, so its card shows a drawn cover and its dialog shows an architecture diagram. Once screenshots are cleared for sharing, drop them in `src/assets/bayyan/`, import them in `projects.js`, and add them to Bayyan's `items` (same shape as K9's); the dialog then shows a **Screens** tab beside the diagram. Point `poster` at one of them to replace the cover.
 
 ### Adding or updating a project
 
@@ -84,11 +105,12 @@ Edit `src/data/projects.js` — each entry is one object:
   tags: ['Go', 'Docker'],
   githubUrl: 'https://github.com/Alasmawi/my-project',
   liveUrl: null,              // optional
-  gif: '/gifs/my-project.gif', // drop the file in public/gifs/, or leave null for a "preview coming soon" placeholder
+  video: asset('/video/my-project.mp4'),     // run scripts/make-posters.mjs for the poster
+  poster: asset('/video/posters/my-project.webp'),
 }
 ```
 
-No layout changes are needed — the Projects section reads this array directly. GIFs are shown at their native aspect ratio (never cropped); keep individual files under ~5 MB where possible for fast loads.
+No layout changes are needed — the Projects section reads this array directly. Add `featured: true` with a `context`, `summary` and three `proof` lines to promote a project to the large cards.
 
 ## Deploying to Vercel
 
@@ -96,7 +118,7 @@ This is a static Vite build, so Vercel's zero-config detection handles it, and a
 
 1. Push this repo to GitHub (or GitLab/Bitbucket).
 2. In the [Vercel dashboard](https://vercel.com/new), click **Add New → Project** and import the repo.
-3. Vercel will detect the Vite framework automatically (Build Command: `npm run build`, Output Directory: `dist`) — leave the defaults.
+3. `vercel.json` pins the build (`npm run build:site`, output `dist`), the `/v1` rewrites and the `/v2` redirects — leave the dashboard defaults.
 4. Click **Deploy**. You'll get a `*.vercel.app` URL once the build finishes.
 
 ## Connecting your custom domain

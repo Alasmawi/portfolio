@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
+  ArrowUpRight,
   ChevronRight,
   ExternalLink,
   FileCode2,
@@ -12,46 +13,24 @@ import {
   LayoutGrid,
   Lock,
   PlayCircle,
-  Star,
   X,
 } from 'lucide-react';
 import Reveal from './ui/Reveal';
+import SectionHeader, { FRAME, SECTION_PAD } from './ui/SectionHeader';
 import RingGallery from './ui/RingGallery';
 import HardwareStrip from './ui/HardwareStrip';
 import K9Architecture from './ui/K9Architecture';
+import BayyanArchitecture from './ui/BayyanArchitecture';
 import { GithubMark } from './ui/BrandIcons';
-import { LANGUAGE_COLORS, PROJECTS } from '../data/projects';
+import { FEATURED, LANGUAGE_COLORS, MORE, PROJECTS } from '../data/projects';
+import { OPEN_PROJECT_EVENT } from '../lib/openProject';
 
-// With the section on screen and nobody touching it, walk to the next project
-// so it plays as a gallery. Any interaction restarts the clock — long enough
-// that it never pulls a project out from under someone still reading it.
-const AUTO_ADVANCE_MS = 30000;
-const IDLE_TICK_MS = 1000;
-
-// Stack tags shared across ≥2 real repos, most-shipped first. Derived from
-// projects.js rather than hand-picked, so it can't drift into inventory that
-// doesn't match what's actually in the list below it.
-const RECURRING_STACK = (() => {
-  const counts = new Map();
-  for (const p of PROJECTS) {
-    for (const t of p.tags) counts.set(t, (counts.get(t) || 0) + 1);
-  }
-  return Array.from(counts.entries())
-    .filter(([, n]) => n >= 2)
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 8)
-    .map(([t]) => t);
-})();
+const ARCHITECTURE = { k9: K9Architecture, bayyan: BayyanArchitecture };
 
 // One reserved box for every kind of preview media, so switching project can't
-// move what is underneath it.
-//
-// A fixed height, not max-h. The previews are screen recordings at a dozen
-// different aspect ratios, so sizing to the content moved the title and
-// description below by up to 141px between projects — mid-read, on a 390px
-// column, and auto-advance was doing it unasked. object-contain letterboxes
-// the odd one out instead, which costs a little dead space on two of the
-// fourteen and buys a panel that holds still.
+// move what is underneath it. A fixed height, not max-h: the previews are
+// screen recordings at a dozen aspect ratios, and object-contain letterboxes
+// the odd one out rather than moving the title and description below.
 const MEDIA_WELL =
   'flex h-[248px] w-full items-center justify-center rounded-lg bg-white/[0.03] ' +
   'shadow-[inset_0_0_0_1px_rgba(251,238,240,0.09)] sm:h-[320px] md:h-[400px]';
@@ -74,31 +53,24 @@ function PreviewVideo({ src, poster, label, playing }) {
     const v = ref.current;
     if (!v) return undefined;
 
-    // Nothing is fetched until the section is actually on screen. The poster
-    // holds the frame in the meantime, so the box is never empty and never
-    // resizes when the video arrives — it is a still of the first frame of the
-    // same recording, so the swap is invisible.
+    // Nothing is fetched until it should play. The poster holds the frame in
+    // the meantime — a still of the same recording, so the swap is invisible.
     if (!playing) {
       v.pause();
-      // Dropping the source releases the buffer. Without this, walking the
-      // list leaves every video visited still held in memory.
+      // Dropping the source releases the buffer, so walking the list doesn't
+      // leave every video visited held in memory.
       v.removeAttribute('src');
       v.load();
       return undefined;
     }
 
-    // React's `muted` JSX prop sets the attribute at mount, but some mobile
-    // browsers only honour autoplay if `muted` is true on the element's
-    // *property* at the moment play() is called — setting it here, every
-    // time the source changes, is what makes autoplay reliable on first
-    // load and on every subsequent project switch, not just sometimes.
+    // Some mobile browsers only honour autoplay if `muted` is true on the
+    // element's *property* when play() is called, not just the attribute.
     v.muted = true;
     v.src = src;
     v.load();
     const playPromise = v.play();
-    // Rapid taps/swipes can call play() while a previous one is still
-    // settling; the browser rejects the superseded call with a benign
-    // AbortError that isn't worth surfacing.
+    // A superseded play() rejects with a benign AbortError.
     if (playPromise) playPromise.catch(() => {});
     return undefined;
   }, [src, playing]);
@@ -117,71 +89,42 @@ function PreviewVideo({ src, poster, label, playing }) {
   );
 }
 
-// Below this the 3D ring gives way to the flat card strip: turning a turntable
-// with a thumb costs more than it pays, and under ~560px the flanking cards
-// have nowhere to go.
-//
-// It is the *container's* width, not the viewport's — the same number the
-// architecture diagram switches on, for the same reason. This panel is not a
-// fixed fraction of the window: the repo sidebar appears at a 768px viewport
-// and takes the preview pane from 570px down to 342px, so a viewport query
-// hands the widest treatment to the narrowest container in the range.
+// Below this the 3D ring gives way to the flat card strip — measured on the
+// container, not the viewport, because the dialog is narrower than the window.
 const WIDE_PANEL_PX = 560;
 
-// The fixed bottom tab bar's row height, matching App's bottom padding. Used to
-// work out whether something has actually gone under it.
+// The fixed dock's row height. Used to work out whether something has gone
+// under it.
 const TAB_BAR_PX = 54;
 
-// Grid or rows, remembered per visitor.
-//
-// Grid is the default: fourteen repositories shown as a wall of cards is the
-// shape of the thing — you can take in the whole body of work at once — where a
-// list makes you read fourteen names to find out what is there. Rows stay on
-// offer as a terminal listing, which is faster to aim at once you know the
-// names, fits far more of them on a phone at once, and is the same metaphor the
-// section has carried since it called itself ~/projects.
-//
-// localStorage, not sessionStorage: a layout preference is the kind of thing a
-// returning visitor expects to still be set.
+// Grid or explorer, remembered per visitor.
 const VIEW_KEY = 'projects-view';
-
 const VIEWS = [
   { id: 'grid', label: 'Grid', Icon: LayoutGrid },
   { id: 'files', label: 'Explorer', Icon: FolderTree },
 ];
 
 // The four pillars, as directories. A project can belong to more than one, so
-// it is filed under the first — a tree where the same repo appears three times
-// is a worse map than one where it appears once.
+// it is filed under the first.
 const FOLDERS = [
+  { id: 'fullstack', name: 'full-stack' },
   { id: 'cloud', name: 'cloud' },
   { id: 'ai', name: 'ai' },
-  { id: 'fullstack', name: 'full-stack' },
   { id: 'cs', name: 'computer-science' },
 ];
 
 const EXT = { Go: 'go', Rust: 'rs', Python: 'py', JavaScript: 'js', TypeScript: 'ts', Shell: 'sh' };
-
-// The id, not the display name: ids are already kebab-case, so they read as
-// filenames where "K9 Pavlov System" and "Brain-Book" do not. The display name
-// is what the card and the dialog show.
-//
-// k9-pavlov carries no language — it is a system rather than a repo in one
-// tongue — so it stays extensionless, the way a file without one looks in a
-// real tree.
 const fileName = (p) => (EXT[p.language] ? `${p.id}.${EXT[p.language]}` : p.id);
 
 const TREE = FOLDERS.map((f) => ({
   ...f,
-  children: PROJECTS.filter((p) => p.pillars?.[0] === f.id),
+  children: MORE.filter((p) => p.pillars?.[0] === f.id),
 })).filter((f) => f.children.length);
 
 function useProjectView() {
   const [view, setView] = useState(() => {
     if (typeof window === 'undefined') return 'grid';
     try {
-      // 'terminal' is the previous name for this view; anyone carrying it in
-      // storage gets the explorer rather than being bounced back to the grid.
       const saved = localStorage.getItem(VIEW_KEY);
       return saved === 'files' || saved === 'terminal' ? 'files' : 'grid';
     } catch {
@@ -199,15 +142,13 @@ function useProjectView() {
   return [view, choose];
 }
 
-// Every project has a still: the thirteen with a demo recording carry the
-// poster frame extracted from it, and K9 — which has no video — leads with the
-// first photo of the hardware.
+// Every project has a still: the recorded ones carry the poster frame from
+// their video, K9 leads with the first photo of the hardware, and Bayyan with
+// its drawn cover.
 const thumbOf = (p) => p.poster ?? p.items?.[0]?.src ?? null;
 
 function useContainerAtLeast(min) {
   const ref = useRef(null);
-  // Starts narrow: the strip fits everywhere, so the first paint is never the
-  // broken one while we wait for a measurement.
   const [wide, setWide] = useState(false);
   useEffect(() => {
     const el = ref.current;
@@ -225,31 +166,19 @@ function Gallery({ items, wide }) {
   return wide ? <RingGallery items={items} /> : <HardwareStrip items={items} />;
 }
 
-/* The hardware and the architecture drawing are two views of one project, not
-   two stacked blocks. Stacked, the diagram sat above the gallery at 336px
-   (desktop) / 620px (phone) and got read first and longest — while the photos
-   of the boards, the collar and the scale, which are the part that was actually
-   built by hand, were what you had to scroll past it to reach. On a phone the
-   split measured 830px of diagram to 150px of photos.
-
-   Tabs rather than a reorder or a shrink: reordering only moves the problem,
-   and the diagram was already being shrunk — to 0.60 scale — which is what made
-   it unreadable. Given its own panel it gets the full width at 1:1, and it
-   costs the photos nothing. Hardware leads. */
+/* The photos and the architecture drawing are two views of one project, not
+   two stacked blocks: stacked, the diagram got read first and longest and was
+   shrunk until it was unreadable. Tabs give each the full width at 1:1.
+   Photos lead. */
 function MediaTabs({ project }) {
-  const [tab, setTab] = useState('hardware');
+  const [tab, setTab] = useState('media');
   const [panelRef, wide] = useContainerAtLeast(WIDE_PANEL_PX);
   const tablistRef = useRef(null);
+  const Diagram = ARCHITECTURE[project.architecture];
 
-  // The architecture drawing is ~590px tall with its legend. On a 390x844 phone
-  // that fits between the nav and the tab bar — but only if it starts near the
-  // top, and tapping the tab from halfway down the panel left it starting near
-  // the bottom, so the diagram opened mostly below the fold and clipped by the
-  // tab bar. Anchoring the tab strip under the nav gives the drawing the room
-  // it already fits in.
-  //
-  // Only when it would actually overflow: a tab change that is already fully
-  // visible should not move the page under the reader.
+  // Anchors the tab strip under the nav when the newly shown panel would run
+  // past the bottom of the screen — and only then, so a tab change that is
+  // already fully visible doesn't move the page.
   const anchor = useCallback(() => {
     const list = tablistRef.current;
     if (!list) return;
@@ -257,17 +186,15 @@ function MediaTabs({ project }) {
       const panel = list.parentElement;
       if (!panel) return;
       const bottom = panel.getBoundingClientRect().bottom;
-      const floor = window.innerHeight - TAB_BAR_PX;
-      if (bottom <= floor) return;
+      if (bottom <= window.innerHeight - TAB_BAR_PX) return;
       list.scrollIntoView({ block: 'start', behavior: 'smooth' });
     });
   }, []);
   const tabs = [
-    { id: 'hardware', label: 'Hardware' },
+    { id: 'media', label: project.mediaLabel ?? (project.id === 'k9-pavlov' ? 'Hardware' : 'Screens') },
     { id: 'architecture', label: 'Architecture' },
   ];
 
-  // Arrow keys move between tabs, per the ARIA tabs pattern.
   const onKeyDown = (e) => {
     const i = tabs.findIndex((t) => t.id === tab);
     const delta = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
@@ -275,7 +202,7 @@ function MediaTabs({ project }) {
     e.preventDefault();
     const next = tabs[(i + delta + tabs.length) % tabs.length];
     setTab(next.id);
-    document.getElementById(`k9tab-${next.id}`)?.focus();
+    document.getElementById(`mtab-${next.id}`)?.focus();
     anchor();
   };
 
@@ -286,9 +213,6 @@ function MediaTabs({ project }) {
         role="tablist"
         aria-label={`${project.name} media`}
         onKeyDown={onKeyDown}
-        /* One liquid object holding two chips, rather than two outlined
-           buttons. w-fit so the pill is the width of its chips and not the
-           width of the panel. */
         className="glass-control flex w-fit scroll-mt-[68px] gap-1 rounded-full p-1.5"
       >
         {tabs.map(({ id, label }) => {
@@ -296,21 +220,16 @@ function MediaTabs({ project }) {
           return (
             <button
               key={id}
-              id={`k9tab-${id}`}
+              id={`mtab-${id}`}
               type="button"
               role="tab"
-              data-k9tab={id}
               aria-selected={on}
-              aria-controls={`k9panel-${id}`}
+              aria-controls={`mpanel-${id}`}
               tabIndex={on ? 0 : -1}
               onClick={() => {
                 setTab(id);
                 anchor();
               }}
-              /* Selected reads as a lit facet of the same glass, the way the
-                 nav marks its current link. It used to copy the primary
-                 button's rose fill, which made rose mean both "the one action
-                 on the page" and "this tab is selected". */
               className={`min-h-11 rounded-full px-4 font-mono text-[11px] uppercase tracking-[0.14em] transition-colors ${
                 on ? 'glass-control text-text-primary' : 'text-text-primary/70 hover:text-text-primary'
               }`}
@@ -321,63 +240,33 @@ function MediaTabs({ project }) {
         })}
       </div>
 
-      {/* minmax(0,1fr) above, and min-w-0 here: the hardware strip's max-content
-          width (~700px) would otherwise size the track and drag the diagram out
-          to 666px inside a 390px screen. */}
+      {/* minmax(0,1fr) above and min-w-0 here: the strip's max-content width
+          would otherwise size the track and drag the diagram past the screen. */}
       <div
         ref={panelRef}
-        id={`k9panel-${tab}`}
+        id={`mpanel-${tab}`}
         role="tabpanel"
-        aria-labelledby={`k9tab-${tab}`}
+        aria-labelledby={`mtab-${tab}`}
         tabIndex={0}
         className="min-w-0"
       >
-        {tab === 'architecture' ? (
-          <K9Architecture />
-        ) : (
-          <Gallery items={project.items} wide={wide} />
-        )}
+        {tab === 'architecture' ? <Diagram /> : <Gallery items={project.items} wide={wide} />}
       </div>
-    </div>
-  );
-}
-
-function GalleryOnly({ items }) {
-  const [ref, wide] = useContainerAtLeast(WIDE_PANEL_PX);
-  return (
-    <div ref={ref} className="grid grid-cols-[minmax(0,1fr)]">
-      <Gallery items={items} wide={wide} />
     </div>
   );
 }
 
 function PreviewMedia({ project, playing }) {
-  if (project.architecture && project.items?.length) {
-    return <MediaTabs project={project} />;
-  }
-
-  if (project.architecture || project.items?.length) {
-    return (
-      <div className="grid grid-cols-[minmax(0,1fr)] gap-4">
-        {project.architecture && <K9Architecture />}
-        {project.items?.length ? <GalleryOnly items={project.items} /> : null}
-      </div>
-    );
-  }
+  const Diagram = ARCHITECTURE[project.architecture];
+  if (Diagram && project.items?.length) return <MediaTabs project={project} />;
+  if (Diagram) return <Diagram />;
 
   if (project.video) {
     return (
       <div className={MEDIA_WELL}>
-        {/* Same visual as a GIF loop, ~90% less data: autoplaying muted video
-            with no controls reads identically but decodes far cheaper on
-            mid-range phones than an animated GIF. playsInline keeps iOS
-            Safari from hijacking it into fullscreen. */}
-        <PreviewVideo
-          src={project.video}
-          poster={project.poster}
-          label={`${project.name} demo`}
-          playing={playing}
-        />
+        {/* Autoplaying muted video instead of a GIF: it reads the same and
+            decodes far cheaper. playsInline keeps iOS from going fullscreen. */}
+        <PreviewVideo src={project.video} poster={project.poster} label={`${project.name} demo`} playing={playing} />
       </div>
     );
   }
@@ -386,18 +275,14 @@ function PreviewMedia({ project, playing }) {
     <div className={`${MEDIA_WELL} flex-col gap-3 text-text-dim`}>
       <Film size={22} />
       <p className="font-mono text-xs uppercase tracking-wider">// preview coming soon</p>
-      <p className="font-mono text-[11px] text-text-dim">clone the repo to see it run</p>
     </div>
   );
 }
 
-// The project, opened.
-//
-// A modal rather than a pane under the selector: the grid is the thing worth
-// looking at, and a permanent detail block below it pushed the grid off screen
-// and made every card tap a scroll hunt for what had changed. A dialog puts the
-// project in front of the reader and gives it back when they are done.
-function ProjectModal({ project, playing, onClose }) {
+// The project, opened. A dialog rather than a pane under the grid: the grid is
+// the thing worth looking at, and a detail block below it pushed the grid off
+// screen and made every tap a scroll hunt.
+function ProjectModal({ project, onClose }) {
   const panelRef = useRef(null);
 
   useEffect(() => {
@@ -409,8 +294,7 @@ function ProjectModal({ project, playing, onClose }) {
         return;
       }
       if (e.key !== 'Tab') return;
-      // Focus stays inside the dialog while it is open, which is what makes it
-      // a dialog rather than a panel that happens to float.
+      // Focus stays inside the dialog while it is open.
       const focusable = panelRef.current?.querySelectorAll(
         'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'
       );
@@ -428,7 +312,6 @@ function ProjectModal({ project, playing, onClose }) {
 
     const opener = document.activeElement;
     document.addEventListener('keydown', onKey);
-    // The page behind must not scroll under the dialog.
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
     panelRef.current?.focus();
@@ -436,16 +319,13 @@ function ProjectModal({ project, playing, onClose }) {
     return () => {
       document.removeEventListener('keydown', onKey);
       document.body.style.overflow = prevOverflow;
-      // Back to the card that opened it, so a keyboard reader does not lose
-      // their place in the grid.
+      // Back to whatever opened it, so a keyboard reader keeps their place.
       if (opener instanceof HTMLElement) opener.focus();
     };
   }, [project, onClose]);
 
-  // Portalled to <body>. `main` carries `relative z-10`, which makes it a
-  // stacking context — a dialog rendered inside it is capped at main's level no
-  // matter how high its own z-index goes, so the fixed nav pill and the dock
-  // (siblings of main, at z-40 and z-50) painted straight over the top of it.
+  // Portalled to <body>: `main` is a stacking context, and a dialog inside it
+  // is capped at main's level, under the fixed nav and dock.
   return createPortal(
     <AnimatePresence>
       {project && (
@@ -475,9 +355,7 @@ function ProjectModal({ project, playing, onClose }) {
             className="glass-pane relative max-h-[88vh] w-full max-w-3xl overflow-y-auto rounded-t-[26px] outline-none sm:rounded-[26px]"
           >
             <div className="sticky top-0 z-10 flex items-center justify-between gap-3 bg-base-bg/80 px-5 py-3 backdrop-blur-md sm:px-7">
-              <p className="min-w-0 truncate font-mono text-[12px] text-text-muted">
-                ~/projects/{project.id}
-              </p>
+              <p className="min-w-0 truncate font-mono text-[12px] text-text-muted">~/projects/{project.id}</p>
               <button
                 type="button"
                 onClick={onClose}
@@ -487,88 +365,79 @@ function ProjectModal({ project, playing, onClose }) {
                 <X size={15} />
               </button>
             </div>
-      <div className="px-5 pb-6 pt-1 sm:px-7 sm:pb-7">
-        <AnimatePresence mode="popLayout">
-          <motion.div
-            key={project.id}
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-          >
-            <PreviewMedia project={project} playing={playing} />
+            <div className="px-5 pb-6 pt-1 sm:px-7 sm:pb-7">
+              <PreviewMedia project={project} playing />
 
-            <div className="mt-5 flex flex-wrap items-start justify-between gap-4">
-              <div>
+              <div className="mt-5 flex flex-wrap items-start justify-between gap-4">
+                <div>
+                  {/* Every project has at least one badge here, so the title
+                      below sits at the same height from dialog to dialog. */}
+                  <div className="flex flex-wrap items-center gap-2">
+                    {project.language && (
+                      <span className="flex items-center gap-1.5 rounded-full border border-base-hairline px-2.5 py-1 font-mono text-[10.5px] text-text-muted">
+                        <LanguageDot language={project.language} />
+                        {project.language}
+                      </span>
+                    )}
+                    {project.featured && (
+                      <span className="tag-outline text-[10.5px] uppercase tracking-wider">featured</span>
+                    )}
+                    {project.private && (
+                      <span className="flex items-center gap-1 rounded-full border border-base-hairline px-2.5 py-1 font-mono text-[10.5px] uppercase tracking-wider text-text-muted">
+                        <Lock size={10} /> private code
+                      </span>
+                    )}
+                  </div>
+                  <h3 className="mt-2 text-[27px] font-medium leading-tight tracking-tight text-text-primary">
+                    {project.name}
+                  </h3>
+                  <p className="mt-0.5 font-mono text-xs text-accent-body">{project.context ?? project.tagline}</p>
+                </div>
+
                 <div className="flex items-center gap-2">
-                  {project.flagship && (
-                    <span className="tag-outline text-[10.5px] uppercase tracking-wider">
-                      flagship
+                  {project.githubUrl ? (
+                    <a
+                      href={project.githubUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      aria-label={`${project.name} on GitHub`}
+                      className="btn btn-ghost glass-control min-h-9 text-xs"
+                    >
+                      <GithubMark size={14} />
+                      <span>source</span>
+                      <ExternalLink size={11} />
+                    </a>
+                  ) : (
+                    <span className="flex items-center gap-2 rounded-full border border-base-edge px-3 py-2 font-mono text-xs text-text-muted">
+                      internship project
                     </span>
                   )}
-                  {project.private && (
-                    <span className="flex items-center gap-1 rounded border border-base-hairline px-2 py-0.5 font-mono text-[10.5px] uppercase tracking-wider text-text-dim">
-                      <Lock size={10} /> private repo
-                    </span>
+                  {project.liveUrl && (
+                    <a
+                      href={project.liveUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      aria-label={`${project.name} live site`}
+                      className="btn btn-ghost glass-control min-h-9 text-xs"
+                    >
+                      <PlayCircle size={14} />
+                      <span>live</span>
+                      <ExternalLink size={11} />
+                    </a>
                   )}
                 </div>
-                <h3 className="mt-2 text-[27px] font-medium leading-tight tracking-tight text-text-primary">
-                  {project.name}
-                </h3>
-                <p className="mt-0.5 font-mono text-xs text-accent-body">{project.tagline}</p>
               </div>
 
-              <div className="flex items-center gap-2">
-                {project.githubUrl ? (
-                  <a
-                    href={project.githubUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    aria-label={`${project.name} on GitHub`}
-                    className="btn btn-ghost glass-control min-h-9 text-xs"
-                  >
-                    <GithubMark size={14} />
-                    <span>source</span>
-                    <ExternalLink size={11} />
-                  </a>
-                ) : (
-                  <span className="flex items-center gap-2 rounded-md border border-base-edge px-3 py-2 font-mono text-xs text-text-dim">
-                    <PlayCircle size={14} />
-                    internship project
+              <p className="mt-4 max-w-2xl text-[15px] leading-relaxed text-text-primary/85">{project.description}</p>
+
+              <div className="mt-4 flex flex-wrap gap-1.5">
+                {project.tags.map((tag) => (
+                  <span key={tag} className="tag-outline text-[11.5px]">
+                    {tag}
                   </span>
-                )}
-                {project.liveUrl && (
-                  <a
-                    href={project.liveUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    aria-label={`${project.name} live site`}
-                    className="btn btn-ghost glass-control min-h-9 text-xs"
-                  >
-                    <PlayCircle size={14} />
-                    <span>live</span>
-                    <ExternalLink size={11} />
-                  </a>
-                )}
+                ))}
               </div>
             </div>
-
-            <div className="mt-4 max-w-2xl">
-              <p className="text-[15px] leading-relaxed text-text-primary/85">
-                {project.description}
-              </p>
-            </div>
-
-            <div className="mt-4 flex flex-wrap gap-1.5">
-              {project.tags.map((tag) => (
-                <span key={tag} className="tag-outline text-[11.5px]">
-                  {tag}
-                </span>
-              ))}
-            </div>
-          </motion.div>
-        </AnimatePresence>
-      </div>
           </motion.div>
         </motion.div>
       )}
@@ -577,16 +446,142 @@ function ProjectModal({ project, playing, onClose }) {
   );
 }
 
-// The explorer, the way an editor draws one.
-//
-// The repo-browser metaphor the section already carries, made literal: the four
-// pillars are directories, the projects are the files in them, and the row
-// treatment is the one every developer looking at this page reads without being
-// taught — a twisty, a folder that opens, a file icon tinted by language, and
-// an indent guide running down each level.
-//
-// Folders are open on arrival. A tree that starts collapsed hides the whole
-// point of showing a tree.
+// A featured project's picture. On a pointer device the recording plays while
+// the card is hovered — the reader sees the thing running without opening it —
+// and nothing is fetched until they do.
+function CardMedia({ project, hovered, className = '' }) {
+  const thumb = thumbOf(project);
+  return (
+    <span className={`relative block overflow-hidden bg-black/30 ${className}`}>
+      <span className="absolute inset-0 flex items-center justify-center text-text-dim/45">
+        <Film size={20} />
+      </span>
+      {thumb && (
+        <img
+          src={thumb}
+          alt=""
+          loading="lazy"
+          decoding="async"
+          /* object-top: these are screenshots of running apps, and the part
+             worth seeing is the header and first rows, at the top. */
+          className="relative h-full w-full object-cover object-top transition-transform duration-500 group-hover:scale-[1.025]"
+        />
+      )}
+      {project.video && hovered && (
+        <video
+          src={project.video}
+          className="absolute inset-0 h-full w-full object-cover object-top"
+          autoPlay
+          muted
+          loop
+          playsInline
+          aria-hidden="true"
+        />
+      )}
+      <span
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3"
+        style={{ background: 'linear-gradient(to top, rgba(18,5,9,.55), rgba(18,5,9,0))' }}
+        aria-hidden="true"
+      />
+    </span>
+  );
+}
+
+function FeaturedCard({ project, onOpen, wide = false }) {
+  const [hovered, setHovered] = useState(false);
+  const canHover = useRef(
+    typeof window !== 'undefined' && window.matchMedia('(hover: hover) and (pointer: fine)').matches
+  );
+  const others = wide ? project.items?.slice(1, 5) ?? [] : [];
+
+  return (
+    <button
+      type="button"
+      onClick={() => onOpen(project.id)}
+      onPointerEnter={() => canHover.current && setHovered(true)}
+      onPointerLeave={() => setHovered(false)}
+      aria-label={`Open ${project.name}`}
+      className={`group glass-pane flex h-full w-full flex-col overflow-hidden rounded-[26px] text-left transition-[border-color,transform] duration-300 hover:-translate-y-0.5 hover:border-accent/50 ${
+        wide ? 'lg:grid lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]' : ''
+      }`}
+    >
+      <span className={`relative block ${wide ? 'lg:min-h-[400px]' : ''}`}>
+        <CardMedia
+          project={project}
+          hovered={hovered}
+          className={wide ? 'aspect-[16/9] lg:absolute lg:inset-0 lg:aspect-auto' : 'aspect-[16/9]'}
+        />
+        {others.length > 0 && (
+          /* The rest of the hardware, as a contact strip over the lead photo:
+             K9 is the project where the parts were built by hand. */
+          <span className="absolute bottom-3 left-3 flex gap-1.5">
+            {others.map((it) => (
+              <img
+                key={it.tag}
+                src={it.src}
+                alt=""
+                loading="lazy"
+                className="h-12 w-12 rounded-lg border border-white/20 bg-black/40 object-cover sm:h-14 sm:w-14"
+              />
+            ))}
+          </span>
+        )}
+        <span className="absolute left-3 top-3 flex flex-wrap gap-1.5">
+          {project.language && (
+            <span className="flex items-center gap-1.5 rounded-full bg-black/55 px-2.5 py-1 font-mono text-[10.5px] text-text-primary backdrop-blur-sm">
+              <LanguageDot language={project.language} />
+              {project.language}
+            </span>
+          )}
+          {project.private && (
+            <span className="flex items-center gap-1 rounded-full bg-black/55 px-2.5 py-1 font-mono text-[10.5px] text-text-muted backdrop-blur-sm">
+              <Lock size={10} /> private
+            </span>
+          )}
+        </span>
+      </span>
+
+      <span className={`flex flex-1 flex-col p-5 sm:p-6 ${wide ? 'lg:p-8' : ''}`}>
+        <span className="font-mono text-[11px] text-accent-body">{project.context}</span>
+        <span
+          className={`mt-1.5 block font-medium leading-tight tracking-[-0.02em] text-text-primary ${
+            wide ? 'text-[26px] lg:text-[32px]' : 'text-[23px]'
+          }`}
+        >
+          {project.name}
+        </span>
+        <span className="mt-2.5 block max-w-[52ch] text-[14.5px] leading-relaxed text-text-primary/75">
+          {project.summary}
+        </span>
+        <span className={`mt-4 grid gap-1.5 ${wide ? '' : 'sm:grid-cols-1'}`}>
+          {project.proof.map((line) => (
+            <span key={line} className="flex items-center gap-2 font-mono text-[11.5px] text-text-muted">
+              <span className="h-1 w-1 shrink-0 rounded-full bg-accent" aria-hidden="true" />
+              {line}
+            </span>
+          ))}
+        </span>
+        <span className="mt-auto flex items-end justify-between gap-3 pt-5">
+          <span className="flex flex-wrap gap-1.5">
+            {project.tags.slice(0, wide ? 5 : 3).map((t) => (
+              <span key={t} className="tag-outline text-[11px]">
+                {t}
+              </span>
+            ))}
+          </span>
+          <span className="flex shrink-0 items-center gap-1 text-[13px] text-text-primary/80 transition-colors group-hover:text-accent-bright">
+            Open
+            <ArrowUpRight size={14} aria-hidden="true" />
+          </span>
+        </span>
+      </span>
+    </button>
+  );
+}
+
+// The explorer, the way an editor draws one: the pillars as directories, the
+// projects as files, a twisty and an indent guide per level. Open on arrival —
+// a tree that starts collapsed hides the point of showing a tree.
 function FileTree({ selectedId, onSelect }) {
   const [closed, setClosed] = useState(() => new Set());
   const toggle = (id) =>
@@ -616,24 +611,17 @@ function FileTree({ selectedId, onSelect }) {
                 onClick={() => toggle(folder.id)}
                 className="flex w-full items-center gap-1.5 rounded px-2 py-[5px] text-left text-text-muted transition-colors hover:bg-white/[0.05] hover:text-text-primary"
               >
-                <ChevronRight
-                  size={13}
-                  className={`shrink-0 transition-transform duration-150 ${open ? 'rotate-90' : ''}`}
-                />
+                <ChevronRight size={13} className={`shrink-0 transition-transform duration-150 ${open ? 'rotate-90' : ''}`} />
                 {open ? (
                   <FolderOpen size={13} className="shrink-0 text-accent/80" />
                 ) : (
                   <Folder size={13} className="shrink-0 text-accent/80" />
                 )}
                 <span className="truncate">{folder.name}</span>
-                <span className="ml-auto shrink-0 tabular-nums text-[11px] text-text-dim">
-                  {folder.children.length}
-                </span>
+                <span className="ml-auto shrink-0 tabular-nums text-[11px] text-text-dim">{folder.children.length}</span>
               </button>
 
               {open && (
-                /* The indent guide. One hairline per level, offset to sit under
-                   the twisty above it, exactly where an editor puts it. */
                 <ul role="group" className="ml-[13px] border-l border-white/[0.1] pl-1.5">
                   {folder.children.map((p) => {
                     const on = p.id === selectedId;
@@ -656,14 +644,6 @@ function FileTree({ selectedId, onSelect }) {
                             style={{ color: LANGUAGE_COLORS[p.language] ?? undefined }}
                           />
                           <span className="truncate">{fileName(p)}</span>
-                          {p.flagship && (
-                            <Star size={10} className="shrink-0 text-accent" fill="currentColor" />
-                          )}
-                          {p.private && <Lock size={10} className="shrink-0 text-text-dim" />}
-                          {/* The tagline is what makes a tree of fourteen
-                              filenames worth reading. It takes whatever room is
-                              left and is dropped on the narrowest screens,
-                              where the filename already fills the row. */}
                           <span className="ml-2 hidden min-w-0 flex-1 truncate text-[11.5px] text-text-dim sm:block">
                             {p.tagline}
                           </span>
@@ -681,39 +661,19 @@ function FileTree({ selectedId, onSelect }) {
   );
 }
 
-// The repository selector, in the two shapes it can take.
-//
-// This replaced a horizontal chip row on a phone and a 264px sidebar of rows on
-// a desktop — two different controls doing one job, neither of which could show
-// you the work. Both shapes now span the panel and both are available at every
-// width.
-function ProjectSelector({ view, selectedId, onSelect }) {
-  if (view === 'files') {
-    return <FileTree selectedId={selectedId} onSelect={onSelect} />;
-  }
-
+function RepoGrid({ onSelect }) {
   return (
-    <ul className="grid grid-cols-2 gap-2.5 p-3 sm:grid-cols-3 lg:grid-cols-4">
-      {PROJECTS.map((p) => {
-        const on = p.id === selectedId;
+    <ul className="grid grid-cols-2 gap-2.5 p-3 lg:grid-cols-5">
+      {MORE.map((p) => {
         const thumb = thumbOf(p);
         return (
           <li key={p.id}>
             <button
               type="button"
               onClick={() => onSelect(p.id)}
-              aria-current={on ? 'true' : undefined}
-              className={`group flex w-full flex-col overflow-hidden rounded-2xl text-left transition-colors ${
-                on
-                  ? 'bg-accent/[0.14] shadow-[inset_0_0_0_1px_rgb(224_122_154_/_0.7)]'
-                  : 'bg-white/[0.045] shadow-[inset_0_0_0_1px_rgb(253_243_244_/_0.12)] hover:bg-white/[0.08]'
-              }`}
+              className="group flex w-full flex-col overflow-hidden rounded-2xl bg-white/[0.045] text-left shadow-[inset_0_0_0_1px_rgb(253_243_244_/_0.12)] transition-colors hover:bg-white/[0.08] hover:shadow-[inset_0_0_0_1px_rgb(224_122_154_/_0.55)]"
             >
               <span className="relative block aspect-[16/9] w-full overflow-hidden bg-black/25">
-                {/* Behind every thumbnail, not only the one project without a
-                    still. The images are lazy, so a card that has not fetched
-                    yet would otherwise be an empty black rectangle — half a
-                    grid of those reads as broken rather than as loading. */}
                 <span className="absolute inset-0 flex items-center justify-center text-text-dim/45">
                   <Film size={18} />
                 </span>
@@ -723,33 +683,16 @@ function ProjectSelector({ view, selectedId, onSelect }) {
                     alt=""
                     loading="lazy"
                     decoding="async"
-                    /* object-top, not centre. These are screenshots of running apps and
-                       the part worth seeing — the header, the first rows of real
-                       content — is at the top of the frame; a centre crop lands on
-                       empty canvas for about half of them. */
                     className="relative h-full w-full object-cover object-top opacity-90 transition-opacity group-hover:opacity-100"
                   />
                 )}
-                {p.flagship && (
-                  <span className="absolute left-1.5 top-1.5 rounded-full bg-black/55 p-1 text-accent backdrop-blur-sm">
-                    <Star size={10} fill="currentColor" />
-                  </span>
-                )}
-                {p.private && (
-                  <span className="absolute right-1.5 top-1.5 rounded-full bg-black/55 p-1 text-text-muted backdrop-blur-sm">
-                    <Lock size={10} />
-                  </span>
-                )}
               </span>
-              <span className="flex min-w-0 items-center gap-2 px-2.5 pb-2.5 pt-2">
-                <LanguageDot language={p.language} />
-                <span
-                  className={`min-w-0 flex-1 truncate font-mono text-[12px] ${
-                    on ? 'text-accent-bright' : 'text-text-primary'
-                  }`}
-                >
-                  {p.name}
+              <span className="flex min-w-0 flex-col gap-0.5 px-3 pb-3 pt-2.5">
+                <span className="flex min-w-0 items-center gap-2">
+                  <LanguageDot language={p.language} />
+                  <span className="min-w-0 flex-1 truncate font-mono text-[12.5px] text-text-primary">{p.name}</span>
                 </span>
+                <span className="hidden truncate text-[12px] text-text-muted sm:block">{p.tagline}</span>
               </span>
             </button>
           </li>
@@ -760,211 +703,103 @@ function ProjectSelector({ view, selectedId, onSelect }) {
 }
 
 export default function ProjectBrowser() {
-  const [selectedId, setSelectedId] = useState(PROJECTS[0].id);
-  // Phones get the first three lines of a description with the rest behind a
-  // tap. The full text is always in the DOM — this clamps, it doesn't truncate.
-  // Whether the section is on screen. Read by the preview video, which fetches
-  // nothing until it is true, and by the auto-advance clock below.
-  const [inView, setInView] = useState(false);
   const [view, setView] = useProjectView();
-  // null when the dialog is shut. Separate from selectedId so the grid keeps
-  // showing which project you last looked at after you close it.
+  // The last project opened, which the explorer keeps lit after the dialog
+  // closes; `openId` is null whenever the dialog is shut.
+  const [selectedId, setSelectedId] = useState(null);
   const [openId, setOpenId] = useState(null);
-  const openProject = openId ? PROJECTS.find((p) => p.id === openId) : null;
+  const openProjectData = openId ? PROJECTS.find((p) => p.id === openId) : null;
 
-  const sectionRef = useRef(null);
-  // Activity is tracked in a ref rather than state: pointermove fires
-  // constantly, and restarting a timer must not cost a re-render.
-  const lastActivityRef = useRef(0);
-  const nudgeIdle = useCallback(() => {
-    lastActivityRef.current = Date.now();
+  const select = useCallback((id) => {
+    setSelectedId(id);
+    setOpenId(id);
   }, []);
-
-  // Selecting a project opens it. The selector's job is to choose; the dialog's
-  // job is to show.
-  const select = useCallback(
-    (id) => {
-      setSelectedId(id);
-      setOpenId(id);
-      nudgeIdle();
-    },
-    [nudgeIdle]
-  );
   const closeModal = useCallback(() => setOpenId(null), []);
 
-  // Separate from the auto-advance effect below, which does not run under
-  // reduced motion. The preview video reads this to decide whether to fetch
-  // anything, and a reduced-motion visitor still gets to watch the video.
+  // Other sections open projects by name — the hero's trace, the focus cards,
+  // the experience entries.
   useEffect(() => {
-    const node = sectionRef.current;
-    if (!node) return undefined;
-    const io = new IntersectionObserver(([e]) => setInView(e.isIntersecting), {
-      threshold: 0.35,
-    });
-    io.observe(node);
-    return () => io.disconnect();
-  }, []);
-
-  useEffect(() => {
-    const node = sectionRef.current;
-    if (!node) return undefined;
-    // Same shape as the reduced-motion guard: a gallery that walks itself is
-    // a desktop affordance. On a phone the reader is already driving with a
-    // thumb, and a project changing under them mid-read is an interruption —
-    // one that also pulled a video they never asked for, every 30 seconds.
-    if (
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches ||
-      !window.matchMedia('(hover: hover)').matches
-    ) {
-      return undefined;
-    }
-
-    let onScreen = false;
-    lastActivityRef.current = Date.now();
-
-    const io = new IntersectionObserver(
-      ([e]) => {
-        // Only cycle while a decent slice of the section is actually on screen,
-        // and give a full quiet period from the moment it comes into view.
-        if (e.isIntersecting && !onScreen) lastActivityRef.current = Date.now();
-        onScreen = e.isIntersecting;
-      },
-      { threshold: 0.35 }
-    );
-    io.observe(node);
-
-    const tick = setInterval(() => {
-      if (!onScreen || document.hidden) {
-        // Time spent off-screen or on another tab shouldn't count as idling.
-        lastActivityRef.current = Date.now();
-        return;
-      }
-      if (Date.now() - lastActivityRef.current < AUTO_ADVANCE_MS) return;
-      lastActivityRef.current = Date.now();
-      setSelectedId((current) => {
-        const i = PROJECTS.findIndex((p) => p.id === current);
-        return PROJECTS[(i + 1) % PROJECTS.length].id;
-      });
-    }, IDLE_TICK_MS);
-
-    // Anything that suggests someone is still there resets the clock.
-    const opts = { passive: true, capture: true };
-    const events = ['pointerdown', 'pointermove', 'wheel', 'touchstart', 'keydown'];
-    events.forEach((ev) => node.addEventListener(ev, nudgeIdle, opts));
-
-    return () => {
-      clearInterval(tick);
-      io.disconnect();
-      events.forEach((ev) => node.removeEventListener(ev, nudgeIdle, opts));
+    const onOpen = (e) => {
+      const id = e.detail?.id;
+      if (PROJECTS.some((p) => p.id === id)) select(id);
     };
-  }, [nudgeIdle]);
+    window.addEventListener(OPEN_PROJECT_EVENT, onOpen);
+    return () => window.removeEventListener(OPEN_PROJECT_EVENT, onOpen);
+  }, [select]);
+
+  const [lead, ...rest] = FEATURED;
 
   return (
-    <section id="projects" ref={sectionRef} className="relative">
-      <div className="mx-auto max-w-6xl px-5 pb-6 pt-11 sm:px-10 sm:pb-8 sm:pt-14 md:px-14 md:pb-10 md:pt-20">
-        <Reveal>
-          <p className="mb-4 font-mono text-[11px] uppercase tracking-[0.18em] text-text-muted">
-            // [ projects ]
-          </p>
-          <div className="flex flex-wrap items-end justify-between gap-6">
-            <h2 className="text-3xl font-medium tracking-tight text-text-primary md:text-[38px]">
-              Projects
-            </h2>
-          </div>
-          {/* Wide screens only. On a phone this was a label plus eight
-              outlined pills sitting between the headline and the browser, and
-              the browser underneath shows every one of those tags again, per
-              project, where they mean something specific. */}
-          <div className="mt-5 hidden flex-wrap items-center gap-3 sm:flex">
-            {/* Full-strength muted, not /70: at 10.5px the faded variant
-                measured 4.19:1, under the 4.5:1 AA floor. */}
-            <span className="shrink-0 font-mono text-[10.5px] uppercase tracking-[0.16em] text-text-muted">
-              Recurring stack
-            </span>
-            <span className="hidden h-3.5 w-px bg-base-hairline sm:block" aria-hidden="true" />
-            <div className="flex flex-wrap gap-1.5">
-              {RECURRING_STACK.map((tag) => (
-                <span key={tag} className="tag-outline text-[11.5px]">
-                  {tag}
-                </span>
-              ))}
+    <section id="projects" className={`relative pb-10 pt-12 sm:pt-16 md:pb-14 md:pt-20 ${SECTION_PAD}`}>
+      <div className={FRAME}>
+        <SectionHeader
+          index="02"
+          eyebrow="Work"
+          title="Selected work"
+          lead="Two systems built for government organizations in Bahrain, and the projects behind them. Open any card for the demo, the architecture or the code."
+        />
+
+        <div className="mt-9 grid gap-4 md:grid-cols-2">
+          <Reveal className="md:col-span-2">
+            <FeaturedCard project={lead} onOpen={select} wide />
+          </Reveal>
+          {rest.map((p, i) => (
+            <Reveal key={p.id} delay={0.04 + (i % 2) * 0.05} className="h-full">
+              <FeaturedCard project={p} onOpen={select} />
+            </Reveal>
+          ))}
+        </div>
+
+        <Reveal delay={0.05} className="mt-12 block">
+          <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <h3 className="text-[22px] font-medium tracking-[-0.015em] text-text-primary">Built from scratch</h3>
+              <p className="mt-1 max-w-[60ch] text-[14px] text-text-primary/65">
+                Servers, shells, a ray tracer, games and frameworks, written without the library that would
+                normally do the hard part.
+              </p>
             </div>
+          </div>
+          <div className="glass-pane overflow-hidden rounded-[26px]">
+            <div className="flex items-center justify-between gap-3 border-b border-white/[0.08] px-3.5 py-2.5">
+              <p className="font-mono text-[10.5px] uppercase tracking-wider text-text-muted">
+                // repositories ({MORE.length})
+              </p>
+              <div
+                role="group"
+                aria-label="Repository layout"
+                className="flex items-center gap-0.5 rounded-full bg-white/[0.06] p-0.5 shadow-[inset_0_0_0_1px_rgb(253_243_244_/_0.12)]"
+              >
+                {VIEWS.map(({ id, label, Icon }) => {
+                  const on = view === id;
+                  return (
+                    <button
+                      key={id}
+                      type="button"
+                      onClick={() => setView(id)}
+                      aria-pressed={on}
+                      title={label}
+                      className={`flex h-8 w-9 items-center justify-center rounded-full transition-colors ${
+                        on ? 'bg-white/[0.14] text-text-primary' : 'text-text-muted hover:text-text-primary'
+                      }`}
+                    >
+                      <Icon size={14} />
+                      <span className="sr-only">{label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+            {view === 'files' ? (
+              <FileTree selectedId={selectedId} onSelect={select} />
+            ) : (
+              <RepoGrid onSelect={select} />
+            )}
           </div>
         </Reveal>
       </div>
 
-      {/* The browser is a pane on the page's own surface. It used to float on a
-          full-bleed band of `void` with a canvas of falling glyphs behind it,
-          faded top and bottom to hide where the band started — a second ground,
-          a per-frame canvas and two gradients, all to stop one panel looking
-          pasted on. The atmosphere layer behind the document does that for
-          every section at once, so the band and the rain are gone and what is
-          left is the panel. */}
-      <div>
-        <div className="relative">
-          <Reveal delay={0.05} className="relative block px-5 py-6 sm:px-10 sm:py-9 md:px-14">
-            <div className="glass-pane mx-auto max-w-6xl overflow-hidden rounded-[26px]">
-              {/* One selector, full width, in whichever shape the reader
-                  picked. This was two different controls doing one job — a
-                  horizontal chip row on a phone and a 264px sidebar of rows on
-                  a desktop — and neither could show you the work itself, only
-                  a list of names. */}
-              <div className="border-b border-white/[0.08]">
-                <div className="flex items-center justify-between gap-3 px-3.5 pt-3">
-                  <p className="font-mono text-[10.5px] uppercase tracking-wider text-text-muted">
-                    // repositories ({PROJECTS.length})
-                  </p>
-                  <div
-                    role="group"
-                    aria-label="Repository layout"
-                    className="flex items-center gap-0.5 rounded-full bg-white/[0.06] p-0.5 shadow-[inset_0_0_0_1px_rgb(253_243_244_/_0.12)]"
-                  >
-                    {VIEWS.map(({ id, label, Icon }) => {
-                      const on = view === id;
-                      return (
-                        <button
-                          key={id}
-                          type="button"
-                          onClick={() => setView(id)}
-                          aria-pressed={on}
-                          /* An icon pair needs a name a screen reader can read
-                             and a tooltip a mouse can find; the label is not
-                             visible because the two shapes are legible as
-                             icons and a word each would double the control. */
-                          title={label}
-                          className={`flex h-8 w-9 items-center justify-center rounded-full transition-colors ${
-                            on
-                              ? 'bg-white/[0.14] text-text-primary'
-                              : 'text-text-muted hover:text-text-primary'
-                          }`}
-                        >
-                          <Icon size={14} />
-                          <span className="sr-only">{label}</span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                <ProjectSelector view={view} selectedId={selectedId} onSelect={select} />
-              </div>
-
-              {/* preview pane.
-
-                  No touch-action here. It used to carry `pan-y`, which reads as
-                  "only vertical panning", and touch-action intersects down the
-                  tree — so it also disabled horizontal panning inside the
-                  hardware gallery and anything else scrollable in this pane. It
-                  was suppressing a horizontal page pan that cannot happen
-                  anyway: nothing on the page scrolls sideways. The swipe
-                  handler below does its own angle check, which is what actually
-                  keeps a vertical fling from being read as a project change. */}
-            </div>
-          </Reveal>
-        </div>
-      </div>
-
-      <ProjectModal project={openProject} playing={inView && !!openProject} onClose={closeModal} />
+      <ProjectModal project={openProjectData} onClose={closeModal} />
     </section>
   );
 }
