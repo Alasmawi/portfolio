@@ -39,7 +39,7 @@ const PORT = await new Promise((resolve) => {
     srv.close(() => resolve(port));
   });
 });
-const BASE = `http://localhost:${PORT}/v2/`;
+const BASE = `http://localhost:${PORT}/`;
 
 function startServer() {
   const args =

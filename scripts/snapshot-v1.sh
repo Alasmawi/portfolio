@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Regenerate legacy-v1/ — the frozen build of the pre-refactor site served at /.
+# Regenerate legacy-v1/ — the frozen build of the pre-refactor site served at /v1.
 #
 # DEVELOPER TOOL, NOT PART OF A DEPLOY. Deploys must not depend on git: a CI
 # checkout is shallow, may not carry other branches, and may hold no credentials
@@ -47,7 +47,7 @@ cp -R "$STAGE/assets" "$ROOT/legacy-v1/"
 cat > "$ROOT/legacy-v1/README.md" <<MD
 # legacy-v1 — generated, do not edit
 
-The built pre-refactor site, served at \`/\`. Regenerate with
+The built pre-refactor site, served at \`/v1\`. Regenerate with
 \`bash scripts/snapshot-v1.sh\`; never edit these files by hand.
 
 - Source: \`$ORIGINAL_REF\` at \`$(git rev-parse "$ORIGINAL_REF")\`
