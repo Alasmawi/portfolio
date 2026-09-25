@@ -18,6 +18,7 @@ import {
 import Reveal from './ui/Reveal';
 import SectionHeader, { FRAME, SECTION_PAD } from './ui/SectionHeader';
 import RingGallery from './ui/RingGallery';
+import ScreenGallery from './ui/ScreenGallery';
 import HardwareStrip from './ui/HardwareStrip';
 import K9Architecture from './ui/K9Architecture';
 import BayyanArchitecture from './ui/BayyanArchitecture';
@@ -144,7 +145,7 @@ function useProjectView() {
 
 // Every project has a still: the recorded ones carry the poster frame from
 // their video, K9 leads with the first photo of the hardware, and Bayyan with
-// its drawn cover.
+// its dashboard.
 const thumbOf = (p) => p.poster ?? p.items?.[0]?.src ?? null;
 
 function useContainerAtLeast(min) {
@@ -162,7 +163,10 @@ function useContainerAtLeast(min) {
   return [ref, wide];
 }
 
+// Hardware photos turn on the ring (or lie flat in the strip on a narrow
+// panel); app screenshots get the flat screen viewer at every width.
 function Gallery({ items, wide }) {
+  if (items[0]?.type === 'screen') return <ScreenGallery items={items} />;
   return wide ? <RingGallery items={items} /> : <HardwareStrip items={items} />;
 }
 

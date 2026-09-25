@@ -11,7 +11,22 @@ import k9Collar from '../assets/k9/collar.webp';
 import k9FoodScale from '../assets/k9/food-scale.webp';
 import k9Pi5Gateway from '../assets/k9/pi5-gateway.webp';
 import k9ReolinkCam from '../assets/k9/reolink-cam.webp';
-import bayyanCover from '../assets/bayyan/cover.webp';
+import bayyanDashboard from '../assets/bayyan/dashboard.webp';
+import bayyanDashboardThumb from '../assets/bayyan/dashboard-thumb.webp';
+import bayyanTelecom from '../assets/bayyan/telecom-list.webp';
+import bayyanTelecomThumb from '../assets/bayyan/telecom-list-thumb.webp';
+import bayyanRecord from '../assets/bayyan/record-detail.webp';
+import bayyanRecordThumb from '../assets/bayyan/record-detail-thumb.webp';
+import bayyanBills from '../assets/bayyan/bills-draft.webp';
+import bayyanBillsThumb from '../assets/bayyan/bills-draft-thumb.webp';
+import bayyanWhereFrom from '../assets/bayyan/where-from.webp';
+import bayyanWhereFromThumb from '../assets/bayyan/where-from-thumb.webp';
+import bayyanContracts from '../assets/bayyan/contracts.webp';
+import bayyanContractsThumb from '../assets/bayyan/contracts-thumb.webp';
+import bayyanDashboardAr from '../assets/bayyan/dashboard-ar-dark.webp';
+import bayyanDashboardArThumb from '../assets/bayyan/dashboard-ar-dark-thumb.webp';
+import bayyanBillsAr from '../assets/bayyan/bills-ar-dark.webp';
+import bayyanBillsArThumb from '../assets/bayyan/bills-ar-dark-thumb.webp';
 
 // Files in public/ are referenced by plain runtime strings, which Vite does not
 // rewrite the way it rewrites imports and index.html — so `base` is applied by
@@ -91,18 +106,75 @@ export const PROJECTS = [
     featured: true,
     private: true,
     summary:
-      'One register of the security department’s telecom, permit, contract and subscription obligations, flagging each renewal before it lapses.',
-    proof: ['English + Arabic, RTL', 'Piloted across 4 teams', 'Linux · nginx · systemd'],
+      'One register of everything the security department owns, owes and needs to renew, flagging each renewal before it lapses.',
+    proof: ['English + Arabic, RTL', 'Bills read from PDF, traced to source', 'Piloted across 4 teams'],
     description:
-      'An internal web app that gives the Shura Council’s Networks & Information Security department one register of its telecom, permit, contract and subscription obligations. Each record’s billing cycle drives its renewal date, and records turn to warning and then critical as that date approaches, so nothing lapses unnoticed. It is fully bilingual with a right-to-left Arabic layout, keeps document attachments in MinIO, produces PDF and Excel reports through WeasyPrint and ExcelJS, and runs natively on Linux behind nginx and systemd. Piloted across Network Operations, Information Security, Infrastructure and the Service Desk.',
+      'An internal web app that gives the Shura Council’s Networks & Information Security department one register of everything it owns, owes and needs to renew: telecom lines, contracts, licences and subscriptions. Each record’s billing cycle sets its renewal date, and records move from healthy to due soon to critical as that date approaches, with email reminders and monthly, quarterly and yearly summaries going to the people who need them. The provider’s monthly bills are read straight from their PDFs into an approval sheet: a charge for a number the registry doesn’t know is flagged before anything is applied, and every amount links back to the line on the bill it was read from. Fully bilingual with a right-to-left Arabic layout and a dark mode, with attachments in MinIO, PDF and Excel reports through WeasyPrint and ExcelJS, and a native Linux deployment behind nginx and systemd. Piloted across Network Operations, Information Security, Infrastructure and the Service Desk.',
     tags: ['NestJS', 'Prisma', 'React', 'PostgreSQL', 'MinIO', 'nginx'],
     architecture: 'bayyan',
     githubUrl: null,
     liveUrl: null,
-    poster: bayyanCover,
-    // Screenshots go here once cleared for sharing — same shape as K9's items.
-    // With any present, the dialog shows them in a tab beside the diagram.
-    items: [],
+    poster: bayyanDashboard,
+    // Captured from a copy running on demo data. Screens that would publish
+    // contact details or the mail relay's setup are left out on purpose.
+    items: [
+      {
+        type: 'screen',
+        src: bayyanDashboard,
+        thumb: bayyanDashboardThumb,
+        caption: 'The dashboard: committed, paid and outstanding spend, and what renews next.',
+        alt: 'Bayyan dashboard with spend totals, record counts by type, upcoming renewals and items needing attention',
+      },
+      {
+        type: 'screen',
+        src: bayyanTelecom,
+        thumb: bayyanTelecomThumb,
+        caption: 'Telecom lines, each with its cost, renewal status and billing group.',
+        alt: 'Bayyan telecom list filtered by renewal status, with cost, due date and group per line',
+      },
+      {
+        type: 'screen',
+        src: bayyanRecord,
+        thumb: bayyanRecordThumb,
+        caption: 'A record, edited in place: bilingual name, group, provider and the payment that is due.',
+        alt: 'A Bayyan telecom record open in a dialog with its renewal, pending payment, group and editable fields',
+      },
+      {
+        type: 'screen',
+        src: bayyanBills,
+        thumb: bayyanBillsThumb,
+        caption: 'A month of provider bills read into an approval sheet. A charge for an unknown number is flagged before anything is applied.',
+        alt: 'Bayyan monthly bill draft with totals, a needs-attention warning and the approval sheet',
+      },
+      {
+        type: 'screen',
+        src: bayyanWhereFrom,
+        thumb: bayyanWhereFromThumb,
+        caption: 'Every amount opens the bill it was read from, with the line highlighted.',
+        alt: 'Dialog showing how an amount was worked out, over the source bill with the matching line highlighted',
+      },
+      {
+        type: 'screen',
+        src: bayyanContracts,
+        thumb: bayyanContractsThumb,
+        caption: 'Contracts by soonest renewal. An overdue one gets a “Mark handled” action.',
+        alt: 'Bayyan contracts list with renewal statuses from overdue to healthy',
+      },
+      {
+        type: 'screen',
+        src: bayyanDashboardAr,
+        thumb: bayyanDashboardArThumb,
+        caption: 'The same dashboard in Arabic, right to left, in dark mode.',
+        alt: 'Bayyan dashboard in Arabic with a right-to-left layout and dark theme',
+      },
+      {
+        type: 'screen',
+        src: bayyanBillsAr,
+        thumb: bayyanBillsArThumb,
+        caption: 'The bill import in Arabic.',
+        alt: 'Bayyan monthly bill draft in Arabic with a right-to-left layout and dark theme',
+      },
+    ],
   },
   {
     id: 'guidely',

@@ -63,6 +63,7 @@ src/
       K9Architecture.jsx, K9Flow.jsx  — the sensors → AWS diagram (lazy)
       BayyanArchitecture.jsx          — Bayyan's deployment diagram
       RingGallery.jsx, HardwareStrip.jsx  — the K9 hardware photos
+      ScreenGallery.jsx    — app screenshots with captions and a thumbnail strip
       CourseworkModule.jsx, ProgramJourney.jsx, Reveal.jsx, BrandIcons.jsx
   data/
     projects.js       — every project; `featured` ones get the large cards
@@ -79,7 +80,7 @@ public/
 scripts/
   build-site.sh        — builds the site and adds the frozen /v1
   make-og.mjs          — renders public/og.png, the link-preview card
-  make-bayyan-cover.mjs — renders Bayyan's drawn card cover
+  make-screens.mjs     — converts app screenshots for the project dialog
   make-posters.mjs, check-contrast.mjs, check-shift.mjs, shots.mjs
 ```
 
@@ -87,9 +88,15 @@ scripts/
 
 Messages are sent through [Web3Forms](https://web3forms.com). Create an access key there with the inbox you want messages delivered to, then add it in Vercel under **Settings → Environment Variables** as `VITE_WEB3FORMS_KEY` and redeploy. The key is public by design — it can only send to that one inbox. Without it, Send falls back to opening a drafted email in the visitor's mail app.
 
-### Bayyan screenshots
+### Project screenshots
 
-Bayyan is an internal system, so its card shows a drawn cover and its dialog shows an architecture diagram. Once screenshots are cleared for sharing, drop them in `src/assets/bayyan/`, import them in `projects.js`, and add them to Bayyan's `items` (same shape as K9's); the dialog then shows a **Screens** tab beside the diagram. Point `poster` at one of them to replace the cover.
+App screenshots (Bayyan's, for example) show in the project dialog's **Screens** tab, one at a time with a caption and a thumbnail strip. To add or replace them, convert the full-size PNGs:
+
+```bash
+node scripts/make-screens.mjs <folder-of-pngs> <project-id> [02-dashboard.png ...]
+```
+
+That writes `src/assets/<project-id>/<name>.webp` and `<name>-thumb.webp`. Import them in `projects.js` and list them in the project's `items` as `{ type: 'screen', src, thumb, caption, alt }`. Bayyan's are captured from a copy running on demo data; screens that would publish contact details or the mail relay's setup are left out.
 
 ### Adding or updating a project
 

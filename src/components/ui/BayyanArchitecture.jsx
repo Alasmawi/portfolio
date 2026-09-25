@@ -7,7 +7,7 @@ import { useEffect, useRef, useState } from 'react';
 // Same colour rule as the K9 diagram: amber marks the hop every request passes
 // through (nginx), everything else is a plain node.
 const DESCRIPTION =
-  'Browsers load a React front end with English and right-to-left Arabic layouts. Requests go through nginx to a NestJS API on the same Linux host, run under systemd. The API uses Prisma to store records in PostgreSQL, where each record’s billing cycle sets its renewal date and its status escalates from ok to warning to critical as that date approaches. Document attachments are kept in MinIO, and reports are produced as PDF through WeasyPrint and as Excel through ExcelJS.';
+  'Browsers load a React front end with English and right-to-left Arabic layouts. Requests go through nginx to a NestJS API on the same Linux host, run under systemd. The API uses Prisma to store records in PostgreSQL, where each record’s billing cycle sets its renewal date and its status moves from healthy to due soon to critical as that date approaches. Document attachments are kept in MinIO, reports are produced as PDF through WeasyPrint and as Excel through ExcelJS, and renewal reminders and periodic summaries go out by email through the organization’s mail relay.';
 
 function Node({ title, sub, gate = false }) {
   return (
@@ -73,6 +73,7 @@ export default function BayyanArchitecture() {
                 <Node title="PostgreSQL" sub="records and renewals" />
                 <Node title="MinIO" sub="document attachments" />
                 <Node title="Reports" sub="WeasyPrint PDF · ExcelJS" />
+                <Node title="Mail relay" sub="reminders and summaries" />
               </div>
             </div>
           </div>
@@ -82,8 +83,8 @@ export default function BayyanArchitecture() {
         <div className="mt-4 flex flex-wrap items-center gap-x-2.5 gap-y-2 border-t border-base-hairline pt-3 font-mono text-[10.5px] text-text-muted">
           <span>billing cycle → renewal date →</span>
           {[
-            ['ok', '#8fd6c9'],
-            ['warning', '#f0a448'],
+            ['healthy', '#8fd6c9'],
+            ['due soon', '#f0a448'],
             ['critical', '#ea5f70'],
           ].map(([label, c], i) => (
             <span key={label} className="inline-flex items-center gap-1.5">

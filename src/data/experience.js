@@ -43,7 +43,7 @@ export const EXPERIENCE = [
     points: [
       'Built the Ministry of Interior Police K9 Unit’s monitoring platform end to end: the dashboard, the serverless backend, and the ingestion pipeline between them.',
       'Designed the backend on AWS: IoT Core and API Gateway take the data in, Lambda processes it, DynamoDB stores it, and Cognito keeps handlers and kennel staff to their own views.',
-      'Wired in Amazon Bedrock to flag anomalies in the sensor data and turn them into care recommendations the dashboard shows as plain guidance.',
+      'Wired in Amazon Bedrock to flag sensor anomalies and turn them into plain care recommendations on the dashboard.',
       'Demonstrated the finished system live to AWS mentors and Ministry of Interior stakeholders.',
     ],
     tags: ['AWS IoT Core', 'API Gateway', 'Lambda', 'DynamoDB', 'Cognito', 'Amazon Bedrock'],
