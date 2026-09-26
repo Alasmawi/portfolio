@@ -78,7 +78,7 @@ public/
   Abdulla_Alasmawi_CV.pdf   — the CV behind every "Download CV" link
   video/                    — project preview clips, referenced from data/projects.js
 scripts/
-  build-site.sh        — builds the site and adds the frozen /v1
+  build-site.sh        — builds the site, then copy-legacy.mjs adds the frozen /v1
   make-og.mjs          — renders public/og.png, the link-preview card
   make-screens.mjs     — converts app screenshots for the project dialog
   make-posters.mjs, check-contrast.mjs, check-shift.mjs, shots.mjs

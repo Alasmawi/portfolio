@@ -28,32 +28,8 @@ echo "==> Building the site -> dist/"
 npx vite build
 
 echo "==> Copying legacy-v1/ -> dist/v1/"
-# The original was built with base '/', so its bundle asks for /assets/<hash>
-# by absolute path. Its files go into the same dist/assets/ as the new build's.
-# Names are content hashes, so a shared name is normally the same file (the K9
-# photos are in both) and is skipped; a shared name with different bytes stops
-# the build rather than silently serving one site's file to the other.
-mkdir -p dist/v1
-cp legacy-v1/index.html dist/v1/index.html
-for f in legacy-v1/assets/*; do
-  dest="dist/assets/$(basename "$f")"
-  if [ -e "$dest" ]; then
-    if cmp -s "$f" "$dest"; then continue; fi
-    echo "error: $dest differs between the two builds" >&2
-    exit 1
-  fi
-  cp "$f" "$dest"
-done
-
-# The archive stays reachable but out of search results, pointing at / as the
-# page of record so the two don't compete as duplicates.
-node -e '
-  const fs = require("fs");
-  const file = "dist/v1/index.html";
-  const tags = `<head>\n    <meta name="robots" content="noindex" />\n    <link rel="canonical" href="https://alasmawi.dev/" />`;
-  fs.writeFileSync(file, fs.readFileSync(file, "utf8").replace("<head>", tags));
-'
+# In Node, not shell: Vercel's build image lacks some of the usual tools (it
+# has no `cmp`), and Node is the one thing a Vite build is guaranteed to have.
+node scripts/copy-legacy.mjs
 
 echo "==> Done"
-echo "    /     $(du -sh dist/index.html | cut -f1) index + $(ls dist/assets | wc -l | tr -d ' ') assets (both builds)"
-echo "    /v1   original, from legacy-v1/"
