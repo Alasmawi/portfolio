@@ -2,13 +2,15 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <!-- Circuit-board mark. PNG rather than the animated GIF: Chrome only ever
-         shows a GIF favicon's first frame, and the GIF is 374kB against 1.4kB
-         here. The site background is baked in so the light strokes stay visible
-         on a light tab strip. -->
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
-    <link rel="icon" type="image/png" sizes="64x64" href="/favicon-64.png" />
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <!-- The hero's data path in miniature: three hops on a trace, the gateway in
+         amber, ending in the teal "live" dot. Drawn by scripts/make-icons.mjs
+         from the site's palette. SVG where the browser takes it, PNG where it
+         doesn't (Safari); the touch icon is a full square because iOS rounds
+         it. The frozen /v1 keeps its own favicon-*.png. -->
+    <link rel="icon" type="image/svg+xml" href="/icon.svg" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/icon-32.png" />
+    <link rel="icon" type="image/png" sizes="64x64" href="/icon-64.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/icon-180.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <!-- First person, and it names what the work is and where it was done. -->
     <meta name="description" content="Software engineer in Bahrain. I build full-stack products and run them on AWS. Most recently, the Ministry of Interior K9 Unit's monitoring platform at the AWS Cloud Innovation Center, and a bilingual obligations registry for the Shura Council." />
