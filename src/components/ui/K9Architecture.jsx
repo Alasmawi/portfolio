@@ -9,7 +9,7 @@ const K9Flow = lazy(() => import('./K9Flow'));
 // Kept in step with the drawing: same devices, same two ingest paths, same
 // diamond at the end where only flagged events detour through Bedrock.
 const DESCRIPTION =
-  'Three ESP32 devices — a smart collar, the Node-A kennel environmental sensor and a smart food scale — report to a Raspberry Pi 5 running AWS IoT Greengrass in the kennel. The gateway forwards their telemetry to AWS IoT Core over MQTT. A Reolink IP camera streams video to AWS on its own path, bypassing the gateway. In the cloud both paths reach Lambda, which applies the detection rules and writes every reading and event to DynamoDB; anything it flags also goes to Amazon Bedrock, which turns the flag into a plain-language explanation and stores that alongside. A React dashboard reads from DynamoDB over REST, and IoT Core pushes live status to it directly.';
+  'Three ESP32 devices, a smart collar, the Node-A kennel environmental sensor and a smart food scale, report to a Raspberry Pi 5 running AWS IoT Greengrass in the kennel. The gateway forwards their telemetry to AWS IoT Core over MQTT. A Reolink IP camera streams video to AWS on its own path, bypassing the gateway. In the cloud both paths reach Lambda, which applies the detection rules and writes every reading and event to DynamoDB; anything it flags also goes to Amazon Bedrock, which turns the flag into a plain-language explanation and stores that alongside. A React dashboard reads from DynamoDB over REST, and IoT Core pushes live status to it directly.';
 
 // The layout is chosen from the *container's* width, not the viewport's. Those
 // are not the same thing here: the projects panel drops a 264px sidebar in at

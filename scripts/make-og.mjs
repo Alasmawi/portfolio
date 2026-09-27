@@ -1,12 +1,13 @@
 // Renders the 1200x630 link-preview card into public/og.png.
 //
-// Built from the site's own tokens and the same cloud still the hero shows, so
-// a preview in LinkedIn, WhatsApp or a CV email looks like the page it points
-// at rather than separate marketing art.
+// Built from the site's own tokens and the same K9 data path the hero's panel
+// draws (read from src/data/traces.js), so a preview in LinkedIn, WhatsApp or a
+// CV email looks like the page it points at rather than separate marketing art.
 //
 //   npm run build && node scripts/make-og.mjs
 import { chromium } from '@playwright/test';
 import { readFile, writeFile } from 'node:fs/promises';
+import { TRACES } from '../src/data/traces.js';
 
 const EXECUTABLE = '/opt/pw-browsers/chromium-1194/chrome-linux/chrome';
 const OUT = 'public/og.png';
@@ -20,7 +21,10 @@ const ROSE = cfg.match(/accent:\s*\{[^}]*DEFAULT:\s*'(#[0-9a-fA-F]{6})'/s)[1];
 const TEXT = cfg.match(/primary:\s*'(#[0-9a-fA-F]{6})'/)[1];
 const MUTED = cfg.match(/muted:\s*'(#[0-9a-fA-F]{6})'/)[1];
 
-const cloud = (await readFile('src/assets/hero/cloud.webp')).toString('base64');
+const k9 = TRACES[0];
+const BAR = { plain: 'linear-gradient(90deg,rgba(226,96,126,.5),rgba(240,157,176,.92))', gate: 'linear-gradient(90deg,rgba(240,164,72,.55),rgba(251,215,164,.95))', live: 'linear-gradient(90deg,rgba(226,96,126,.5),rgba(251,211,220,.95))' };
+const rows = k9.spans.map((sp) => `<div class="row"><div><b>${sp.name}</b><i>${sp.detail}</i></div>
+  <div class="lane"><span style="left:${sp.start * 100}%;width:${sp.width * 100}%;background:${BAR[sp.kind ?? 'plain']}"></span></div></div>`).join('');
 const inter = (await readFile(
   'node_modules/@fontsource-variable/inter/files/inter-latin-wght-normal.woff2'
 )).toString('base64');
@@ -45,7 +49,14 @@ body{width:1200px;height:630px;background:${VOID};font-family:Inter,sans-serif;p
 .pane{position:absolute;right:70px;top:105px;width:470px;height:420px;border-radius:30px;
   background:rgba(253,243,244,.06);border:1px solid rgba(253,243,244,.14);overflow:hidden;
   box-shadow:inset 0 1px 0 rgba(255,255,255,.07), 0 30px 62px -32px rgba(0,0,0,.85)}
-.pane img{position:absolute;inset:-9%;width:118%;height:118%;object-fit:contain}
+.pane{padding:26px 28px}
+.ph{display:flex;justify-content:space-between;align-items:center;font:15px JB;letter-spacing:.14em;color:${MUTED};text-transform:uppercase;padding-bottom:16px;border-bottom:1px solid rgba(255,255,255,.08);margin-bottom:16px}
+.ph em{font-style:normal;text-transform:none;letter-spacing:0;font-family:Inter;font-size:16px;color:${TEXT};background:rgba(255,255,255,.14);padding:5px 14px;border-radius:99px}
+.row{display:grid;grid-template-columns:46% 1fr;gap:14px;align-items:center;margin-bottom:9px}
+.row b{display:block;font-weight:400;font-size:17px;color:${TEXT};line-height:1.15}
+.row i{display:block;font-style:normal;font:12.5px JB;color:${MUTED};line-height:1.2}
+.lane{position:relative;height:11px;border-radius:99px;background:rgba(255,255,255,.05)}
+.lane span{position:absolute;top:0;bottom:0;border-radius:99px}
 .wrap{position:absolute;inset:0;padding:76px 80px;display:flex;flex-direction:column;justify-content:space-between;width:660px}
 h1{font-size:70px;font-weight:500;letter-spacing:-.035em;color:${TEXT};line-height:.98}
 p{margin-top:24px;font-size:27px;line-height:1.42;color:${TEXT};opacity:.86;max-width:20ch}
@@ -56,12 +67,12 @@ p{margin-top:24px;font-size:27px;line-height:1.42;color:${TEXT};opacity:.86;max-
 .edge{position:absolute;inset-inline:0;bottom:0;height:5px;background:${ROSE}}
 </style>
 <div class="orb o1"></div><div class="orb o2"></div><div class="grid"></div>
-<div class="pane"><img src="data:image/webp;base64,${cloud}" alt=""></div>
+<div class="pane"><div class="ph"><span>● Data path</span><em>K9 Pavlov</em></div>${rows}</div>
 <div class="wrap">
   <div>
     <div class="rule"></div>
     <h1>Abdulla<br>Alasmawi</h1>
-    <p>I build full-stack systems on AWS — and understand them the whole way down.</p>
+    <p>Software engineer. I build full-stack products and run them on AWS.</p>
   </div>
   <div class="foot"><span class="dot"></span><span>alasmawi.dev</span>
     <span>·</span><span>MANAMA, BAHRAIN</span></div>

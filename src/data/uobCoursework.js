@@ -51,25 +51,3 @@ export const UOB_COURSEWORK = [
   // plan's own listed course codes.
   { code: 'Dept. Approved', title: 'Business Information Systems', ch: 3, pillar: 'cs' },
 ];
-
-// Four categories, four hues. A single-accent ramp made these read as one
-// gradient rather than four distinct areas of study, which is the whole point
-// of the bar. Cloud and AI keep the amber/cyan the site has always used.
-// Four categorical colours, not four accents. They label segments of a bar and
-// the pillar counts, so they only have to be told apart from each other — the
-// old set (cyan, violet, hot pink) was cool against a warm ground and read as
-// leftovers from the previous palette.
-//
-// Teal is deliberately absent: it is the status colour everywhere else on the
-// page, and spending it on a category here would make "live" stop meaning live.
-// One hue, four steps. This was amber, rose, violet and near-white — four
-// hues for a decorative summary bar, in a palette whose rule is one accent
-// that signals. A single-hue ramp reads as one gradient only when the segments
-// touch; CourseworkModule separates them by 3px of the pane behind, which
-// distinguishes them better than hue did, and each is named in the legend.
-export const PILLAR_COLORS = {
-  cloud: 'rgba(224, 122, 154, 1)',
-  ai: 'rgba(224, 122, 154, 0.74)',
-  fullstack: 'rgba(224, 122, 154, 0.5)',
-  cs: 'rgba(224, 122, 154, 0.3)',
-};
