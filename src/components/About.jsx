@@ -1,14 +1,35 @@
-import { Download } from 'lucide-react';
+import { ArrowUpRight, Download } from 'lucide-react';
 import Reveal from './ui/Reveal';
 import SectionHeader, { FRAME, SECTION_PAD } from './ui/SectionHeader';
 import pfp from '../assets/pfp-nobg.webp';
 import { CV_URL } from '../data/navLinks';
+import { openProject } from '../lib/openProject';
+import { scrollToSection } from '../lib/scrollToSection';
 
-const FACTS = [
-  { label: 'Good at', value: 'Owning a feature from schema to screen without a handoff.' },
-  { label: 'Bad at', value: 'Leaving a dashboard alone once it works.' },
-  { label: 'Looking for', value: 'A product team where I can own features from design to production.' },
-  { label: 'Speaks', value: 'Arabic (native) and English (fluent).' },
+// How the work gets done, each with the thing on this page that shows it. It
+// replaced a Good at / Bad at pair, which is a format every portfolio has and
+// which proved nothing; each of these points at a project or a role.
+const PRACTICES = [
+  {
+    title: 'Schema to screen',
+    body: 'I design the tables, write the API, build the interface and deploy it. Bayyan went from its first table to a Linux server behind nginx without a handoff.',
+    proof: { label: 'Bayyan', project: 'bayyan' },
+  },
+  {
+    title: 'Answers that show their source',
+    body: 'When software tells someone something, it should show where that came from. Guidely cites the passages behind every answer, and Bayyan links each billed amount to its line on the bill.',
+    proof: { label: 'Guidely', project: 'guidely' },
+  },
+  {
+    title: 'Reviewed before it ships',
+    body: 'Guidely runs 264 automated tests. At Reboot01 nothing passed until peers had read the code and I had defended it in a live audit.',
+    proof: { label: 'Brain-Book', project: 'brain-book' },
+  },
+  {
+    title: 'Written down for whoever is next',
+    body: 'At the Shura Council I write the procedures the team works from after I hand a system over, alongside the system itself.',
+    proof: { label: 'Experience', section: 'experience' },
+  },
 ];
 
 function Title() {
@@ -33,7 +54,7 @@ export default function About() {
   return (
     <section id="about" className={`relative py-12 sm:py-16 md:py-20 ${SECTION_PAD}`}>
       <div className={FRAME}>
-        {/* Header, photo, body — in that order on a phone, where the photo is a
+        {/* Header, photo, body, in that order on a phone, where the photo is a
             compact card under the heading. From lg the photo takes a column of
             its own beside both. */}
         <div className="grid gap-y-8 lg:grid-cols-[300px_minmax(0,1fr)] lg:gap-x-14 lg:gap-y-0">
@@ -83,29 +104,38 @@ export default function About() {
                   Reboot01, where nothing passes until you defend it in front of your peers.
                 </p>
                 <p>
-                  That combination is how I work now. I take a feature from the database schema to the
-                  screen and deploy it myself. At the AWS Cloud Innovation Center that meant a serverless
-                  platform for the Ministry of Interior’s K9 unit. At the Shura Council it has meant a
-                  bilingual registry, a production database moved off AWS without losing a row, and the
-                  procedures the team works from after handover.
+                  At the AWS Cloud Innovation Center I built a serverless platform for the Ministry of
+                  Interior’s K9 unit. At the Shura Council I built Bayyan, a bilingual registry piloted
+                  across four teams, and moved a production database off AWS without losing a row.
                 </p>
               </div>
             </Reveal>
 
             <Reveal delay={0.15}>
-              <dl className="glass-pane mt-8 grid max-w-[640px] rounded-[22px]">
-                {FACTS.map((f, i) => (
+              <p className="mt-9 font-mono text-[10.5px] uppercase tracking-[0.14em] text-text-muted">How I work</p>
+              {/* One pane divided into cells, like the Skills sheet, rather than
+                  four cards: they are four parts of one answer. */}
+              <div className="glass-pane mt-3 grid overflow-hidden rounded-[22px] sm:grid-cols-2">
+                {PRACTICES.map((p, i) => (
                   <div
-                    key={f.label}
-                    className={`grid gap-1 px-5 py-3.5 sm:grid-cols-[110px_1fr] sm:items-baseline sm:gap-4 ${
-                      i ? 'border-t border-white/[0.07]' : ''
-                    }`}
+                    key={p.title}
+                    className={`flex flex-col gap-2 p-5 ${i ? 'border-t border-white/[0.07]' : ''} ${
+                      i === 1 ? 'sm:border-t-0' : ''
+                    } ${i % 2 === 1 ? 'sm:border-l sm:border-white/[0.07]' : ''}`}
                   >
-                    <dt className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-text-muted">{f.label}</dt>
-                    <dd className="text-[14.5px] leading-snug text-text-primary">{f.value}</dd>
+                    <h3 className="text-[15.5px] font-medium leading-snug text-text-primary">{p.title}</h3>
+                    <p className="text-[14px] leading-relaxed text-text-primary/70">{p.body}</p>
+                    <button
+                      type="button"
+                      onClick={() => (p.proof.project ? openProject(p.proof.project) : scrollToSection(p.proof.section))}
+                      className="mt-auto inline-flex min-h-8 w-fit items-center gap-1 pt-1 font-mono text-[11.5px] text-accent-body transition-colors hover:text-accent-bright"
+                    >
+                      {p.proof.label}
+                      <ArrowUpRight size={12} aria-hidden="true" />
+                    </button>
                   </div>
                 ))}
-              </dl>
+              </div>
 
               <div className="mt-8 flex flex-wrap gap-2.5">
                 {/* Glass, not a fill: the hero opens with the filled version of

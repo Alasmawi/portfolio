@@ -34,7 +34,7 @@ export const FOCUS_PILLARS = [
     id: 'ai',
     label: 'Applied AI',
     blurb:
-      'Models put to work inside products — retrieval, detection, anomaly explanations — with the evidence shown to whoever relies on the answer.',
+      'Models put to work inside products for retrieval, detection and anomaly explanations, with the evidence shown to whoever relies on the answer.',
     proof: [
       { label: 'Guidely', project: 'guidely' },
       { label: 'Detecto', project: 'detecto' },

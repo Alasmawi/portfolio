@@ -24,7 +24,7 @@ export const EXPERIENCE = [
       'Moved a production MariaDB database off Amazon RDS to on-premises servers through an S3 snapshot, and sequenced the cutover so the restored copy matched the source with no data lost.',
       'Traced a kernel version incompatibility that stopped the AWS Elastic Disaster Recovery agent from replicating a production EC2 instance from Ireland to Frankfurt, and worked the case with AWS Support until the agent installed.',
       'Support staff with network, endpoint and infrastructure issues; run account lifecycle across Active Directory, Entra ID and Intune; and roll out PAM, BitLocker encryption policy and ManageEngine patching across the fleet.',
-      'Built a site presenting the organization’s HR achievements for a GCC-level awards competition, published on GitHub Pages.',
+      'Built a site presenting the organization’s HR achievements for a GCC-level awards competition.',
       'Write the technical documentation and step-by-step procedures the department works from after handover.',
     ],
     tags: ['NestJS', 'PostgreSQL', 'Amazon RDS', 'AWS DRS', 'Active Directory', 'Intune', 'BitLocker'],

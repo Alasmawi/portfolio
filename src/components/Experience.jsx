@@ -24,7 +24,7 @@ const TICKS = ['Jan', 'Apr', 'Jul', 'Oct'].map((label, i) => ({ label, pct: (i *
 
 const fmt = (iso) =>
   new Date(`${iso}T00:00:00Z`).toLocaleDateString('en-US', { month: 'short', year: 'numeric', timeZone: 'UTC' });
-const formatRange = (job) => `${fmt(job.start)} — ${job.end ? fmt(job.end) : 'Present'}`;
+const formatRange = (job) => `${fmt(job.start)} - ${job.end ? fmt(job.end) : 'Present'}`;
 
 // The timeline reads left to right in time; the cards below read newest first,
 // the way the CV does.

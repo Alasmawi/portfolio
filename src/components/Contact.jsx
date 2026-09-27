@@ -27,7 +27,7 @@ const DIRECTORY = [
 ];
 
 function buildMailto({ name, email, topic, message }) {
-  const subject = encodeURIComponent(`${topic} — portfolio message${name ? ` from ${name}` : ''}`);
+  const subject = encodeURIComponent(`${topic}: portfolio message${name ? ` from ${name}` : ''}`);
   const body = encodeURIComponent([message, '', email && `Reply to: ${email}`].filter(Boolean).join('\n'));
   return `mailto:${EMAIL}?subject=${subject}&body=${body}`;
 }
@@ -97,7 +97,7 @@ export default function Contact() {
           headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
           body: JSON.stringify({
             access_key: WEB3FORMS_KEY,
-            subject: `${draft.topic} — portfolio message from ${draft.name}`,
+            subject: `${draft.topic}: portfolio message from ${draft.name}`,
             from_name: 'alasmawi.dev',
             name: draft.name,
             email: draft.email,
@@ -136,7 +136,7 @@ export default function Contact() {
           index="07"
           eyebrow="Contact"
           title="Hiring, or building something? Let’s talk."
-          lead="I’m looking to join a product team where I can own features from design to production. Send a line about the role or the problem — I reply to most messages within a day."
+          lead="I’m looking to join a product team where I can own features from design to production. Send a line about the role or the problem. I reply to most messages within a day."
         />
 
         <div className="mt-9 grid gap-4 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
@@ -213,7 +213,7 @@ export default function Contact() {
                 </span>
                 <h3 className="mt-5 text-[24px] font-medium tracking-tight text-text-primary">Message sent.</h3>
                 <p className="mt-2 max-w-[40ch] text-[15px] leading-relaxed text-text-primary/75">
-                  Thanks — it’s in my inbox. I’ll reply to the address you gave, usually within a day.
+                  Thanks, it’s in my inbox. I’ll reply to the address you gave, usually within a day.
                 </p>
                 <button
                   type="button"
@@ -327,10 +327,10 @@ export default function Contact() {
                       <a href={`mailto:${EMAIL}`} className="text-accent-bright underline underline-offset-2">
                         {EMAIL}
                       </a>{' '}
-                      instead — the copy button puts it on your clipboard.
+                      instead. The copy button puts it on your clipboard.
                     </>
                   )}
-                  {state === 'handed-off' && 'Your mail app has the draft — send it from there.'}
+                  {state === 'handed-off' && 'Your mail app has the draft. Send it from there.'}
                 </p>
               </form>
             )}

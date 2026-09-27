@@ -188,7 +188,7 @@ export const PROJECTS = [
       'Answers questions about a team’s own documents in a sentence, and shows the exact passages each answer came from.',
     proof: ['94% retrieval hit rate', '264 automated tests', 'Runs fully local'],
     description:
-      'Answers everyday questions about a team’s own documents, so someone gets the answer in a sentence instead of reading twelve pages of policy — and every answer shows the passages it was drawn from, with filename, section, similarity score and snippet, so the reader can check it. Documents are parsed, split along their headings, embedded and searched with FAISS, then answered either fully locally through sentence-transformers and Ollama or against the OpenAI API, so nothing has to leave the organization. It finds the right passage for 94% of the test questions, and 264 automated tests cover the system.',
+      'Answers everyday questions about a team’s own documents, so someone gets the answer in a sentence instead of reading twelve pages of policy. Every answer shows the passages it was drawn from, with filename, section, similarity score and snippet, so the reader can check it. Documents are parsed, split along their headings, embedded and searched with FAISS, then answered either fully locally through sentence-transformers and Ollama or against the OpenAI API, so nothing has to leave the organization. It finds the right passage for 94% of the test questions, and 264 automated tests cover the system.',
     tags: ['Python', 'FastAPI', 'FAISS', 'sentence-transformers', 'Ollama', 'SQLite', 'React'],
     githubUrl: 'https://github.com/Alasmawi/guidely',
     liveUrl: null,
@@ -254,7 +254,7 @@ export const PROJECTS = [
     tagline: 'a shell, no external binaries',
     language: 'Rust',
     description:
-      'A Unix-style shell in Rust where every builtin — cd, ls, cat, cp, mv and the rest — is written from scratch instead of calling out to system binaries.',
+      'A Unix-style shell in Rust where every builtin, from cd and ls to cat, cp and mv, is written from scratch instead of calling out to system binaries.',
     tags: ['Rust', 'Shell', 'Systems Programming'],
     githubUrl: 'https://github.com/Alasmawi/0-shell',
     liveUrl: null,
@@ -310,7 +310,7 @@ export const PROJECTS = [
     tagline: 'real-time multiplayer, no game engine',
     language: 'JavaScript',
     description:
-      'Real-time multiplayer Bomberman with a WebSocket server as the single source of truth, drawn in the DOM on top of my own mini-framework — no canvas and no game engine.',
+      'Real-time multiplayer Bomberman with a WebSocket server as the single source of truth, drawn in the DOM on top of my own mini-framework, with no canvas and no game engine.',
     tags: ['JavaScript', 'WebSockets', 'Game Dev'],
     githubUrl: 'https://github.com/Alasmawi/bomberman-dom',
     liveUrl: null,
@@ -321,7 +321,7 @@ export const PROJECTS = [
     id: 'mini-framework',
     pillars: ['fullstack', 'cs'],
     name: 'mini-framework',
-    tagline: '"Domino" — a JS framework, from scratch',
+    tagline: 'Domino, a JS framework from scratch',
     language: 'JavaScript',
     description:
       'Domino, a JavaScript framework with no dependencies: a virtual DOM, delegated events, a hash router and an observable store, shipped with a TodoMVC app built on it.',

@@ -45,7 +45,7 @@ export default function HardwareStrip({ items = [] }) {
         tabIndex={0}
         role="group"
         aria-roledescription="carousel"
-        aria-label="Hardware gallery — scroll or swipe to browse"
+        aria-label="Hardware gallery. Scroll or swipe to browse."
       >
         {items.map((item, i) => (
           <li

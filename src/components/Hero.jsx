@@ -28,22 +28,21 @@ export default function Hero() {
           transition={{ duration: 0.6, delay: 0.1 }}
           style={{ textShadow: '0 2px 34px rgba(23,18,26,.75)' }}
         >
-          {/* glass-pane, not glass-control: a status readout, not a button. */}
-          <p
-            className="glass-pane inline-flex items-center gap-2.5 rounded-full px-3.5 py-2 font-mono text-[10.5px] uppercase tracking-[0.14em] text-text-primary"
-            style={{ textShadow: 'none' }}
-          >
-            <span
-              className="signal-blip h-[7px] w-[7px] rounded-full bg-signal"
-              style={{ boxShadow: '0 0 10px rgba(79,209,197,.9)' }}
-              aria-hidden="true"
-            />
-            Available for work
-            <span className="text-white/25" aria-hidden="true">
-              |
-            </span>
-            <span className="text-text-muted">Manama, Bahrain</span>
-          </p>
+          {/* The status is the pill; the location sits beside it as plain
+              text. Both in one pill made a single unbreakable line, about
+              335px of tracked mono, which ran off the edge of a 360px phone. */}
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2" style={{ textShadow: 'none' }}>
+            {/* glass-pane, not glass-control: a status readout, not a button. */}
+            <p className="glass-pane inline-flex items-center gap-2.5 rounded-full px-3.5 py-2 font-mono text-[10.5px] uppercase tracking-[0.14em] text-text-primary">
+              <span
+                className="signal-blip h-[7px] w-[7px] rounded-full bg-signal"
+                style={{ boxShadow: '0 0 10px rgba(79,209,197,.9)' }}
+                aria-hidden="true"
+              />
+              Available for work
+            </p>
+            <p className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-text-muted">Manama, Bahrain</p>
+          </div>
 
           <h1 className="mt-6 text-[46px] font-medium leading-[0.96] tracking-[-0.04em] text-text-primary sm:text-[64px] lg:text-[80px]">
             Abdulla
@@ -64,13 +63,13 @@ export default function Hero() {
             className="mt-8 flex flex-wrap items-center gap-2.5 sm:gap-3"
             style={{ textShadow: 'none' }}
           >
-            <a href="#contact" className="btn btn-primary min-h-[50px] flex-1 px-6 text-[15px] sm:flex-none">
+            <a href="#contact" className="btn btn-primary min-h-[50px] flex-1 whitespace-nowrap px-5 text-[15px] sm:flex-none sm:px-6">
               Get in touch
             </a>
             <a
               href={CV_URL}
               download
-              className="btn btn-ghost glass-control min-h-[50px] flex-1 px-5 sm:flex-none"
+              className="btn btn-ghost glass-control min-h-[50px] flex-1 whitespace-nowrap px-4 sm:flex-none sm:px-5"
             >
               <span className="flex items-center gap-2">
                 <Download size={16} aria-hidden="true" />

@@ -1,4 +1,6 @@
+import { ArrowUpRight } from 'lucide-react';
 import Reveal from './ui/Reveal';
+import { GithubMark } from './ui/BrandIcons';
 import SectionHeader, { FRAME, SECTION_PAD } from './ui/SectionHeader';
 import CourseworkModule from './ui/CourseworkModule';
 import ProgramJourney from './ui/ProgramJourney';
@@ -11,7 +13,7 @@ const YEARS = Array.from({ length: AXIS_TO - AXIS_FROM + 1 }, (_, i) => AXIS_FRO
 const pct = (year) => ((year - AXIS_FROM) / (AXIS_TO - AXIS_FROM)) * 100;
 const OVERLAP_FROM = Math.max(...EDUCATION.map((e) => e.from));
 
-// The headline's claim — two tracks, in parallel — drawn. Two lanes on one
+// The headline's claim, two tracks in parallel, drawn. Two lanes on one
 // axis of years, with the stretch where both ran shaded, and Reboot's lane
 // split into its two phases so the current one can carry the live marker.
 function ParallelTracks() {
@@ -51,10 +53,13 @@ function ParallelTracks() {
                           backgroundColor: s.status === 'active' ? `${e.color}cc` : `${e.color}55`,
                         }}
                       >
+                        {/* Inside the segment's end, not centred on it: centred,
+                            half the dot hung past the bar and the pane edge
+                            on a phone. */}
                         {s.status === 'active' && (
                           <span
-                            className="absolute right-0 top-1/2 h-2.5 w-2.5 -translate-y-1/2 translate-x-1/2 animate-pulse-slow rounded-full"
-                            style={{ backgroundColor: e.color, boxShadow: `0 0 12px ${e.color}` }}
+                            className="absolute right-[3px] top-1/2 h-1.5 w-1.5 -translate-y-1/2 animate-pulse-slow rounded-full bg-white"
+                            style={{ boxShadow: `0 0 8px ${e.color}` }}
                           />
                         )}
                       </div>
@@ -177,6 +182,25 @@ export default function Education() {
                     <p className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-text-muted">Phases</p>
                     <ProgramJourney color={entry.color} />
                   </div>
+                )}
+                {entry.github && (
+                  <a
+                    href={entry.github.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="group mt-6 flex items-center gap-4 rounded-2xl border border-white/[0.1] bg-white/[0.04] px-4 py-3.5 transition-colors hover:border-white/25 hover:bg-white/[0.06]"
+                  >
+                    <GithubMark size={22} className="shrink-0 text-text-primary" />
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-[14px] font-medium text-text-primary">github.com/Alasmawi</span>
+                      <span className="block text-[13px] leading-snug text-text-primary/65">{entry.github.note}</span>
+                    </span>
+                    <ArrowUpRight
+                      size={16}
+                      className="shrink-0 text-text-muted transition-colors group-hover:text-text-primary"
+                      aria-hidden="true"
+                    />
+                  </a>
                 )}
               </article>
             </Reveal>

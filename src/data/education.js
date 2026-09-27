@@ -12,13 +12,12 @@ export const EDUCATION = [
     color: '#C9A227',
     degree: 'B.Sc. Computer Science',
     track: 'Cloud Computing',
-    period: '2022 — 2026',
+    period: '2022 - 2026',
     from: 2022,
     to: 2026,
-    stats: [
-      { value: '30', label: 'courses' },
-      { value: '88', label: 'credit hours' },
-    ],
+    // The whole degree. The coursework list under it is a selection, so it
+    // carries no count of its own.
+    stats: [{ value: '132', label: 'credit hours' }],
     points: [
       'Specialized in cloud architecture, security, networking and distributed systems, on a track built around the AWS Academy curriculum.',
       'Senior capstone: the K9 Pavlov System, which I carried into the AWS Cloud Innovation Center internship.',
@@ -32,7 +31,7 @@ export const EDUCATION = [
     color: '#1CCFC9',
     degree: 'Full Stack Development',
     track: 'DevOps specialization',
-    period: '2024 — 2026',
+    period: '2024 - 2026',
     from: 2024,
     to: 2026,
     // The specialisation phase is still running — rebootJourney.js marks it
@@ -47,5 +46,10 @@ export const EDUCATION = [
       'Go, algorithms, networking and full-stack web development, studied alongside the degree. Brain-Book was built and audited here.',
     ],
     journey: true,
+    // Most of the program's projects are public; the card links out to them.
+    github: {
+      url: 'https://github.com/Alasmawi',
+      note: 'Most of the projects from the program are public on GitHub, including the ones in Built from scratch above.',
+    },
   },
 ];

@@ -8,7 +8,7 @@ export const REBOOT_JOURNEY = [
     duration: '18 months',
     months: 18,
     description:
-      'Peer-to-peer and entirely project-based — no lectures, no answers given. Several languages, building a portfolio the whole way through.',
+      'Peer-to-peer and entirely project-based, with no lectures and no answers given. Several languages, building a portfolio the whole way through.',
     status: 'complete',
   },
   {
