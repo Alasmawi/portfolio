@@ -80,6 +80,7 @@ public/
 scripts/
   build-site.sh        — builds the site, then copy-legacy.mjs adds the frozen /v1
   make-og.mjs          — renders public/og.png, the link-preview card
+  make-icons.mjs       — renders the tab icon (public/icon.svg and PNGs)
   make-screens.mjs     — converts app screenshots for the project dialog
   make-posters.mjs, check-contrast.mjs, check-shift.mjs, shots.mjs
 ```
