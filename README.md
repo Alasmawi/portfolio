@@ -2,7 +2,7 @@
 
 A single-page portfolio built with React, Vite, Tailwind CSS and Framer Motion, served at the root of alasmawi.dev. Systems-diagram furniture — mono labels, status dots, a trace-style data path in the hero, drawn architecture diagrams — on a warm dusk ground under glass.
 
-Sections, in order: Hero, What I do, Work, Experience, Skills, Education, About, Contact. The previous site is kept, frozen, at `/v1`; `/v2/*` (where this build lived while it was being finished) redirects permanently to `/`.
+Sections, in order: Hero, What I do, Work, Experience, Education, About, Contact. The previous site is kept, frozen, at `/v1`; `/v2/*` (where this build lived while it was being finished) redirects permanently to `/`.
 
 The CV (`public/Abdulla_Alasmawi_CV.pdf`) carries the same roles, bullets, projects and skills as `src/data/`. Change one, change the other.
 
@@ -53,7 +53,7 @@ npm run preview   # serve the production build locally
 ```
 src/
   components/
-    Hero.jsx, FocusPillars.jsx, ProjectBrowser.jsx, Experience.jsx, Skills.jsx,
+    Hero.jsx, FocusPillars.jsx, ProjectBrowser.jsx, Experience.jsx,
     Education.jsx, About.jsx, Contact.jsx, Nav.jsx
     ui/
       SectionHeader.jsx    — the shared section header, and the frame every section sits in
@@ -68,7 +68,6 @@ src/
   data/
     projects.js       — every project; `featured` ones get the large cards
     experience.js     — roles, bullets, and the project each role produced
-    skills.js         — the toolbox, grouped as on the CV
     focusPillars.js   — the four kinds of work and the evidence for each
     traces.js         — the hero's data paths
     education.js, uobCoursework.js, rebootJourney.js, navLinks.js

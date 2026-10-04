@@ -59,7 +59,7 @@ export default function About() {
             its own beside both. */}
         <div className="grid gap-y-8 lg:grid-cols-[300px_minmax(0,1fr)] lg:gap-x-14 lg:gap-y-0">
           <div className="lg:col-start-2 lg:row-start-1">
-            <SectionHeader index="06" eyebrow="About" title={<Title />} />
+            <SectionHeader index="05" eyebrow="About" title={<Title />} />
           </div>
 
           <Reveal delay={0.05} className="lg:col-start-1 lg:row-span-2 lg:row-start-1">
@@ -113,7 +113,7 @@ export default function About() {
 
             <Reveal delay={0.15}>
               <p className="mt-9 font-mono text-[10.5px] uppercase tracking-[0.14em] text-text-muted">How I work</p>
-              {/* One pane divided into cells, like the Skills sheet, rather than
+              {/* One pane divided into cells, rather than
                   four cards: they are four parts of one answer. */}
               <div className="glass-pane mt-3 grid overflow-hidden rounded-[22px] sm:grid-cols-2">
                 {PRACTICES.map((p, i) => (

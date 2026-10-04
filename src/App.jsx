@@ -5,7 +5,6 @@ import Hero from './components/Hero';
 import FocusPillars from './components/FocusPillars';
 import ProjectBrowser from './components/ProjectBrowser';
 import Experience from './components/Experience';
-import Skills from './components/Skills';
 import Education from './components/Education';
 import About from './components/About';
 import Contact from './components/Contact';
@@ -30,7 +29,6 @@ export default function App() {
         <FocusPillars />
         <ProjectBrowser />
         <Experience />
-        <Skills />
         <Education />
         <About />
         <Contact />
