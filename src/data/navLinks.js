@@ -5,12 +5,10 @@ import { User, Briefcase, FolderGit2, GraduationCap, Mail } from 'lucide-react';
 // here — the wordmark returns to it.
 //
 // `dock: false` keeps a link out of the phone dock, which has room for five
-// thumb-sized tabs and no more. Skills is a short section between two that are
-// in the dock, so it is reachable by scrolling either way.
+// thumb-sized tabs and no more.
 export const LINKS = [
   { id: 'projects', label: 'Work', icon: FolderGit2 },
   { id: 'experience', label: 'Experience', icon: Briefcase },
-  { id: 'skills', label: 'Skills', dock: false },
   { id: 'education', label: 'Education', icon: GraduationCap },
   { id: 'about', label: 'About', icon: User },
 ];

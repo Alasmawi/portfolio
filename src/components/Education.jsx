@@ -113,7 +113,7 @@ export default function Education() {
     <section id="education" className={`relative py-12 sm:py-16 md:py-20 ${SECTION_PAD}`}>
       <div className={FRAME}>
         <SectionHeader
-          index="05"
+          index="04"
           eyebrow="Education"
           title="Two tracks, run in parallel."
           lead="A Computer Science degree on the cloud computing track, and for its last two years a project-based full-stack program alongside it."

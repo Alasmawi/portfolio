@@ -133,7 +133,7 @@ export default function Contact() {
     <section id="contact" className={`relative pb-9 pt-12 sm:pt-16 md:pb-12 md:pt-20 ${SECTION_PAD}`}>
       <div className={FRAME}>
         <SectionHeader
-          index="07"
+          index="06"
           eyebrow="Contact"
           title="Hiring, or building something? Let’s talk."
           lead="I’m looking to join a product team where I can own features from design to production. Send a line about the role or the problem. I reply to most messages within a day."
