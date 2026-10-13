@@ -1,5 +1,6 @@
 import { ArrowUpRight } from 'lucide-react';
 import Reveal from './ui/Reveal';
+import Fold from './ui/Fold';
 import { GithubMark } from './ui/BrandIcons';
 import SectionHeader, { FRAME, SECTION_PAD } from './ui/SectionHeader';
 import CourseworkModule from './ui/CourseworkModule';
@@ -25,12 +26,15 @@ function ParallelTracks() {
           className="absolute inset-y-0 rounded-xl bg-white/[0.035]"
           style={{ left: `${pct(OVERLAP_FROM)}%`, right: 0 }}
         >
-          <span className="absolute -top-0.5 right-2 font-mono text-[10px] uppercase tracking-[0.14em] text-text-dim">
+          {/* Inside the band, clear of its rounded corner. It used to sit half
+              a pixel above the band's top edge, so the edge ran through the
+              lettering. */}
+          <span className="absolute right-3 top-2 font-mono text-[10px] uppercase tracking-[0.14em] text-text-dim">
             both at once
           </span>
         </div>
 
-        <div className="relative grid gap-5 pb-2 pt-6">
+        <div className="relative grid gap-5 pb-3 pt-8">
           {EDUCATION.map((e) => (
             <div key={e.id}>
               <p className="mb-2 flex flex-wrap items-baseline gap-x-2 font-mono text-[11px]">
@@ -55,12 +59,12 @@ function ParallelTracks() {
                       >
                         {/* Inside the segment's end, not centred on it: centred,
                             half the dot hung past the bar and the pane edge
-                            on a phone. */}
+                            on a phone. Centred with auto margins rather than
+                            a translate: the pulse animates `transform`, which
+                            replaced the translate and dropped the dot below
+                            the bar. */}
                         {s.status === 'active' && (
-                          <span
-                            className="absolute right-[3px] top-1/2 h-1.5 w-1.5 -translate-y-1/2 animate-pulse-slow rounded-full bg-white"
-                            style={{ boxShadow: `0 0 8px ${e.color}` }}
-                          />
+                          <span className="absolute inset-y-0 right-[3px] my-auto h-1.5 w-1.5 animate-pulse-slow rounded-full bg-white" />
                         )}
                       </div>
                     ))}
@@ -154,14 +158,7 @@ export default function Education() {
                   )}
                 </div>
 
-                <ul className="mt-4 space-y-2">
-                  {entry.points.map((p) => (
-                    <li key={p} className="flex gap-2.5 text-[14.5px] leading-relaxed text-text-primary/80">
-                      <span className="mt-[9px] h-1 w-1 shrink-0 rounded-full" style={{ backgroundColor: entry.color }} />
-                      {p}
-                    </li>
-                  ))}
-                </ul>
+                <p className="mt-4 text-[14.5px] leading-relaxed text-text-primary/80">{entry.points[0]}</p>
 
                 <div className="mt-5 flex flex-wrap gap-x-8 gap-y-3">
                   {entry.stats.map((s) => (
@@ -176,19 +173,34 @@ export default function Education() {
                   ))}
                 </div>
 
-                {entry.coursework && <CourseworkModule color={entry.color} />}
-                {entry.journey && (
-                  <div className="mt-6 border-t border-white/[0.08] pt-5">
-                    <p className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-text-muted">Phases</p>
-                    <ProgramJourney color={entry.color} />
-                  </div>
-                )}
+                <Fold
+                  more={entry.coursework ? 'Show coursework' : 'Show phases'}
+                  color={entry.color}
+                  className="mt-2"
+                >
+                  <ul className="space-y-2 pt-3">
+                    {entry.points.slice(1).map((p) => (
+                      <li key={p} className="flex gap-2.5 text-[14.5px] leading-relaxed text-text-primary/80">
+                        <span className="mt-[9px] h-1 w-1 shrink-0 rounded-full" style={{ backgroundColor: entry.color }} />
+                        {p}
+                      </li>
+                    ))}
+                  </ul>
+                  {entry.coursework && <CourseworkModule color={entry.color} />}
+                  {entry.journey && (
+                    <div className="mt-6 border-t border-white/[0.08] pt-5">
+                      <p className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-text-muted">Phases</p>
+                      <ProgramJourney color={entry.color} />
+                    </div>
+                  )}
+                </Fold>
+
                 {entry.github && (
                   <a
                     href={entry.github.url}
                     target="_blank"
                     rel="noreferrer"
-                    className="group mt-6 flex items-center gap-4 rounded-2xl border border-white/[0.1] bg-white/[0.04] px-4 py-3.5 transition-colors hover:border-white/25 hover:bg-white/[0.06]"
+                    className="group mt-3 flex items-center gap-4 rounded-2xl border border-white/[0.1] bg-white/[0.04] px-4 py-3.5 transition-colors hover:border-white/25 hover:bg-white/[0.06]"
                   >
                     <GithubMark size={22} className="shrink-0 text-text-primary" />
                     <span className="min-w-0 flex-1">

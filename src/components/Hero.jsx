@@ -19,7 +19,7 @@ export default function Hero() {
   return (
     <section
       id="hero"
-      className="relative px-5 pb-10 pt-[100px] sm:px-10 sm:pb-14 sm:pt-[124px] md:px-14 lg:pt-[140px]"
+      className="relative px-5 pb-10 pt-12 sm:px-10 sm:pb-14 sm:pt-16 md:px-14 md:pt-[116px] lg:pt-[132px]"
     >
       <div className="mx-auto grid max-w-6xl items-center gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(400px,480px)] lg:gap-14">
         <motion.div

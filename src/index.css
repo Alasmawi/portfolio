@@ -73,24 +73,22 @@
   }
 
   /* ——— glass, and the rule that splits it ———————————————————————————
-     Two effects, one job each. This is the whole finding from the redesign
-     exploration, written down as two classes so it can't drift back into one:
+     Two classes, one job each:
 
        .glass-pane     a *surface*. Large things that hold a diagram or copy.
-                       One blur, low tint, hairline edge, no rim. A heavy rim
-                       at pane scale fights the figure inside it.
+                       One blur, low tint, hairline edge.
 
        .glass-control  an *object*. Small things you operate — the nav pill,
-                       the dock, buttons, filter chips, badges. Thick tint,
-                       saturation and brightness pushed, a masked inner ring
-                       for edge refraction, a specular top stroke and a
-                       travelling highlight. Object quality is a feature only
-                       where no text is competing with it.
+                       the dock, buttons, filter chips, badges. A denser tint
+                       of the page's own surface colour and a firmer edge, so
+                       it reads as something to press.
 
-     The cost sits entirely with the control: a nested backdrop-filter behind a
-     composited mask, per element. That is why it is confined to controls —
-     there are about a dozen on the page, against the panes' several dozen —
-     and why the ring is gated below.                                        */
+     The control used to be liquid glass: saturation and brightness pushed, a
+     refracting rim, a white top stroke and a highlight travelling across it.
+     On the nav pill, which is on screen the whole time, that made the
+     navigation the brightest and busiest thing on the page — glare over the
+     content rather than a material. It is matte now: the pane's family, one
+     step more solid, and nothing on it moves.                               */
 
   .glass-pane {
     background: rgba(253, 243, 244, 0.06);
@@ -107,80 +105,20 @@
   }
 
   .glass-control {
-    position: relative;
-    overflow: hidden;
-    background: linear-gradient(150deg, rgba(255, 255, 255, 0.17), rgba(255, 255, 255, 0.045));
-    border: 1px solid rgba(255, 255, 255, 0.25);
-    backdrop-filter: blur(11px) saturate(205%) brightness(1.07);
+    background: rgba(44, 15, 26, 0.62);
+    border: 1px solid rgba(253, 243, 244, 0.2);
+    backdrop-filter: blur(16px);
     box-shadow:
-      inset 0 1.5px 0 rgba(255, 255, 255, 0.55),
-      inset 0 -1.5px 1px rgba(255, 255, 255, 0.14),
-      0 20px 42px -18px rgba(0, 0, 0, 0.82);
+      inset 0 1px 0 rgba(255, 255, 255, 0.06),
+      0 16px 36px -20px rgba(0, 0, 0, 0.8);
   }
 
   /* The dock is the only control with the whole document scrolling under it,
      so it carries more tint and more blur than a control sitting on the ground.
      Same material, turned up. */
   .dock-dense {
-    background: linear-gradient(150deg, rgba(255, 255, 255, 0.2), rgba(45, 35, 49, 0.62));
-    backdrop-filter: blur(22px) saturate(190%) brightness(1.04);
-  }
-
-  /* The travelling highlight. A specular band crossing the object every ~18s,
-     which is what stops the glass reading as a printed gradient. transform and
-     opacity only, so it composites and never lays out. */
-  .glass-control::after {
-    content: '';
-    position: absolute;
-    inset: -70%;
-    pointer-events: none;
-    background: linear-gradient(
-      112deg,
-      rgba(255, 255, 255, 0) 40%,
-      rgba(255, 255, 255, 0.3) 49%,
-      rgba(255, 255, 255, 0) 58%
-    );
-    filter: blur(8px);
-    animation: glass-specular 18s ease-in-out infinite;
-  }
-
-  /* Edge refraction: a second, stronger blur confined to a 10px inset ring by
-     an excluded mask, so the rim samples the background differently from the
-     face. This is the expensive half of liquid glass — a nested backdrop-filter
-     behind a composited mask — and it is also the half that degrades worst:
-     Firefox composites the mask without the filter and Android WebView drops
-     both, which leaves a grey band rather than a ring.
-
-     So it is opt-in rather than opt-out. It renders only where the mask
-     primitive is actually supported, and only on a pointer device wide enough
-     to be a laptop, which is also where the specular detail is visible at all.
-     Everywhere else the control keeps its tint, its top stroke and its
-     highlight — still an object, one effect lighter. */
-  @supports ((mask-composite: exclude) or (-webkit-mask-composite: xor)) {
-    @media (min-width: 768px) and (hover: hover) {
-      .glass-control::before {
-        content: '';
-        position: absolute;
-        inset: 0;
-        border-radius: inherit;
-        padding: 10px;
-        box-sizing: border-box;
-        pointer-events: none;
-        backdrop-filter: blur(7px) saturate(250%) brightness(1.14);
-        mask:
-          linear-gradient(#000, #000) content-box,
-          linear-gradient(#000, #000);
-        mask-composite: exclude;
-        -webkit-mask-composite: xor;
-      }
-    }
-  }
-
-  /* Content inside a control has to clear both pseudo-elements, which are
-     painted in the same stacking context. */
-  .glass-control > * {
-    position: relative;
-    z-index: 1;
+    background: rgba(28, 8, 16, 0.8);
+    backdrop-filter: blur(22px);
   }
 
   /* Note: the -webkit- prefix is NOT written by hand anywhere in this file.
@@ -203,16 +141,7 @@
       background: rgba(36, 28, 40, 0.92);
     }
     .glass-control {
-      background: linear-gradient(150deg, rgba(74, 60, 78, 0.96), rgba(45, 35, 49, 0.96));
-    }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .glass-control::after {
-      animation: none;
-      /* Parked where the band is off the object, not frozen mid-sweep across
-         it — a stalled highlight reads as a rendering fault. */
-      opacity: 0;
+      background: rgba(44, 15, 26, 0.96);
     }
   }
 
@@ -263,9 +192,7 @@
   }
   /* The secondary button is a glass control, so it holds its own beside a
      filled one instead of disappearing next to it. Composed in the markup as
-     `btn glass-control` rather than @apply-ed here: @apply copies a class's own
-     declarations and not the ::before/::after rules attached to it, so an
-     @apply-ed control would come out flat — tint but no ring, no highlight. */
+     `btn glass-control`. */
   .btn-ghost {
     @apply text-text-primary;
   }
@@ -283,6 +210,14 @@
   /* — tags — */
   .tag-outline {
     @apply inline-flex items-center rounded-full border border-accent/70 px-2.5 py-1 font-mono text-[11px] tracking-wide text-accent-body;
+  }
+
+  /* A technology chip: the mark and the name on a faint fill. Quieter than
+     the rose outline above, which on a card carrying six of them was the
+     loudest thing in it. */
+  .tech-tag {
+    @apply inline-flex items-center gap-1.5 rounded-full border border-white/[0.09] bg-white/[0.045] px-2.5 py-1 text-[12px] leading-none text-text-primary/85;
+    min-height: 26px;
   }
 
   /* — forms — */
@@ -378,16 +313,6 @@
 @media (prefers-reduced-motion: reduce) {
   .atmosphere-orb {
     animation: none !important;
-  }
-}
-
-@keyframes glass-specular {
-  0%,
-  100% {
-    transform: translate3d(-26%, -16%, 0) rotate(10deg);
-  }
-  50% {
-    transform: translate3d(22%, 14%, 0) rotate(10deg);
   }
 }
 

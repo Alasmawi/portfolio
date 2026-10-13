@@ -1,5 +1,5 @@
 import { useCallback, useRef, useState } from 'react';
-import { ArrowUpRight, Check, Copy, Download, Loader2, Mail, MapPin, Phone, RotateCcw } from 'lucide-react';
+import { ArrowUpRight, Check, Copy, Download, Loader2, MapPin, Phone, RotateCcw } from 'lucide-react';
 import { GithubMark, LinkedinMark } from './ui/BrandIcons';
 import Reveal from './ui/Reveal';
 import SectionHeader, { FRAME, SECTION_PAD } from './ui/SectionHeader';
@@ -18,36 +18,21 @@ const WEB3FORMS_KEY = import.meta.env.VITE_WEB3FORMS_KEY;
 const WEB3FORMS_URL = 'https://api.web3forms.com/submit';
 const EMAIL_FALLBACK_MS = 900;
 
-const TOPICS = ['A role', 'A project', 'Something else'];
-
 const DIRECTORY = [
   { label: 'Phone', value: '+973 3671 1325', href: 'tel:+97336711325', Icon: Phone },
   { label: 'LinkedIn', value: 'linkedin.com/in/alasmawi', href: 'https://linkedin.com/in/alasmawi', Icon: LinkedinMark },
   { label: 'GitHub', value: 'github.com/Alasmawi', href: 'https://github.com/Alasmawi', Icon: GithubMark },
 ];
 
-function buildMailto({ name, email, topic, message }) {
-  const subject = encodeURIComponent(`${topic}: portfolio message${name ? ` from ${name}` : ''}`);
+function buildMailto({ name, email, message }) {
+  const subject = encodeURIComponent(`Portfolio message${name ? ` from ${name}` : ''}`);
   const body = encodeURIComponent([message, '', email && `Reply to: ${email}`].filter(Boolean).join('\n'));
   return `mailto:${EMAIL}?subject=${subject}&body=${body}`;
-}
-
-function Row({ label, Icon, children }) {
-  return (
-    <div className="grid grid-cols-[92px_minmax(0,1fr)] items-center gap-3 border-t border-white/[0.07] px-5 py-3.5 first:border-t-0">
-      <dt className="flex items-center gap-2 font-mono text-[10.5px] uppercase tracking-[0.14em] text-text-muted">
-        <Icon size={13} className="shrink-0" />
-        {label}
-      </dt>
-      <dd className="min-w-0">{children}</dd>
-    </div>
-  );
 }
 
 export default function Contact() {
   // idle | sending | sent | error | handed-off | stalled
   const [state, setState] = useState('idle');
-  const [topic, setTopic] = useState(TOPICS[0]);
   const [copied, setCopied] = useState(false);
   const timerRef = useRef(null);
   const statusRef = useRef(null);
@@ -82,7 +67,6 @@ export default function Contact() {
         name: form.name.value.trim(),
         email: form.email.value.trim(),
         message: form.message.value.trim(),
-        topic,
       };
 
       if (!WEB3FORMS_KEY) {
@@ -97,11 +81,10 @@ export default function Contact() {
           headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
           body: JSON.stringify({
             access_key: WEB3FORMS_KEY,
-            subject: `${draft.topic}: portfolio message from ${draft.name}`,
+            subject: `Portfolio message from ${draft.name}`,
             from_name: 'alasmawi.dev',
             name: draft.name,
             email: draft.email,
-            topic: draft.topic,
             message: draft.message,
           }),
         });
@@ -114,7 +97,7 @@ export default function Contact() {
       }
       requestAnimationFrame(() => statusRef.current?.scrollIntoView({ block: 'nearest', behavior: 'smooth' }));
     },
-    [topic, handOffToMailApp]
+    [handOffToMailApp]
   );
 
   const copyEmail = useCallback(async () => {
@@ -136,68 +119,67 @@ export default function Contact() {
           index="06"
           eyebrow="Contact"
           title="Hiring, or building something? Let’s talk."
-          lead="I’m looking to join a product team where I can own features from design to production. Send a line about the role or the problem. I reply to most messages within a day."
+          lead="Send a line about the role or the problem. I reply to most messages within a day."
         />
 
-        <div className="mt-9 grid gap-4 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
-          <Reveal delay={0.05} className="h-full">
-            <div className="flex h-full flex-col gap-4">
-              {/* The address first and largest: it works with no mail app, no
-                  form service and no JavaScript. */}
-              <div className="glass-pane rounded-[26px] p-5 sm:p-6">
-                <p className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-text-muted">Email</p>
-                <a
-                  href={`mailto:${EMAIL}`}
-                  className="mt-2 block break-all text-[19px] font-medium tracking-[-0.01em] text-text-primary transition-colors hover:text-accent-bright sm:text-[21px]"
-                >
-                  {EMAIL}
-                </a>
-                <div className="mt-4 flex flex-wrap gap-2">
-                  <a href={`mailto:${EMAIL}`} className="btn btn-ghost glass-control min-h-10 px-4 text-[13px]">
-                    <span className="flex items-center gap-2">
-                      <Mail size={14} /> Write
-                    </span>
-                  </a>
-                  <button type="button" onClick={copyEmail} className="btn btn-ghost glass-control min-h-10 px-4 text-[13px]">
-                    <span className="flex items-center gap-2" aria-live="polite">
-                      {copied ? <Check size={14} /> : <Copy size={14} />}
-                      {copied ? 'Copied' : 'Copy address'}
-                    </span>
-                  </button>
-                </div>
-              </div>
+        <div className="mt-9 grid gap-x-12 gap-y-9 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]">
+          <Reveal delay={0.05}>
+            {/* Set on the page, not in panes. This column was two boxed panels
+                — an email card and a five-row labelled table — beside the
+                boxed form, and three panels of ruled rows was the heaviest
+                screen on the site for the simplest job on it. The address
+                leads because it works with no mail app, no form service and
+                no JavaScript; the rest is a short list of links. */}
+            <div>
+              <p className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-text-muted">Email</p>
+              <a
+                href={`mailto:${EMAIL}`}
+                className="mt-2 block break-all text-[19px] font-medium tracking-[-0.01em] text-text-primary transition-colors hover:text-accent-bright sm:text-[21px]"
+              >
+                {EMAIL}
+              </a>
+              <button
+                type="button"
+                onClick={copyEmail}
+                className="-ml-2 mt-1 inline-flex min-h-11 items-center gap-2 rounded-full px-2 text-[13px] text-text-primary/75 transition-colors hover:text-text-primary"
+              >
+                <span className="flex items-center gap-2" aria-live="polite">
+                  {copied ? <Check size={14} /> : <Copy size={14} />}
+                  {copied ? 'Copied' : 'Copy address'}
+                </span>
+              </button>
 
-              <dl className="glass-pane overflow-hidden rounded-[26px]">
+              <ul className="mt-5 grid gap-1 border-t border-white/[0.08] pt-4">
                 {DIRECTORY.map(({ label, value, href, Icon }) => (
-                  <Row key={label} label={label} Icon={Icon}>
+                  <li key={label}>
                     <a
                       href={href}
                       target={href.startsWith('http') ? '_blank' : undefined}
                       rel={href.startsWith('http') ? 'noreferrer' : undefined}
-                      className="group flex min-h-8 items-center gap-1.5 truncate text-[14px] text-text-primary/90 transition-colors hover:text-accent-bright"
+                      aria-label={`${label}: ${value}`}
+                      className="group flex min-h-11 items-center gap-3 text-[14.5px] text-text-primary/85 transition-colors hover:text-accent-bright"
                     >
+                      <Icon size={16} className="shrink-0 text-text-muted transition-colors group-hover:text-accent-bright" />
                       <span className="truncate">{value}</span>
-                      {href.startsWith('http') && (
-                        <ArrowUpRight size={13} className="shrink-0 text-text-dim group-hover:text-accent-bright" />
-                      )}
                     </a>
-                  </Row>
+                  </li>
                 ))}
-                <Row label="CV" Icon={Download}>
+                <li>
                   <a
                     href={CV_URL}
                     download
-                    className="flex min-h-8 items-center gap-1.5 text-[14px] text-text-primary/90 transition-colors hover:text-accent-bright"
+                    className="group flex min-h-11 items-center gap-3 text-[14.5px] text-text-primary/85 transition-colors hover:text-accent-bright"
                   >
-                    Download PDF
+                    <Download size={16} className="shrink-0 text-text-muted transition-colors group-hover:text-accent-bright" />
+                    Download CV
                   </a>
-                </Row>
-                <Row label="Based in" Icon={MapPin}>
-                  <p className="flex min-h-8 items-center gap-1.5 text-[14px] text-text-primary/90">
-                    Manama, Bahrain <span className="font-mono text-[11.5px] text-text-muted">· UTC+3</span>
-                  </p>
-                </Row>
-              </dl>
+                </li>
+              </ul>
+
+              <p className="mt-4 flex items-center gap-3 text-[13.5px] text-text-muted">
+                <MapPin size={16} className="shrink-0" aria-hidden="true" />
+                Manama, Bahrain · UTC+3
+              </p>
             </div>
           </Reveal>
 
@@ -227,35 +209,6 @@ export default function Contact() {
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="glass-pane grid h-full gap-4 rounded-[26px] p-5 sm:p-7">
-                <fieldset>
-                  <legend className="mb-2 font-mono text-xs uppercase tracking-wider text-text-dim">It’s about</legend>
-                  <div className="flex flex-wrap gap-2">
-                    {TOPICS.map((t) => {
-                      const on = t === topic;
-                      return (
-                        <label
-                          key={t}
-                          className={`cursor-pointer rounded-full border px-3.5 py-2 text-[13px] transition-colors has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-accent-body ${
-                            on
-                              ? 'border-accent/70 bg-accent/[0.14] text-text-primary'
-                              : 'border-base-edge text-text-primary/75 hover:text-text-primary'
-                          }`}
-                        >
-                          <input
-                            type="radio"
-                            name="topic"
-                            value={t}
-                            checked={on}
-                            onChange={() => setTopic(t)}
-                            className="sr-only"
-                          />
-                          {t}
-                        </label>
-                      );
-                    })}
-                  </div>
-                </fieldset>
-
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div className="field">
                     <label htmlFor="contact-name">Name</label>
@@ -280,7 +233,7 @@ export default function Contact() {
                     id="contact-message"
                     name="message"
                     required
-                    rows={5}
+                    rows={4}
                     className="input"
                     placeholder="The role, the team, or the problem. A few sentences is plenty."
                   />

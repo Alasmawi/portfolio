@@ -21,10 +21,10 @@ export default function App() {
       <Atmosphere />
       <Nav active={active} />
       {/* Clears the floating dock plus the home indicator on a notched phone;
-          the dock isn't rendered at lg and up, so neither is the space. 54px is
+          the dock isn't rendered at md and up, so neither is the space. 54px is
           the tab row's height, 12px the dock's padding, and 10px the gap it
           floats above the bottom edge. */}
-      <main className="relative z-10 pb-[calc(76px+max(10px,env(safe-area-inset-bottom,0px)))] lg:pb-0">
+      <main className="relative z-10 pb-[calc(76px+max(10px,env(safe-area-inset-bottom,0px)))] md:pb-0">
         <Hero />
         <FocusPillars />
         <ProjectBrowser />

@@ -4,6 +4,12 @@
 // `end: null` means ongoing. Experience.jsx draws an ongoing bar up to today
 // and prints the range as "Jul 2026 — Present".
 //
+// `logo` is the organisation's mark, as a path under public/ (for example
+// '/logos/shura.svg'). While it is null the card shows the role's colour dot.
+//
+// The first entry in `points` is the one the folded card shows; the rest sit
+// behind "Show more", so lead with the thing that was built.
+//
 // `projectId` links a role to the project it produced, which Experience renders
 // as a row that opens that project in the Projects section.
 export const EXPERIENCE = [
@@ -12,6 +18,7 @@ export const EXPERIENCE = [
     role: 'Network & Information Security Intern',
     org: 'Bahrain Shura Council',
     context: 'Networks & Information Security department',
+    logo: null,
     color: '#CE1126',
     // Bahrain red is 3.13:1 on this ground — fine for a dot or a bar, which
     // only need 3:1 as non-text UI, but it fails as text. This is the same
@@ -35,6 +42,7 @@ export const EXPERIENCE = [
     role: 'Cloud & IoT Intern',
     org: 'AWS Cloud Innovation Center (CIC)',
     context: 'AWS CIC Bahrain · University of Bahrain',
+    logo: null,
     color: '#F2A93B',
     // Same hue, used for text. Marks only need 3:1; text needs 4.5:1.
     colorText: '#F2A93B',
