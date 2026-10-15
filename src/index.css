@@ -2,30 +2,36 @@
 @tailwind components;
 @tailwind utilities;
 
+/* The system, in one place.
+
+   Three flat grounds — ink, bone and carmine — and nothing laid over them: no
+   blur, no glow, no gradient, no rounded panel. A section sits on one ground
+   and the next section may sit on another; that change of ground is the page's
+   rhythm.
+
+   One typeface, Archivo, used at three widths. Condensed and heavy for
+   headlines (.display), its normal width for reading, wide and tracked for
+   small labels (.label). JetBrains Mono is for data only: dates, stacks,
+   filenames. */
+
 @layer base {
   html {
     scroll-behavior: smooth;
-    background-color: #1c0810;
+    background-color: #0e0f12;
     /* Stops iOS's rubber-band at the ends of the page.
 
        The bottom dock is position: fixed, and iOS does not hold fixed elements
        still through an overscroll — pull past the end of the document and the
-       whole page, the dock included, slides up, leaving it floating several
-       hundred pixels above the bottom of the screen with body background
-       beneath it. It settles back on release, but on a page whose primary
-       navigation lives at the bottom edge that is the dock coming unstuck from
-       the edge it is supposed to define.
-
-       No bounce, no detach. It also disables pull-to-refresh, which this page
-       has no use for. iOS 16+; older WebKit ignores it and bounces as before. */
+       whole page, the dock included, slides up. No bounce, no detach. iOS 16+;
+       older WebKit ignores it and bounces as before. */
     overscroll-behavior-y: none;
   }
 
   main > section {
     position: relative;
-    /* Clears the floating nav pill so a heading jumped to by an anchor isn't
-       tucked under it: 22px of top offset plus the pill's own 58px. */
-    scroll-margin-top: 88px;
+    /* Clears the fixed top bar so a section jumped to by an anchor isn't
+       tucked under it. */
+    scroll-margin-top: 60px;
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -36,325 +42,153 @@
 
   body {
     @apply text-text-primary font-sans antialiased;
-    /* Two grounds, still. The page ground is flat; the atmosphere layer paints
-       the orbs and the grid over it once, for the whole document, rather than
-       each section carrying its own gradient. */
-    background: #1c0810;
+    background: #0e0f12;
   }
 
   ::selection {
-    background: rgba(224, 122, 154, 0.32);
-    color: #fbeef0;
+    background: #b0122b;
+    color: #efe9dd;
   }
 
   :focus-visible {
-    outline: 2px solid #f09db0;
+    outline: 2px solid #efe9dd;
     outline-offset: 2px;
+  }
+  /* On the bone ground the outline has to be ink to be seen. */
+  .on-bone :focus-visible {
+    outline-color: #0e0f12;
   }
 
   ::-webkit-scrollbar {
     width: 10px;
   }
   ::-webkit-scrollbar-track {
-    background: #120509;
+    background: #0e0f12;
   }
   ::-webkit-scrollbar-thumb {
-    background: #866a73;
-    border-radius: 6px;
-  }
-  ::-webkit-scrollbar-thumb:hover {
-    background: #866a73;
+    background: #3a3c44;
   }
 }
 
 @layer components {
+  /* — type — */
+  .display {
+    font-stretch: 62%;
+    font-weight: 900;
+    text-transform: uppercase;
+    line-height: 0.86;
+    letter-spacing: -0.01em;
+  }
+  /* The same voice one step down, for a card or row title. */
+  .display-sm {
+    font-stretch: 68%;
+    font-weight: 800;
+    text-transform: uppercase;
+    line-height: 0.94;
+    letter-spacing: 0;
+  }
+  .label {
+    font-stretch: 118%;
+    font-weight: 500;
+    font-size: 11px;
+    line-height: 1.35;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
   .mono-label {
-    @apply font-mono text-xs uppercase tracking-[0.14em] text-text-muted;
+    @apply label text-text-muted;
   }
 
-  /* ——— glass, and the rule that splits it ———————————————————————————
-     Two classes, one job each:
-
-       .glass-pane     a *surface*. Large things that hold a diagram or copy.
-                       One blur, low tint, hairline edge.
-
-       .glass-control  an *object*. Small things you operate — the nav pill,
-                       the dock, buttons, filter chips, badges. A denser tint
-                       of the page's own surface colour and a firmer edge, so
-                       it reads as something to press.
-
-     The control used to be liquid glass: saturation and brightness pushed, a
-     refracting rim, a white top stroke and a highlight travelling across it.
-     On the nav pill, which is on screen the whole time, that made the
-     navigation the brightest and busiest thing on the page — glare over the
-     content rather than a material. It is matte now: the pane's family, one
-     step more solid, and nothing on it moves.                               */
-
+  /* — surfaces —
+     A panel is a step up from the ink ground with a hairline round it. The
+     class names are the previous design's (glass), kept because every section
+     already composes with them; nothing about them is glass any more. */
   .glass-pane {
-    background: rgba(253, 243, 244, 0.06);
-    /* .14, not the mock-ups' .11. The mock-ups place every pane over the bright
-       part of an orb; on the real page the atmosphere is fixed, so a pane
-       halfway down a 6000px document sits over the darkest part of the ground
-       and a .11 edge disappears into it. The inset top stroke does the rest —
-       it is what keeps the pane reading as a lit surface rather than a hole. */
-    border: 1px solid rgba(253, 243, 244, 0.14);
-    backdrop-filter: blur(14px);
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.07),
-      0 30px 62px -32px rgba(0, 0, 0, 0.85);
+    background: #15171c;
+    border: 1px solid rgba(239, 233, 221, 0.14);
   }
-
   .glass-control {
-    background: rgba(44, 15, 26, 0.62);
-    border: 1px solid rgba(253, 243, 244, 0.2);
-    backdrop-filter: blur(16px);
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.06),
-      0 16px 36px -20px rgba(0, 0, 0, 0.8);
+    background: transparent;
+    border: 1.5px solid rgba(239, 233, 221, 0.55);
   }
-
-  /* The dock is the only control with the whole document scrolling under it,
-     so it carries more tint and more blur than a control sitting on the ground.
-     Same material, turned up. */
+  .glass-control:hover {
+    border-color: #efe9dd;
+  }
   .dock-dense {
-    background: rgba(28, 8, 16, 0.8);
-    backdrop-filter: blur(22px);
+    background: #0e0f12;
+    border: 0;
+    border-top: 1px solid rgba(239, 233, 221, 0.16);
   }
 
-  /* Note: the -webkit- prefix is NOT written by hand anywhere in this file.
-     Autoprefixer emits it, in the order the minifier needs.
-
-     Hand-writing `-webkit-backdrop-filter` immediately after the standard
-     property is what broke this: esbuild treats the two as duplicate
-     declarations of one property and keeps only the last, so every unprefixed
-     `backdrop-filter` was deleted from the production build. Chromium dropped
-     the -webkit- alias, so it applied no blur at all — the glass rendered as a
-     flat translucent tint in Chrome, Edge, Android and every in-app WebView,
-     and only ever looked correct in Safari. Let autoprefixer add it. */
-
-  /* No backdrop-filter at all — older Firefox, and anything with the effect
-     switched off for battery. Both classes fall back to an opaque-enough tint
-     of the page ground, because a translucent surface over an unblurred
-     background is a smear, not a material. */
-  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-    .glass-pane {
-      background: rgba(36, 28, 40, 0.92);
-    }
-    .glass-control {
-      background: rgba(44, 15, 26, 0.96);
-    }
-  }
-
-/* — rules — */
-  /* Freestanding rules fade to transparent at both ends instead of stopping
-     cleanly. Box outlines and short accent marks stay solid; this is only for
-     rules with nothing anchoring their ends. */
   .hr-fade {
     height: 1px;
-    background: linear-gradient(
-      to right,
-      transparent,
-      rgba(253, 243, 244, 0.16) 48px,
-      rgba(253, 243, 244, 0.16) calc(100% - 48px),
-      transparent
-    );
+    background: rgba(239, 233, 221, 0.16);
   }
 
-  /* — buttons — */
-  /* Filled, warm, dark-labelled. This is the one place the redesign overrules
-     Nocturne, which took a button's weight from an outline and never a fill: on
-     a ground this dark, an outlined button beside a dozen glass objects is the
-     quietest thing on the screen, and the primary action should not be. Rose
-     for "talk to me", amber for the one call to action in the nav.
-
-     #2b0a12 measures 9.48:1 on the rose gradient's darker stop and 8.51:1 on
-     the amber's, so the label clears AA at its worst point on either. */
+  /* — buttons —
+     Square, one weight of border. The filled one is bone on ink: the single
+     primary action on a screen. */
   .btn {
-    @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-transparent px-5 font-sans text-sm font-medium transition-transform;
+    @apply inline-flex min-h-12 items-center justify-center gap-2 px-5 font-sans text-[15px] font-semibold transition-colors;
   }
-  .btn-primary {
-    color: #2b0a12;
-    background: linear-gradient(160deg, #fbd3dc, #f09db0);
-    box-shadow:
-      inset 0 2px 0 rgba(255, 255, 255, 0.85),
-      0 18px 38px -14px rgba(224, 122, 154, 0.85);
-  }
+  .btn-primary,
   .btn-amber {
-    color: #2b0a12;
-    background: linear-gradient(160deg, #fbd7a4, #f0a448);
-    box-shadow:
-      inset 0 1.5px 0 rgba(255, 255, 255, 0.85),
-      0 12px 26px -10px rgba(240, 164, 72, 0.85);
+    color: #0e0f12;
+    background: #efe9dd;
+    border: 1.5px solid #efe9dd;
   }
   .btn-primary:hover,
   .btn-amber:hover {
-    transform: translateY(-1px);
+    background: #ffffff;
+    border-color: #ffffff;
   }
-  /* The secondary button is a glass control, so it holds its own beside a
-     filled one instead of disappearing next to it. Composed in the markup as
-     `btn glass-control`. */
   .btn-ghost {
     @apply text-text-primary;
   }
   .btn-block {
     @apply w-full;
   }
-
-  @media (prefers-reduced-motion: reduce) {
-    .btn-primary:hover,
-    .btn-amber:hover {
-      transform: none;
-    }
+  /* The same two buttons on the bone and carmine grounds. */
+  .on-bone .btn-primary {
+    color: #efe9dd;
+    background: #0e0f12;
+    border-color: #0e0f12;
+  }
+  .on-bone .glass-control {
+    border-color: #0e0f12;
+    color: #0e0f12;
+  }
+  .on-red .glass-control {
+    border-color: rgba(239, 233, 221, 0.8);
   }
 
   /* — tags — */
   .tag-outline {
-    @apply inline-flex items-center rounded-full border border-accent/70 px-2.5 py-1 font-mono text-[11px] tracking-wide text-accent-body;
+    @apply label inline-flex items-center border border-accent-body px-2 py-1 text-accent-body;
   }
-
-  /* A technology chip: the mark and the name on a faint fill. Quieter than
-     the rose outline above, which on a card carrying six of them was the
-     loudest thing in it. */
   .tech-tag {
-    @apply inline-flex items-center gap-1.5 rounded-full border border-white/[0.09] bg-white/[0.045] px-2.5 py-1 text-[12px] leading-none text-text-primary/85;
+    @apply inline-flex items-center gap-1.5 border px-2 py-1 font-mono text-[11.5px] leading-none text-text-primary/85;
+    border-color: rgba(239, 233, 221, 0.18);
     min-height: 26px;
   }
 
   /* — forms — */
   .field > label {
-    @apply mb-1.5 block font-mono text-xs uppercase tracking-wider text-text-dim;
+    @apply label mb-2 block text-text-primary/80;
   }
   .input {
-    @apply w-full min-h-11 rounded-xl border border-base-edge bg-black/20 px-3 py-2 font-sans text-sm text-text-primary transition-colors placeholder:text-text-dim;
+    @apply min-h-12 w-full border bg-transparent px-3 py-2.5 font-sans text-[15px] text-text-primary transition-colors placeholder:text-text-primary/45;
+    border-color: rgba(239, 233, 221, 0.45);
   }
   .input:hover {
-    @apply border-text-dim;
+    border-color: rgba(239, 233, 221, 0.8);
   }
   .input:focus-visible {
-    @apply border-accent outline-offset-0;
+    border-color: #efe9dd;
+    outline-offset: 0;
   }
   textarea.input {
-    min-height: 90px;
+    min-height: 110px;
     resize: vertical;
   }
-}
-
-/* ——— atmosphere ————————————————————————————————————————————————————
-   Four drifting orbs and a grid, painted once behind the whole document.
-
-   The mock-ups carry these per section, which on a page this tall means a
-   dozen blurred radial gradients each promoted to its own layer and each
-   repainted as its section scrolls. One `position: fixed` layer costs the
-   same as one section's worth and covers all of them, and because it is fixed
-   it never repaints on scroll at all — the parallax comes free from the layer
-   staying still while the page moves over it.
-
-   `contain: strict` keeps the layer out of the rest of the page's layout and
-   paint work, and the animations are transform-only for the same reason. */
-/* Liquid, not a pan.
-   
-   The orbs used to translate and scale on one 2-keyframe cycle, which reads as
-   a picture sliding about behind glass. A liquid ground needs the shape itself
-   to change, so each orb also morphs its border-radius on a longer, coprime
-   period — the silhouette swells and slackens while it drifts, and because the
-   two periods never line up the loop has no visible seam.
-   
-   border-radius animates on the compositor alongside transform and neither
-   touches layout, so this is still one fixed, contained layer that never
-   repaints on scroll. */
-@keyframes orb-drift {
-  0% {
-    transform: translate3d(-5%, -3%, 0) scale(1);
-  }
-  33% {
-    transform: translate3d(4%, 4%, 0) scale(1.09);
-  }
-  66% {
-    transform: translate3d(-2%, 6%, 0) scale(0.97);
-  }
-  100% {
-    transform: translate3d(-5%, -3%, 0) scale(1);
-  }
-}
-
-@keyframes orb-morph {
-  0% {
-    border-radius: 58% 42% 47% 53% / 51% 46% 54% 49%;
-  }
-  25% {
-    border-radius: 44% 56% 62% 38% / 59% 55% 45% 41%;
-  }
-  50% {
-    border-radius: 53% 47% 38% 62% / 43% 61% 39% 57%;
-  }
-  75% {
-    border-radius: 62% 38% 55% 45% / 48% 40% 60% 52%;
-  }
-  100% {
-    border-radius: 58% 42% 47% 53% / 51% 46% 54% 49%;
-  }
-}
-
-.atmosphere-orb {
-  animation-name: orb-drift, orb-morph;
-  animation-timing-function: ease-in-out;
-  animation-iteration-count: infinite;
-  will-change: transform, border-radius;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .atmosphere-orb {
-    animation: none;
-  }
-}
-
-/* Reduced motion stops the drift outright. The orbs are ambient light, not
-   information, so there is nothing to preserve by slowing them down. */
-@media (prefers-reduced-motion: reduce) {
-  .atmosphere-orb {
-    animation: none !important;
-  }
-}
-
-/* A hard on/off blink for status dots — a switching feel, not a fade. */
-@keyframes signal-blip {
-  0%,
-  60% {
-    opacity: 1;
-  }
-  61%,
-  100% {
-    opacity: 0.25;
-  }
-}
-
-.signal-blip {
-  animation: signal-blip 3.4s step-end infinite;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .signal-blip {
-    animation: none;
-  }
-}
-
-/* React Flow's attribution badge ships at 1.18:1 against this ground — its
-   default is grey text on a translucent *white* box, which on a dark page is a
-   smudge. The attribution is kept (the library is MIT and its maintainers ask
-   you leave it unless you hold a Pro licence) but restyled to the site's muted
-   token so it is legible rather than decorative noise.
-
-   `a[href]` and the custom property are both needed: React Flow's stylesheet
-   is imported inside the lazy chunk, so it lands after this file and wins at
-   equal specificity. */
-.react-flow__attribution {
-  --xy-attribution-background-color: transparent;
-  padding: 0 8px 4px 0;
-}
-
-.react-flow__attribution a[href] {
-  color: #a98d95;
-  font-family: 'JetBrains Mono', ui-monospace, monospace;
-  font-size: 10.5px;
-  letter-spacing: 0.04em;
 }

@@ -191,7 +191,7 @@ export const PROJECTS = [
     id: 'guidely',
     pillars: ['ai', 'fullstack'],
     name: 'Guidely',
-    tagline: 'answers with their sources attached',
+    tagline: 'document Q&A with cited sources',
     context: 'Internal knowledge assistant',
     language: 'Python',
     featured: true,
@@ -229,8 +229,8 @@ export const PROJECTS = [
     id: 'detecto',
     pillars: ['ai', 'fullstack'],
     name: 'Detecto',
-    tagline: 'how many people are in this frame?',
-    context: 'Person detection and counting',
+    tagline: 'person detection and counting',
+    context: 'Computer vision',
     language: 'Python',
     featured: true,
     summary:
@@ -262,7 +262,7 @@ export const PROJECTS = [
     id: '0-shell',
     pillars: ['cs'],
     name: '0-shell',
-    tagline: 'a shell, no external binaries',
+    tagline: 'Unix shell with built-in commands',
     language: 'Rust',
     description:
       'A Unix-style shell in Rust where every builtin, from cd and ls to cat, cp and mv, is written from scratch instead of calling out to system binaries.',
@@ -290,7 +290,7 @@ export const PROJECTS = [
     id: 'smart-road',
     pillars: ['cs'],
     name: 'smart-road',
-    tagline: 'intersections without traffic lights',
+    tagline: 'traffic simulation without signals',
     language: 'Rust',
     description:
       'Autonomous cars crossing a four-way intersection with no traffic lights. Each car reserves its path through the junction ahead of time, and the scheduler keeps them from colliding under heavy traffic. Rust and SDL2.',
@@ -387,7 +387,7 @@ export const PROJECTS = [
     id: 'groupie-tracker',
     pillars: ['fullstack'],
     name: 'groupie-tracker',
-    tagline: 'REST API, visualized',
+    tagline: 'server-rendered REST client',
     language: 'Go',
     description:
       'A Go web app that reads the Groupie Trackers REST API and lets you browse bands, members, tour dates and concert locations through server-rendered pages.',

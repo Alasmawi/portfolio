@@ -1,8 +1,8 @@
 import { useCallback, useRef, useState } from 'react';
-import { ArrowUpRight, Check, Copy, Download, Loader2, MapPin, Phone, RotateCcw } from 'lucide-react';
+import { ArrowUpRight, Check, Copy, Download, Loader2, Mail, MapPin, Phone, RotateCcw } from 'lucide-react';
 import { GithubMark, LinkedinMark } from './ui/BrandIcons';
 import Reveal from './ui/Reveal';
-import SectionHeader, { FRAME, SECTION_PAD } from './ui/SectionHeader';
+import { FRAME, SECTION_PAD, SECTION_Y } from './ui/SectionHeader';
 import { CV_URL } from '../data/navLinks';
 
 const EMAIL = 'asmawiabdulla0@gmail.com';
@@ -34,6 +34,7 @@ export default function Contact() {
   // idle | sending | sent | error | handed-off | stalled
   const [state, setState] = useState('idle');
   const [copied, setCopied] = useState(false);
+  const [formOpen, setFormOpen] = useState(false);
   const timerRef = useRef(null);
   const statusRef = useRef(null);
 
@@ -113,192 +114,167 @@ export default function Contact() {
   const sending = state === 'sending';
 
   return (
-    <section id="contact" className={`relative pb-9 pt-12 sm:pt-16 md:pb-12 md:pt-20 ${SECTION_PAD}`}>
-      <div className={FRAME}>
-        <SectionHeader
-          index="06"
-          eyebrow="Contact"
-          title="Hiring, or building something? Let’s talk."
-          lead="Send a line about the role or the problem. I reply to most messages within a day."
-        />
+    // The last section, on the carmine ground: the address set as large as it
+    // will go, because writing to it is the one thing this section is for.
+    <section id="contact" className={`on-red relative bg-carmine text-bone ${SECTION_PAD}`}>
+      <div className={`${FRAME} ${SECTION_Y}`}>
+        <Reveal>
+          <h2 className="display text-[clamp(52px,10.5vw,148px)]">Contact</h2>
+          <a
+            href={`mailto:${EMAIL}`}
+            className="display-sm mt-6 block break-all text-[clamp(24px,5.2vw,76px)] underline decoration-bone/40 decoration-2 underline-offset-[0.14em] transition-colors hover:decoration-bone"
+          >
+            {EMAIL}
+          </a>
+          <button type="button" onClick={copyEmail} className="label mt-3 inline-flex min-h-11 items-center gap-2 hover:underline">
+            <span className="flex items-center gap-2" aria-live="polite">
+              {copied ? <Check size={14} /> : <Copy size={14} />}
+              {copied ? 'Copied' : 'Copy address'}
+            </span>
+          </button>
+        </Reveal>
 
-        <div className="mt-9 grid gap-x-12 gap-y-9 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]">
+        <div className="mt-8 grid gap-x-16 gap-y-8 border-t border-bone/30 pt-8 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1fr)]">
           <Reveal delay={0.05}>
-            {/* Set on the page, not in panes. This column was two boxed panels
-                — an email card and a five-row labelled table — beside the
-                boxed form, and three panels of ruled rows was the heaviest
-                screen on the site for the simplest job on it. The address
-                leads because it works with no mail app, no form service and
-                no JavaScript; the rest is a short list of links. */}
-            <div>
-              <p className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-text-muted">Email</p>
-              <a
-                href={`mailto:${EMAIL}`}
-                className="mt-2 block break-all text-[19px] font-medium tracking-[-0.01em] text-text-primary transition-colors hover:text-accent-bright sm:text-[21px]"
-              >
-                {EMAIL}
-              </a>
-              <button
-                type="button"
-                onClick={copyEmail}
-                className="-ml-2 mt-1 inline-flex min-h-11 items-center gap-2 rounded-full px-2 text-[13px] text-text-primary/75 transition-colors hover:text-text-primary"
-              >
-                <span className="flex items-center gap-2" aria-live="polite">
-                  {copied ? <Check size={14} /> : <Copy size={14} />}
-                  {copied ? 'Copied' : 'Copy address'}
-                </span>
-              </button>
-
-              <ul className="mt-5 grid gap-1 border-t border-white/[0.08] pt-4">
-                {DIRECTORY.map(({ label, value, href, Icon }) => (
-                  <li key={label}>
-                    <a
-                      href={href}
-                      target={href.startsWith('http') ? '_blank' : undefined}
-                      rel={href.startsWith('http') ? 'noreferrer' : undefined}
-                      aria-label={`${label}: ${value}`}
-                      className="group flex min-h-11 items-center gap-3 text-[14.5px] text-text-primary/85 transition-colors hover:text-accent-bright"
-                    >
-                      <Icon size={16} className="shrink-0 text-text-muted transition-colors group-hover:text-accent-bright" />
-                      <span className="truncate">{value}</span>
-                    </a>
-                  </li>
-                ))}
-                <li>
+            <p className="max-w-[40ch] text-[16px] leading-relaxed text-bone/90">
+              For roles or project inquiries, email me or use the form. I usually reply within a day.
+            </p>
+            <ul className="mt-5 grid gap-x-8 sm:grid-cols-2 lg:grid-cols-1">
+              {DIRECTORY.map(({ label, value, href, Icon }) => (
+                <li key={label}>
                   <a
-                    href={CV_URL}
-                    download
-                    className="group flex min-h-11 items-center gap-3 text-[14.5px] text-text-primary/85 transition-colors hover:text-accent-bright"
+                    href={href}
+                    target={href.startsWith('http') ? '_blank' : undefined}
+                    rel={href.startsWith('http') ? 'noreferrer' : undefined}
+                    aria-label={`${label}: ${value}`}
+                    className="flex min-h-11 items-center gap-3 text-[15.5px] hover:underline"
                   >
-                    <Download size={16} className="shrink-0 text-text-muted transition-colors group-hover:text-accent-bright" />
-                    Download CV
+                    <Icon size={16} className="shrink-0" />
+                    <span className="truncate">{value}</span>
                   </a>
                 </li>
-              </ul>
-
-              <p className="mt-4 flex items-center gap-3 text-[13.5px] text-text-muted">
+              ))}
+              <li>
+                <a href={CV_URL} download className="flex min-h-11 items-center gap-3 text-[15.5px] hover:underline">
+                  <Download size={16} className="shrink-0" />
+                  Download CV
+                </a>
+              </li>
+              <li className="flex min-h-11 items-center gap-3 text-[15.5px] text-bone/85">
                 <MapPin size={16} className="shrink-0" aria-hidden="true" />
-                Manama, Bahrain · UTC+3
-              </p>
-            </div>
+                Manama, Bahrain (UTC+3)
+              </li>
+            </ul>
           </Reveal>
 
-          <Reveal delay={0.1} className="h-full">
-            {state === 'sent' ? (
-              <div
-                ref={statusRef}
-                role="status"
-                className="glass-pane flex h-full min-h-[420px] flex-col items-start justify-center rounded-[26px] p-6 sm:p-8"
-              >
-                <span className="flex h-11 w-11 items-center justify-center rounded-full bg-signal/15 text-signal">
-                  <Check size={20} />
-                </span>
-                <h3 className="mt-5 text-[24px] font-medium tracking-tight text-text-primary">Message sent.</h3>
-                <p className="mt-2 max-w-[40ch] text-[15px] leading-relaxed text-text-primary/75">
-                  Thanks, it’s in my inbox. I’ll reply to the address you gave, usually within a day.
-                </p>
-                <button
-                  type="button"
-                  onClick={() => setState('idle')}
-                  className="btn btn-ghost glass-control mt-6 min-h-10 px-4 text-[13px]"
-                >
-                  <span className="flex items-center gap-2">
+          <Reveal delay={0.1}>
+            {/* On a phone the form opens on request: the address and the links
+                above already cover the job. */}
+            {!formOpen && (
+              <button type="button" onClick={() => setFormOpen(true)} className="btn btn-ghost glass-control w-full lg:hidden">
+                <Mail size={15} aria-hidden="true" />
+                Send a message
+              </button>
+            )}
+            <div className={formOpen ? '' : 'hidden lg:block'}>
+              {state === 'sent' ? (
+                <div ref={statusRef} role="status">
+                  <h3 className="display-sm text-[40px]">Message sent.</h3>
+                  <p className="mt-3 max-w-[40ch] text-[16px] leading-relaxed text-bone/90">
+                    Thanks. I’ll reply to the address you gave, usually within a day.
+                  </p>
+                  <button type="button" onClick={() => setState('idle')} className="btn btn-ghost glass-control mt-6">
                     <RotateCcw size={14} /> Send another
-                  </span>
-                </button>
-              </div>
-            ) : (
-              <form onSubmit={handleSubmit} className="glass-pane grid h-full gap-4 rounded-[26px] p-5 sm:p-7">
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <div className="field">
-                    <label htmlFor="contact-name">Name</label>
-                    <input id="contact-name" name="name" required autoComplete="name" className="input" placeholder="Your name" />
+                  </button>
+                </div>
+              ) : (
+                <form onSubmit={handleSubmit} className="grid gap-4">
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="field">
+                      <label htmlFor="contact-name">Name</label>
+                      <input id="contact-name" name="name" required autoComplete="name" className="input" placeholder="Your name" />
+                    </div>
+                    <div className="field">
+                      <label htmlFor="contact-email">Email</label>
+                      <input
+                        id="contact-email"
+                        name="email"
+                        type="email"
+                        required
+                        autoComplete="email"
+                        className="input"
+                        placeholder="you@company.com"
+                      />
+                    </div>
                   </div>
                   <div className="field">
-                    <label htmlFor="contact-email">Email</label>
-                    <input
-                      id="contact-email"
-                      name="email"
-                      type="email"
+                    <label htmlFor="contact-message">Message</label>
+                    <textarea
+                      id="contact-message"
+                      name="message"
                       required
-                      autoComplete="email"
+                      rows={4}
                       className="input"
-                      placeholder="you@company.com"
+                      placeholder="A few sentences about the role or the project."
                     />
                   </div>
-                </div>
-                <div className="field">
-                  <label htmlFor="contact-message">Message</label>
-                  <textarea
-                    id="contact-message"
-                    name="message"
-                    required
-                    rows={4}
-                    className="input"
-                    placeholder="The role, the team, or the problem. A few sentences is plenty."
+                  {/* Honeypot. Off-screen rather than display:none, which some
+                      bots skip. */}
+                  <input
+                    type="checkbox"
+                    name="botcheck"
+                    tabIndex={-1}
+                    autoComplete="off"
+                    aria-hidden="true"
+                    className="absolute -left-[9999px] h-px w-px opacity-0"
                   />
-                </div>
-                {/* Honeypot. Off-screen rather than display:none, which some
-                    bots skip. */}
-                <input
-                  type="checkbox"
-                  name="botcheck"
-                  tabIndex={-1}
-                  autoComplete="off"
-                  aria-hidden="true"
-                  className="absolute -left-[9999px] h-px w-px opacity-0"
-                />
 
-                <button type="submit" disabled={sending} className="btn btn-primary btn-block min-h-12 text-[15px] disabled:opacity-70">
-                  {sending ? (
-                    <span className="flex items-center gap-2">
-                      <Loader2 size={16} className="animate-spin" /> Sending…
-                    </span>
-                  ) : (
-                    'Send message'
-                  )}
-                </button>
+                  <button type="submit" disabled={sending} className="btn btn-primary btn-block disabled:opacity-70">
+                    {sending ? (
+                      <span className="flex items-center gap-2">
+                        <Loader2 size={16} className="animate-spin" /> Sending…
+                      </span>
+                    ) : (
+                      'Send message'
+                    )}
+                  </button>
 
-                <p
-                  ref={statusRef}
-                  role="status"
-                  aria-live="polite"
-                  className="min-h-[1.25rem] text-[13px] leading-snug text-text-muted"
-                >
-                  {state === 'error' && (
-                    <>
-                      That didn’t go through. Write to{' '}
-                      <a href={`mailto:${EMAIL}`} className="text-accent-bright underline underline-offset-2">
-                        {EMAIL}
-                      </a>{' '}
-                      directly and it will reach me.
-                    </>
-                  )}
-                  {state === 'stalled' && (
-                    <>
-                      Nothing opened, so this device has no mail app set up. Write to{' '}
-                      <a href={`mailto:${EMAIL}`} className="text-accent-bright underline underline-offset-2">
-                        {EMAIL}
-                      </a>{' '}
-                      instead. The copy button puts it on your clipboard.
-                    </>
-                  )}
-                  {state === 'handed-off' && 'Your mail app has the draft. Send it from there.'}
-                </p>
-              </form>
-            )}
+                  <p
+                    ref={statusRef}
+                    role="status"
+                    aria-live="polite"
+                    className="min-h-[1.25rem] text-[14px] leading-snug text-bone/90"
+                  >
+                    {state === 'error' && (
+                      <>
+                        That didn’t go through. Write to{' '}
+                        <a href={`mailto:${EMAIL}`} className="underline underline-offset-2">
+                          {EMAIL}
+                        </a>{' '}
+                        directly and it will reach me.
+                      </>
+                    )}
+                    {state === 'stalled' && (
+                      <>
+                        Nothing opened, so this device has no mail app set up. Write to{' '}
+                        <a href={`mailto:${EMAIL}`} className="underline underline-offset-2">
+                          {EMAIL}
+                        </a>{' '}
+                        instead. The copy button puts it on your clipboard.
+                      </>
+                    )}
+                    {state === 'handed-off' && 'Your mail app has the draft. Send it from there.'}
+                  </p>
+                </form>
+              )}
+            </div>
           </Reveal>
         </div>
 
-        <div className="hr-fade my-10" />
-
         {/* A real landmark, so "jump to footer" works in a screen reader. */}
-        <footer className="flex flex-col gap-3 font-mono text-[11.5px] text-text-dim sm:flex-row sm:items-center sm:justify-between">
-          <p>© {new Date().getFullYear()} Abdulla Alasmawi · Built with React, Tailwind CSS and Framer Motion</p>
-          <a
-            href="/v1/"
-            className="inline-flex min-h-6 items-center gap-1.5 py-1.5 text-text-muted transition-colors hover:text-accent-bright"
-          >
+        <footer className="label mt-12 flex flex-col gap-3 border-t border-bone/30 pt-6 text-bone/85 sm:flex-row sm:items-center sm:justify-between">
+          <p>© {new Date().getFullYear()} Abdulla Alasmawi</p>
+          <a href="/v1/" className="inline-flex min-h-6 items-center gap-1.5 py-1.5 hover:underline">
             Previous version of this site
             <ArrowUpRight size={12} />
           </a>

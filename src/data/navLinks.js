@@ -7,7 +7,7 @@ import { User, Briefcase, FolderGit2, GraduationCap, Mail } from 'lucide-react';
 // `dock: false` keeps a link out of the phone dock, which has room for five
 // thumb-sized tabs and no more.
 export const LINKS = [
-  { id: 'projects', label: 'Work', icon: FolderGit2 },
+  { id: 'projects', label: 'Projects', icon: FolderGit2 },
   { id: 'experience', label: 'Experience', icon: Briefcase },
   { id: 'education', label: 'Education', icon: GraduationCap },
   { id: 'about', label: 'About', icon: User },
@@ -24,6 +24,12 @@ export const DOCK_LINKS = [
 // view of the page showed "Work" as current before anyone had scrolled.
 export const SECTION_IDS = ['hero', 'focus', ...LINKS.map((l) => l.id), 'contact'];
 
-// The CV, as a file in public/. Named for the person saving it, not for us:
-// "cv.pdf" in a downloads folder full of them tells a recruiter nothing.
-export const CV_URL = `${import.meta.env.BASE_URL}Abdulla_Alasmawi_CV.pdf`;
+// The CV lives in Dropbox, so it can be updated without touching the site:
+// upload a new file with the same name to the same folder, choose Replace, and
+// every "Download CV" button serves the new one. `dl=1` makes Dropbox send it
+// as a download (as Abdulla_Alasmawi_CV.pdf) rather than open its preview page.
+//
+// The old address on this site, /Abdulla_Alasmawi_CV.pdf, redirects here (see
+// vercel.json), so links to it shared before the move get the current CV too.
+export const CV_URL =
+  'https://www.dropbox.com/scl/fi/cysq8ud29lf1rxx32233i/Abdulla_Alasmawi_CV.pdf?rlkey=3lljq72npsgam3t6uzm77qpbf&st=4ducr8qq&dl=1';

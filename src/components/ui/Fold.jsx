@@ -35,7 +35,7 @@ export default function Fold({ more = 'Show more', less = 'Show less', color, cl
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
         aria-controls={panelId}
-        className="-ml-2 mt-2 inline-flex min-h-11 items-center gap-1.5 rounded-full px-2 font-mono text-[11.5px] uppercase tracking-[0.1em] text-accent-body transition-colors hover:text-accent-bright"
+        className="label mt-1 inline-flex min-h-11 items-center gap-1.5 text-accent-body transition-colors hover:text-accent-bright"
         style={color ? { color } : undefined}
       >
         {open ? less : more}

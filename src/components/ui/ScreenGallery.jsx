@@ -53,7 +53,7 @@ export default function ScreenGallery({ items = [] }) {
     <div className="grid gap-3" onKeyDown={onKeyDown}>
       <figure className="m-0">
         <div
-          className="group relative aspect-[16/10] overflow-hidden rounded-xl bg-white/[0.03] shadow-[inset_0_0_0_1px_rgba(251,238,240,0.1)]"
+          className="group relative aspect-[16/10] overflow-hidden rounded-xl bg-white/[0.03] shadow-[inset_0_0_0_1px_rgba(239,233,221,0.1)]"
           tabIndex={0}
           aria-roledescription="carousel"
           aria-label={`Screenshots, ${index + 1} of ${count}. Use the arrow keys to move between them.`}
@@ -72,7 +72,7 @@ export default function ScreenGallery({ items = [] }) {
             />
           </AnimatePresence>
 
-          <span className="absolute right-2.5 top-2.5 rounded-full bg-black/60 px-2.5 py-1 font-mono text-[10.5px] tabular-nums text-text-primary backdrop-blur-sm">
+          <span className="absolute right-2.5 top-2.5 rounded-none bg-black/60 px-2.5 py-1 font-mono text-[10.5px] tabular-nums text-text-primary backdrop-blur-sm">
             {index + 1} / {count}
           </span>
 
@@ -82,7 +82,7 @@ export default function ScreenGallery({ items = [] }) {
                 type="button"
                 onClick={() => go(-1)}
                 aria-label="Previous screenshot"
-                className="glass-control absolute left-2.5 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full text-text-primary opacity-90 transition-opacity sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100"
+                className="glass-control absolute left-2.5 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-none text-text-primary opacity-90 transition-opacity sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100"
               >
                 <ChevronLeft size={18} />
               </button>
@@ -90,7 +90,7 @@ export default function ScreenGallery({ items = [] }) {
                 type="button"
                 onClick={() => go(1)}
                 aria-label="Next screenshot"
-                className="glass-control absolute right-2.5 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full text-text-primary opacity-90 transition-opacity sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100"
+                className="glass-control absolute right-2.5 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-none text-text-primary opacity-90 transition-opacity sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100"
               >
                 <ChevronRight size={18} />
               </button>
@@ -132,8 +132,8 @@ export default function ScreenGallery({ items = [] }) {
               onClick={() => setIndex(i)}
               className={`relative aspect-[16/10] w-[104px] shrink-0 overflow-hidden rounded-lg transition-[opacity,box-shadow] sm:w-[112px] ${
                 on
-                  ? 'opacity-100 shadow-[0_0_0_2px_rgb(240_157_176)]'
-                  : 'opacity-60 shadow-[inset_0_0_0_1px_rgba(251,238,240,0.14)] hover:opacity-90'
+                  ? 'opacity-100 shadow-[0_0_0_2px_rgb(239_233_221)]'
+                  : 'opacity-60 shadow-[inset_0_0_0_1px_rgba(239,233,221,0.14)] hover:opacity-90'
               }`}
             >
               <img src={it.thumb ?? it.src} alt="" loading="lazy" className="h-full w-full object-cover object-top" />

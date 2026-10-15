@@ -2,7 +2,7 @@ import { ArrowUpRight } from 'lucide-react';
 import Reveal from './ui/Reveal';
 import Fold from './ui/Fold';
 import { GithubMark } from './ui/BrandIcons';
-import SectionHeader, { FRAME, SECTION_PAD } from './ui/SectionHeader';
+import SectionHeader, { FRAME, SECTION_PAD, SECTION_Y } from './ui/SectionHeader';
 import CourseworkModule from './ui/CourseworkModule';
 import ProgramJourney from './ui/ProgramJourney';
 import { EDUCATION } from '../data/education';
@@ -14,23 +14,23 @@ const YEARS = Array.from({ length: AXIS_TO - AXIS_FROM + 1 }, (_, i) => AXIS_FRO
 const pct = (year) => ((year - AXIS_FROM) / (AXIS_TO - AXIS_FROM)) * 100;
 const OVERLAP_FROM = Math.max(...EDUCATION.map((e) => e.from));
 
-// The headline's claim, two tracks in parallel, drawn. Two lanes on one
+// The degree and the program on one axis of years. Two lanes on one
 // axis of years, with the stretch where both ran shaded, and Reboot's lane
 // split into its two phases so the current one can carry the live marker.
 function ParallelTracks() {
   const totalMonths = REBOOT_JOURNEY.reduce((n, s) => n + s.months, 0);
   return (
-    <div className="glass-pane mt-9 rounded-[26px] p-5 sm:p-7" aria-hidden="true">
+    <div className="glass-pane mt-10 hidden p-8 md:block" aria-hidden="true">
       <div className="relative">
         <div
-          className="absolute inset-y-0 rounded-xl bg-white/[0.035]"
+          className="absolute inset-y-0 bg-white/[0.04]"
           style={{ left: `${pct(OVERLAP_FROM)}%`, right: 0 }}
         >
           {/* Inside the band, clear of its rounded corner. It used to sit half
               a pixel above the band's top edge, so the edge ran through the
               lettering. */}
           <span className="absolute right-3 top-2 font-mono text-[10px] uppercase tracking-[0.14em] text-text-dim">
-            both at once
+            overlap
           </span>
         </div>
 
@@ -42,7 +42,7 @@ function ParallelTracks() {
                 <span className="text-text-muted">{e.degree}</span>
               </p>
               <div className="relative h-3">
-                <div className="absolute inset-0 rounded-full shadow-[inset_0_0_0_1px_rgba(251,238,240,0.08)]" />
+                <div className="absolute inset-0 rounded-none shadow-[inset_0_0_0_1px_rgba(239,233,221,0.08)]" />
                 {e.journey ? (
                   <div
                     className="absolute inset-y-0 flex gap-[3px]"
@@ -51,7 +51,7 @@ function ParallelTracks() {
                     {REBOOT_JOURNEY.map((s) => (
                       <div
                         key={s.id}
-                        className="relative h-full rounded-full"
+                        className="relative h-full rounded-none"
                         style={{
                           width: `${(s.months / totalMonths) * 100}%`,
                           backgroundColor: s.status === 'active' ? `${e.color}cc` : `${e.color}55`,
@@ -71,7 +71,7 @@ function ParallelTracks() {
                   </div>
                 ) : (
                   <div
-                    className="absolute inset-y-0 rounded-full"
+                    className="absolute inset-y-0 rounded-none"
                     style={{
                       left: `${pct(e.from)}%`,
                       width: `${pct(e.to) - pct(e.from)}%`,
@@ -114,35 +114,33 @@ function ParallelTracks() {
 
 export default function Education() {
   return (
-    <section id="education" className={`relative py-12 sm:py-16 md:py-20 ${SECTION_PAD}`}>
+    <section id="education" className={`relative ${SECTION_Y} ${SECTION_PAD}`}>
       <div className={FRAME}>
         <SectionHeader
-          index="04"
-          eyebrow="Education"
-          title="Two tracks, run in parallel."
-          lead="A Computer Science degree on the cloud computing track, and for its last two years a project-based full-stack program alongside it."
+          title="Education"
+          lead="A Computer Science degree on the cloud computing track, with a project-based full-stack program taken alongside its final two years."
         />
 
         <Reveal delay={0.08}>
           <ParallelTracks />
         </Reveal>
 
-        <div className="mt-4 grid gap-4 lg:grid-cols-2">
+        <div className="mt-6 grid gap-3 md:mt-4 md:gap-4 lg:grid-cols-2">
           {EDUCATION.map((entry, i) => (
             <Reveal key={entry.id} delay={0.1 + i * 0.05} className="h-full">
-              <article className="glass-pane flex h-full flex-col rounded-[26px] p-5 sm:p-7">
+              <article className="glass-pane flex h-full flex-col p-5 sm:p-8">
                 <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
-                  <p className="font-mono text-[12px]" style={{ color: entry.color }}>
+                  <p className="label" style={{ color: entry.color }}>
                     {entry.school}
                   </p>
                   <p className="font-mono text-[11.5px] text-text-muted">{entry.period}</p>
                 </div>
-                <h3 className="mt-3 text-[22px] font-medium leading-snug tracking-tight text-text-primary">
+                <h3 className="display-sm mt-4 text-[30px] sm:text-[36px]">
                   {entry.degree}
                 </h3>
                 <div className="mt-2 flex flex-wrap items-center gap-2.5">
                   <span
-                    className="inline-flex items-center rounded-full border px-2.5 py-1 font-mono text-[11px]"
+                    className="label inline-flex items-center border px-2 py-1"
                     style={{ color: entry.color, borderColor: `${entry.color}66`, backgroundColor: `${entry.color}14` }}
                   >
                     {entry.track}
@@ -163,7 +161,7 @@ export default function Education() {
                 <div className="mt-5 flex flex-wrap gap-x-8 gap-y-3">
                   {entry.stats.map((s) => (
                     <div key={s.label} className="flex items-baseline gap-1.5">
-                      <span className="font-mono text-2xl font-medium tabular-nums" style={{ color: entry.color }}>
+                      <span className="display-sm text-[40px] tabular-nums" style={{ color: entry.color }}>
                         {s.value}
                       </span>
                       <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-text-muted">
@@ -200,7 +198,7 @@ export default function Education() {
                     href={entry.github.url}
                     target="_blank"
                     rel="noreferrer"
-                    className="group mt-3 flex items-center gap-4 rounded-2xl border border-white/[0.1] bg-white/[0.04] px-4 py-3.5 transition-colors hover:border-white/25 hover:bg-white/[0.06]"
+                    className="group mt-4 flex items-center gap-4 border-t border-bone/15 pt-4"
                   >
                     <GithubMark size={22} className="shrink-0 text-text-primary" />
                     <span className="min-w-0 flex-1">

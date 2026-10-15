@@ -2,7 +2,7 @@ import { ArrowUpRight } from 'lucide-react';
 import Reveal from './ui/Reveal';
 import Fold from './ui/Fold';
 import TechTag from './ui/TechTag';
-import SectionHeader, { FRAME, SECTION_PAD } from './ui/SectionHeader';
+import SectionHeader, { FRAME, SECTION_PAD, SECTION_Y } from './ui/SectionHeader';
 import { EXPERIENCE } from '../data/experience';
 import { PROJECTS } from '../data/projects';
 import { openProject } from '../lib/openProject';
@@ -38,7 +38,7 @@ function Bar({ start, end, color, muted = false, indent = false, live = false })
   const width = Math.max((frac(end) - frac(start)) * 100, 1.5);
   return (
     <div className={`relative h-2.5 rounded ${indent ? 'ml-4' : ''}`}>
-      <div className="absolute inset-0 rounded shadow-[inset_0_0_0_1px_rgba(251,238,240,0.09)]" />
+      <div className="absolute inset-0 rounded shadow-[inset_0_0_0_1px_rgba(239,233,221,0.09)]" />
       <div
         className="absolute bottom-0 top-0 rounded"
         style={{
@@ -66,7 +66,7 @@ function JobCard({ job }) {
   const indent = job.logo ? '' : 'sm:pl-[22px]';
 
   return (
-    <article className="glass-pane flex h-full flex-col rounded-[26px] p-5 sm:p-7">
+    <article className="glass-pane flex h-full flex-col p-5 sm:p-8">
       <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
         <p className="font-mono text-[11.5px] text-text-muted">{formatRange(job)}</p>
         {job.end ? (
@@ -97,14 +97,14 @@ function JobCard({ job }) {
           />
         ) : (
           <span
-            className="mt-[9px] h-2.5 w-2.5 shrink-0 rounded-full"
+            className="mt-[10px] h-3 w-3 shrink-0"
             style={{ backgroundColor: job.color }}
             aria-hidden="true"
           />
         )}
         <div>
-          <h3 className="text-[21px] font-medium leading-snug tracking-tight text-text-primary">{job.role}</h3>
-          <p className="mt-0.5 text-[15px] text-text-primary/85">{job.org}</p>
+          <h3 className="display-sm text-[30px] sm:text-[36px]">{job.role}</h3>
+          <p className="mt-2 text-[16px] font-medium text-text-primary">{job.org}</p>
           <p className="mt-0.5 font-mono text-[11.5px]" style={{ color: job.colorText }}>
             {job.context}
           </p>
@@ -132,17 +132,17 @@ function JobCard({ job }) {
       {/* The project link sits at the foot of the card, so the two cards'
           links line up whichever of them is open. */}
       {job.projectId && (
-        <div className={`mt-auto pt-3 ${indent}`}>
+        <div className={`mt-auto pt-5 ${indent}`}>
           <button
             type="button"
             onClick={() => openProject(job.projectId)}
-            className="flex w-full items-center justify-between gap-3 rounded-2xl border border-white/[0.1] bg-white/[0.04] px-4 py-3 text-left transition-colors hover:border-accent/50 hover:bg-white/[0.06]"
+            className="group flex w-full items-center justify-between gap-3 border-t border-bone/15 pt-4 text-left"
           >
             <span>
-              <span className="block font-mono text-[10px] uppercase tracking-[0.14em] text-text-dim">Built here</span>
-              <span className="text-[15px] font-medium text-text-primary">{projectName(job.projectId)}</span>
+              <span className="label block text-text-dim">Built here</span>
+              <span className="display-sm mt-1 block text-[22px] transition-colors group-hover:text-accent-bright">{projectName(job.projectId)}</span>
             </span>
-            <span className="flex items-center gap-1 text-[13px] text-text-primary/80">
+            <span className="label flex items-center gap-1 text-text-primary/80">
               Open project <ArrowUpRight size={14} aria-hidden="true" />
             </span>
           </button>
@@ -154,15 +154,15 @@ function JobCard({ job }) {
 
 export default function Experience() {
   return (
-    <section id="experience" className={`relative py-12 sm:py-16 md:py-20 ${SECTION_PAD}`}>
+    <section id="experience" className={`relative ${SECTION_Y} ${SECTION_PAD}`}>
       <div className={FRAME}>
-        <SectionHeader index="03" eyebrow="Experience" title={`Two internships, back to back, in ${YEAR}.`} />
+        <SectionHeader title="Experience" lead={`Two internships in ${YEAR}: network and information security, then cloud and IoT.`} />
 
         {/* The year as a figure: two roles and the project each produced, on
             one axis. Desktop only — on a phone the dates on each card say the
             same thing in a fraction of the height. */}
         <Reveal delay={0.1}>
-          <div className="glass-pane mt-10 hidden rounded-[26px] p-7 md:block">
+          <div className="glass-pane mt-10 hidden p-8 md:block">
             <div className="relative mb-2.5 h-4 font-mono text-[10.5px] uppercase tracking-wider text-text-dim">
               {TICKS.map((t, i) => (
                 <span
@@ -220,7 +220,7 @@ export default function Experience() {
           </div>
         </Reveal>
 
-        <div className="mt-8 grid gap-4 md:mt-6 lg:grid-cols-2">
+        <div className="mt-6 grid gap-3 md:gap-4 lg:grid-cols-2">
           {EXPERIENCE.map((job, i) => (
             <Reveal key={job.id} delay={0.1 + i * 0.05} className="h-full">
               <JobCard job={job} />

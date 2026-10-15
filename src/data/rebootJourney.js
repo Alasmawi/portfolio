@@ -8,7 +8,7 @@ export const REBOOT_JOURNEY = [
     duration: '18 months',
     months: 18,
     description:
-      'Peer-to-peer and entirely project-based, with no lectures and no answers given. Several languages, building a portfolio the whole way through.',
+      'Peer-to-peer and entirely project-based, across several languages.',
     status: 'complete',
   },
   {
@@ -16,7 +16,7 @@ export const REBOOT_JOURNEY = [
     phase: 'DevOps',
     duration: '6 months',
     months: 6,
-    description: 'The specialization phase, in DevOps. Running now.',
+    description: 'The specialization phase, in progress.',
     status: 'active',
   },
 ];

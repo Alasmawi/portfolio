@@ -49,7 +49,7 @@ const ICONS = {
 // name → path under public/, for marks simple-icons does not carry.
 const LOCAL = {};
 
-const INK = '#fbeef0';
+const INK = '#efe9dd';
 
 // A brand colour is only used where it can be seen. Rust's is black and
 // SQLite's a near-black teal; on this ground those are holes, so anything
