@@ -1,4 +1,4 @@
-// Renders the 1200x630 link-preview card into public/og.png.
+// Renders the 1200x630 link-preview card into public/og-2026-10.png.
 //
 // The card is the site's cover at a smaller size: the name in the condensed
 // headline face, the black and white portrait on the carmine block, on ink. A
@@ -10,7 +10,11 @@
 import { chromium } from '@playwright/test';
 import { readFile, writeFile } from 'node:fs/promises';
 
-const OUT = 'public/og.png';
+// The filename carries a date because LinkedIn caches a preview image by its
+// URL, often past a re-scrape: a new design needs a new filename, here and in
+// the og:image and twitter:image tags in index.html, or LinkedIn keeps showing
+// the old card.
+const OUT = 'public/og-2026-10.png';
 
 // Read the palette out of tailwind.config.js so this cannot drift from the site.
 const cfg = await readFile('tailwind.config.js', 'utf8');
