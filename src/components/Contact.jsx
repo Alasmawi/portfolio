@@ -155,7 +155,7 @@ export default function Contact() {
                 </li>
               ))}
               <li>
-                <a href={CV_URL} download className="flex min-h-11 items-center gap-3 text-[15.5px] hover:underline">
+                <a href={CV_URL} className="flex min-h-11 items-center gap-3 text-[15.5px] hover:underline">
                   <Download size={16} className="shrink-0" />
                   Download CV
                 </a>
