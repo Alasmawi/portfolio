@@ -28,6 +28,17 @@ import bayyanDashboardArThumb from '../assets/bayyan/dashboard-ar-dark-thumb.web
 import bayyanBillsAr from '../assets/bayyan/bills-ar-dark.webp';
 import bayyanBillsArThumb from '../assets/bayyan/bills-ar-dark-thumb.webp';
 
+// Stills captured by scripts/record/<project>.mjs from the project running
+// locally, and converted by scripts/make-screens.mjs.
+const stills = import.meta.glob('../assets/{bomberman-dom,mini-framework}/*.webp', { eager: true, import: 'default' });
+const screen = (id, name, caption, alt) => ({
+  type: 'screen',
+  src: stills[`../assets/${id}/${name}.webp`],
+  thumb: stills[`../assets/${id}/${name}-thumb.webp`],
+  caption,
+  alt,
+});
+
 // Files in public/ are referenced by plain runtime strings, which Vite does not
 // rewrite the way it rewrites imports and index.html — so `base` is applied by
 // hand here. BASE_URL carries its own trailing slash.
@@ -180,7 +191,7 @@ export const PROJECTS = [
     id: 'guidely',
     pillars: ['ai', 'fullstack'],
     name: 'Guidely',
-    tagline: 'answers with their sources attached',
+    tagline: 'document Q&A with cited sources',
     context: 'Internal knowledge assistant',
     language: 'Python',
     featured: true,
@@ -218,8 +229,8 @@ export const PROJECTS = [
     id: 'detecto',
     pillars: ['ai', 'fullstack'],
     name: 'Detecto',
-    tagline: 'how many people are in this frame?',
-    context: 'Person detection and counting',
+    tagline: 'person detection and counting',
+    context: 'Computer vision',
     language: 'Python',
     featured: true,
     summary:
@@ -251,7 +262,7 @@ export const PROJECTS = [
     id: '0-shell',
     pillars: ['cs'],
     name: '0-shell',
-    tagline: 'a shell, no external binaries',
+    tagline: 'Unix shell with built-in commands',
     language: 'Rust',
     description:
       'A Unix-style shell in Rust where every builtin, from cd and ls to cat, cp and mv, is written from scratch instead of calling out to system binaries.',
@@ -279,7 +290,7 @@ export const PROJECTS = [
     id: 'smart-road',
     pillars: ['cs'],
     name: 'smart-road',
-    tagline: 'intersections without traffic lights',
+    tagline: 'traffic simulation without signals',
     language: 'Rust',
     description:
       'Autonomous cars crossing a four-way intersection with no traffic lights. Each car reserves its path through the junction ahead of time, and the scheduler keeps them from colliding under heavy traffic. Rust and SDL2.',
@@ -316,6 +327,13 @@ export const PROJECTS = [
     liveUrl: null,
     video: asset('/video/bomberman-dom.mp4'),
     poster: asset('/video/posters/bomberman-dom.webp'),
+    items: [
+      screen('bomberman-dom', 'match', 'A four-player match at the start: one player in each corner, three lives apiece.', 'Bomberman board with four players in the corners, a timer and each player’s lives'),
+      screen('bomberman-dom', 'explosion', 'A bomb going off. The server decides what the blast hits; the clients only draw it.', 'Bomberman board with a bomb exploding beside the blue player'),
+      screen('bomberman-dom', 'lobby', 'The lobby: players join, chat, and the match starts on a countdown once the room fills.', 'Bomberman lobby with four players lined up, a chat box and a countdown'),
+      screen('bomberman-dom', 'character-select', 'Pick a name and a colour. A colour another player has taken is locked.', 'Bomberman character select with a username field and four coloured characters'),
+      screen('bomberman-dom', 'title', 'The title screen.', 'Bomberman title screen'),
+    ],
   },
   {
     id: 'mini-framework',
@@ -330,6 +348,12 @@ export const PROJECTS = [
     liveUrl: null,
     video: asset('/video/mini-framework.mp4'),
     poster: asset('/video/posters/mini-framework.webp'),
+    items: [
+      screen('mini-framework', 'all', 'TodoMVC on the framework: a keyed list, re-rendered through the virtual DOM diff.', 'TodoMVC app with four todos, two of them completed'),
+      screen('mini-framework', 'active-filter', 'The Active filter, driven by the hash router.', 'TodoMVC filtered to the two todos still active'),
+      screen('mini-framework', 'editing', 'Editing a todo in place.', 'TodoMVC with one todo open for editing'),
+      screen('mini-framework', 'phone', 'The same app at phone width.', 'TodoMVC at phone width'),
+    ],
   },
   {
     id: 'real-time-forum',
@@ -363,7 +387,7 @@ export const PROJECTS = [
     id: 'groupie-tracker',
     pillars: ['fullstack'],
     name: 'groupie-tracker',
-    tagline: 'REST API, visualized',
+    tagline: 'server-rendered REST client',
     language: 'Go',
     description:
       'A Go web app that reads the Groupie Trackers REST API and lets you browse bands, members, tour dates and concert locations through server-rendered pages.',

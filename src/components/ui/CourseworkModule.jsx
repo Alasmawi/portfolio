@@ -30,7 +30,7 @@ export default function CourseworkModule({ color }) {
           type="button"
           onClick={() => setMore((v) => !v)}
           aria-expanded={more}
-          className="min-h-8 rounded-full px-3 font-mono text-[11px] text-text-primary/80 transition-colors hover:text-text-primary"
+          className="min-h-8 rounded-none px-3 font-mono text-[11px] text-text-primary/80 transition-colors hover:text-text-primary"
           style={{ boxShadow: `inset 0 0 0 1px ${color}55` }}
         >
           {more ? 'Show fewer' : 'Show more'}

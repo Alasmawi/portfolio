@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
-  ArrowUpRight,
+  ChevronDown,
   ChevronRight,
   ExternalLink,
   FileCode2,
@@ -16,13 +16,15 @@ import {
   X,
 } from 'lucide-react';
 import Reveal from './ui/Reveal';
-import SectionHeader, { FRAME, SECTION_PAD } from './ui/SectionHeader';
+import SectionHeader, { FRAME, SECTION_PAD, SECTION_Y } from './ui/SectionHeader';
 import RingGallery from './ui/RingGallery';
 import ScreenGallery from './ui/ScreenGallery';
 import HardwareStrip from './ui/HardwareStrip';
 import K9Architecture from './ui/K9Architecture';
 import BayyanArchitecture from './ui/BayyanArchitecture';
 import { GithubMark } from './ui/BrandIcons';
+import TechTag from './ui/TechTag';
+import Fold from './ui/Fold';
 import { FEATURED, LANGUAGE_COLORS, MORE, PROJECTS } from '../data/projects';
 import { OPEN_PROJECT_EVENT } from '../lib/openProject';
 
@@ -34,7 +36,7 @@ const ARCHITECTURE = { k9: K9Architecture, bayyan: BayyanArchitecture };
 // the odd one out rather than moving the title and description below.
 const MEDIA_WELL =
   'flex h-[248px] w-full items-center justify-center rounded-lg bg-white/[0.03] ' +
-  'shadow-[inset_0_0_0_1px_rgba(251,238,240,0.09)] sm:h-[320px] md:h-[400px]';
+  'shadow-[inset_0_0_0_1px_rgba(239,233,221,0.09)] sm:h-[320px] md:h-[400px]';
 
 function LanguageDot({ language }) {
   if (!language) return null;
@@ -170,12 +172,13 @@ function Gallery({ items, wide }) {
   return wide ? <RingGallery items={items} /> : <HardwareStrip items={items} />;
 }
 
-/* The photos and the architecture drawing are two views of one project, not
-   two stacked blocks: stacked, the diagram got read first and longest and was
-   shrunk until it was unreadable. Tabs give each the full width at 1:1.
-   Photos lead. */
-function MediaTabs({ project }) {
-  const [tab, setTab] = useState('media');
+/* A project's media, as tabs: the recorded demo, the stills, and the
+   architecture drawing, whichever of them it has. They are views of one
+   project, not stacked blocks: stacked, whatever came first got read longest
+   and the rest was scrolled past. Tabs give each the full width. The demo
+   leads where there is one, then the stills. */
+function MediaTabs({ project, tabs, playing }) {
+  const [tab, setTab] = useState(tabs[0].id);
   const [panelRef, wide] = useContainerAtLeast(WIDE_PANEL_PX);
   const tablistRef = useRef(null);
   const Diagram = ARCHITECTURE[project.architecture];
@@ -194,10 +197,6 @@ function MediaTabs({ project }) {
       list.scrollIntoView({ block: 'start', behavior: 'smooth' });
     });
   }, []);
-  const tabs = [
-    { id: 'media', label: project.mediaLabel ?? (project.id === 'k9-pavlov' ? 'Hardware' : 'Screens') },
-    { id: 'architecture', label: 'Architecture' },
-  ];
 
   const onKeyDown = (e) => {
     const i = tabs.findIndex((t) => t.id === tab);
@@ -217,7 +216,7 @@ function MediaTabs({ project }) {
         role="tablist"
         aria-label={`${project.name} media`}
         onKeyDown={onKeyDown}
-        className="glass-control flex w-fit scroll-mt-[68px] gap-1 rounded-full p-1.5"
+        className="glass-control flex w-fit scroll-mt-[68px] gap-1 rounded-none p-1.5"
       >
         {tabs.map(({ id, label }) => {
           const on = tab === id;
@@ -234,8 +233,8 @@ function MediaTabs({ project }) {
                 setTab(id);
                 anchor();
               }}
-              className={`min-h-11 rounded-full px-4 font-mono text-[11px] uppercase tracking-[0.14em] transition-colors ${
-                on ? 'glass-control text-text-primary' : 'text-text-primary/70 hover:text-text-primary'
+              className={`min-h-11 rounded-none px-4 font-mono text-[11px] uppercase tracking-[0.14em] transition-colors ${
+                on ? 'bg-white/10 text-text-primary' : 'text-text-primary/70 hover:text-text-primary'
               }`}
             >
               {label}
@@ -254,26 +253,39 @@ function MediaTabs({ project }) {
         tabIndex={0}
         className="min-w-0"
       >
-        {tab === 'architecture' ? <Diagram /> : <Gallery items={project.items} wide={wide} />}
+        {tab === 'architecture' && <Diagram />}
+        {tab === 'media' && <Gallery items={project.items} wide={wide} />}
+        {tab === 'demo' && <DemoVideo project={project} playing={playing} />}
       </div>
+    </div>
+  );
+}
+
+function DemoVideo({ project, playing }) {
+  return (
+    <div className={MEDIA_WELL}>
+      {/* Autoplaying muted video instead of a GIF: it reads the same and
+          decodes far cheaper. playsInline keeps iOS from going fullscreen. */}
+      <PreviewVideo src={project.video} poster={project.poster} label={`${project.name} demo`} playing={playing} />
     </div>
   );
 }
 
 function PreviewMedia({ project, playing }) {
   const Diagram = ARCHITECTURE[project.architecture];
-  if (Diagram && project.items?.length) return <MediaTabs project={project} />;
-  if (Diagram) return <Diagram />;
+  const tabs = [
+    project.video && { id: 'demo', label: 'Demo' },
+    project.items?.length && {
+      id: 'media',
+      label: project.mediaLabel ?? (project.id === 'k9-pavlov' ? 'Hardware' : 'Screens'),
+    },
+    Diagram && { id: 'architecture', label: 'Architecture' },
+  ].filter(Boolean);
 
-  if (project.video) {
-    return (
-      <div className={MEDIA_WELL}>
-        {/* Autoplaying muted video instead of a GIF: it reads the same and
-            decodes far cheaper. playsInline keeps iOS from going fullscreen. */}
-        <PreviewVideo src={project.video} poster={project.poster} label={`${project.name} demo`} playing={playing} />
-      </div>
-    );
-  }
+  if (tabs.length > 1) return <MediaTabs project={project} tabs={tabs} playing={playing} />;
+  if (Diagram) return <Diagram />;
+  if (project.items?.length) return <Gallery items={project.items} wide />;
+  if (project.video) return <DemoVideo project={project} playing={playing} />;
 
   return (
     <div className={`${MEDIA_WELL} flex-col gap-3 text-text-dim`}>
@@ -344,7 +356,7 @@ function ProjectModal({ project, onClose }) {
             type="button"
             aria-label="Close project"
             onClick={onClose}
-            className="absolute inset-0 h-full w-full cursor-default bg-void/70 backdrop-blur-[3px]"
+            className="absolute inset-0 h-full w-full cursor-default bg-void/85"
           />
           <motion.div
             ref={panelRef}
@@ -356,90 +368,98 @@ function ProjectModal({ project, onClose }) {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.99 }}
             transition={{ duration: 0.26, ease: [0.16, 1, 0.3, 1] }}
-            className="glass-pane relative max-h-[88vh] w-full max-w-3xl overflow-y-auto rounded-t-[26px] outline-none sm:rounded-[26px]"
+            className="glass-pane relative max-h-[88vh] w-full max-w-3xl overflow-y-auto rounded-t-none outline-none sm:rounded-none lg:max-w-6xl"
           >
-            <div className="sticky top-0 z-10 flex items-center justify-between gap-3 bg-base-bg/80 px-5 py-3 backdrop-blur-md sm:px-7">
-              <p className="min-w-0 truncate font-mono text-[12px] text-text-muted">~/projects/{project.id}</p>
+            <div className="sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-bone/15 bg-ink-raised px-5 py-3 sm:px-7">
+              <p className="label min-w-0 truncate text-text-muted">Project</p>
               <button
                 type="button"
                 onClick={onClose}
                 aria-label="Close"
-                className="glass-control flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-text-primary"
+                className="glass-control flex h-9 w-9 shrink-0 items-center justify-center rounded-none text-text-primary"
               >
                 <X size={15} />
               </button>
             </div>
-            <div className="px-5 pb-6 pt-1 sm:px-7 sm:pb-7">
-              <PreviewMedia project={project} playing />
-
-              <div className="mt-5 flex flex-wrap items-start justify-between gap-4">
-                <div>
-                  {/* Every project has at least one badge here, so the title
-                      below sits at the same height from dialog to dialog. */}
-                  <div className="flex flex-wrap items-center gap-2">
-                    {project.language && (
-                      <span className="flex items-center gap-1.5 rounded-full border border-base-hairline px-2.5 py-1 font-mono text-[10.5px] text-text-muted">
-                        <LanguageDot language={project.language} />
-                        {project.language}
-                      </span>
-                    )}
-                    {project.featured && (
-                      <span className="tag-outline text-[10.5px] uppercase tracking-wider">featured</span>
-                    )}
-                    {project.private && (
-                      <span className="flex items-center gap-1 rounded-full border border-base-hairline px-2.5 py-1 font-mono text-[10.5px] uppercase tracking-wider text-text-muted">
-                        <Lock size={10} /> private code
-                      </span>
-                    )}
-                  </div>
-                  <h3 className="mt-2 text-[27px] font-medium leading-tight tracking-tight text-text-primary">
-                    {project.name}
-                  </h3>
-                  <p className="mt-0.5 font-mono text-xs text-accent-body">{project.context ?? project.tagline}</p>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  {project.githubUrl ? (
-                    <a
-                      href={project.githubUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      aria-label={`${project.name} on GitHub`}
-                      className="btn btn-ghost glass-control min-h-9 text-xs"
-                    >
-                      <GithubMark size={14} />
-                      <span>source</span>
-                      <ExternalLink size={11} />
-                    </a>
-                  ) : (
-                    <span className="flex items-center gap-2 rounded-full border border-base-edge px-3 py-2 font-mono text-xs text-text-muted">
-                      internship project
-                    </span>
-                  )}
-                  {project.liveUrl && (
-                    <a
-                      href={project.liveUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      aria-label={`${project.name} live site`}
-                      className="btn btn-ghost glass-control min-h-9 text-xs"
-                    >
-                      <PlayCircle size={14} />
-                      <span>live</span>
-                      <ExternalLink size={11} />
-                    </a>
-                  )}
-                </div>
+            {/* Two columns from `lg`: the words on the left, the thing itself
+                beside them. Stacked in one narrow column the dialog was a
+                picture and then a wall of copy under it, and reading about
+                the project meant scrolling the picture away. On a phone the
+                media still leads and the copy follows. */}
+            <div className="px-5 pb-6 pt-1 sm:px-7 sm:pb-7 lg:grid lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.25fr)] lg:items-start lg:gap-9 lg:pt-3">
+              <div className="min-w-0 lg:order-2">
+                <PreviewMedia project={project} playing />
               </div>
 
-              <p className="mt-4 max-w-2xl text-[15px] leading-relaxed text-text-primary/85">{project.description}</p>
+              <div className="mt-5 min-w-0 lg:order-1 lg:mt-0">
+                {/* Every project has at least one badge here, so the title
+                    below sits at the same height from dialog to dialog. */}
+                <div className="flex flex-wrap items-center gap-2">
+                  {project.language && (
+                    <span className="flex items-center gap-1.5 rounded-none border border-base-hairline px-2.5 py-1 font-mono text-[10.5px] text-text-muted">
+                      <LanguageDot language={project.language} />
+                      {project.language}
+                    </span>
+                  )}
+                  {project.private && (
+                    <span className="flex items-center gap-1 rounded-none border border-base-hairline px-2.5 py-1 font-mono text-[10.5px] uppercase tracking-wider text-text-muted">
+                      <Lock size={10} /> private code
+                    </span>
+                  )}
+                </div>
+                <h3 className="display-sm mt-3 text-[38px] lg:text-[52px]">
+                  {project.name}
+                </h3>
+                <p className="label mt-2 text-accent-body">{project.context ?? project.tagline}</p>
 
-              <div className="mt-4 flex flex-wrap gap-1.5">
-                {project.tags.map((tag) => (
-                  <span key={tag} className="tag-outline text-[11.5px]">
-                    {tag}
-                  </span>
-                ))}
+                <p className="mt-4 text-[15px] leading-relaxed text-text-primary/85">
+                  {project.summary ?? project.description}
+                </p>
+
+                <div className="mt-4 flex flex-wrap gap-1.5">
+                  {project.tags.map((tag) => (
+                    <TechTag key={tag} name={tag} />
+                  ))}
+                </div>
+
+                {/* The long account, for whoever wants it. The summary above
+                    is what the dialog opens on. */}
+                {project.summary && project.description && (
+                  <Fold more="Read the full story" less="Show less">
+                    <p className="pt-3 text-[14.5px] leading-relaxed text-text-primary/78">{project.description}</p>
+                  </Fold>
+                )}
+
+                {(project.githubUrl || project.liveUrl) && (
+                  <div className="mt-4 flex flex-wrap items-center gap-2">
+                    {project.githubUrl && (
+                      <a
+                        href={project.githubUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        aria-label={`${project.name} on GitHub`}
+                        className="btn btn-ghost glass-control min-h-10 text-[13px]"
+                      >
+                        <GithubMark size={14} />
+                        <span>Source</span>
+                        <ExternalLink size={11} />
+                      </a>
+                    )}
+                    {project.liveUrl && (
+                      <a
+                        href={project.liveUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        aria-label={`${project.name} live site`}
+                        className="btn btn-ghost glass-control min-h-10 text-[13px]"
+                      >
+                        <PlayCircle size={14} />
+                        <span>Live</span>
+                        <ExternalLink size={11} />
+                      </a>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           </motion.div>
@@ -482,21 +502,22 @@ function CardMedia({ project, hovered, className = '' }) {
           aria-hidden="true"
         />
       )}
-      <span
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3"
-        style={{ background: 'linear-gradient(to top, rgba(18,5,9,.55), rgba(18,5,9,0))' }}
-        aria-hidden="true"
-      />
     </span>
   );
 }
 
-function FeaturedCard({ project, onOpen, wide = false }) {
+// A featured project, as a row of the index: who it was for, its name set
+// large, one sentence, the stack, and a picture. The whole row opens the
+// dialog. On a pointer device the recording plays in the picture while the row
+// is hovered.
+//
+// A phone gets the name and the picture only; the sentence is in the dialog,
+// and five rows of full copy was three screens of scrolling.
+function FeaturedRow({ project, onOpen }) {
   const [hovered, setHovered] = useState(false);
   const canHover = useRef(
     typeof window !== 'undefined' && window.matchMedia('(hover: hover) and (pointer: fine)').matches
   );
-  const others = wide ? project.items?.slice(1, 5) ?? [] : [];
 
   return (
     <button
@@ -505,80 +526,19 @@ function FeaturedCard({ project, onOpen, wide = false }) {
       onPointerEnter={() => canHover.current && setHovered(true)}
       onPointerLeave={() => setHovered(false)}
       aria-label={`Open ${project.name}`}
-      className={`group glass-pane flex h-full w-full flex-col overflow-hidden rounded-[26px] text-left transition-[border-color,transform] duration-300 hover:-translate-y-0.5 hover:border-accent/50 ${
-        wide ? 'lg:grid lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]' : ''
-      }`}
+      className="group grid w-full grid-cols-[minmax(0,1fr)_116px] items-center gap-x-4 border-t border-bone/15 py-4 text-left sm:grid-cols-[minmax(0,1fr)_200px] md:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)_minmax(200px,300px)] md:gap-x-10 md:py-7"
     >
-      <span className={`relative block ${wide ? 'lg:min-h-[400px]' : ''}`}>
-        <CardMedia
-          project={project}
-          hovered={hovered}
-          className={wide ? 'aspect-[16/9] lg:absolute lg:inset-0 lg:aspect-auto' : 'aspect-[16/9]'}
-        />
-        {others.length > 0 && (
-          /* The rest of the hardware, as a contact strip over the lead photo:
-             K9 is the project where the parts were built by hand. */
-          <span className="absolute bottom-3 left-3 flex gap-1.5">
-            {others.map((it) => (
-              <img
-                key={it.tag}
-                src={it.src}
-                alt=""
-                loading="lazy"
-                className="h-12 w-12 rounded-lg border border-white/20 bg-black/40 object-cover sm:h-14 sm:w-14"
-              />
-            ))}
-          </span>
-        )}
-        <span className="absolute left-3 top-3 flex flex-wrap gap-1.5">
-          {project.language && (
-            <span className="flex items-center gap-1.5 rounded-full bg-black/55 px-2.5 py-1 font-mono text-[10.5px] text-text-primary backdrop-blur-sm">
-              <LanguageDot language={project.language} />
-              {project.language}
-            </span>
-          )}
-          {project.private && (
-            <span className="flex items-center gap-1 rounded-full bg-black/55 px-2.5 py-1 font-mono text-[10.5px] text-text-muted backdrop-blur-sm">
-              <Lock size={10} /> private
-            </span>
-          )}
-        </span>
-      </span>
-
-      <span className={`flex flex-1 flex-col p-5 sm:p-6 ${wide ? 'lg:p-8' : ''}`}>
-        <span className="font-mono text-[11px] text-accent-body">{project.context}</span>
-        <span
-          className={`mt-1.5 block font-medium leading-tight tracking-[-0.02em] text-text-primary ${
-            wide ? 'text-[26px] lg:text-[32px]' : 'text-[23px]'
-          }`}
-        >
+      <span className="block min-w-0">
+        <span className="label block text-accent-body">{project.context}</span>
+        <span className="display-sm mt-2 block text-[30px] transition-colors group-hover:text-accent-bright sm:text-[40px] lg:text-[clamp(44px,4.6vw,72px)]">
           {project.name}
         </span>
-        <span className="mt-2.5 block max-w-[52ch] text-[14.5px] leading-relaxed text-text-primary/75">
-          {project.summary}
-        </span>
-        <span className={`mt-4 grid gap-1.5 ${wide ? '' : 'sm:grid-cols-1'}`}>
-          {project.proof.map((line) => (
-            <span key={line} className="flex items-center gap-2 font-mono text-[11.5px] text-text-muted">
-              <span className="h-1 w-1 shrink-0 rounded-full bg-accent" aria-hidden="true" />
-              {line}
-            </span>
-          ))}
-        </span>
-        <span className="mt-auto flex items-end justify-between gap-3 pt-5">
-          <span className="flex flex-wrap gap-1.5">
-            {project.tags.slice(0, wide ? 5 : 3).map((t) => (
-              <span key={t} className="tag-outline text-[11px]">
-                {t}
-              </span>
-            ))}
-          </span>
-          <span className="flex shrink-0 items-center gap-1 text-[13px] text-text-primary/80 transition-colors group-hover:text-accent-bright">
-            Open
-            <ArrowUpRight size={14} aria-hidden="true" />
-          </span>
-        </span>
       </span>
+      <span className="hidden min-w-0 md:block">
+        <span className="block text-[15.5px] leading-relaxed text-text-primary/75">{project.summary}</span>
+        <span className="mt-3 block font-mono text-[12px] text-text-dim">{project.tags.slice(0, 4).join(' · ')}</span>
+      </span>
+      <CardMedia project={project} hovered={hovered} className="aspect-[16/10] w-full" />
     </button>
   );
 }
@@ -665,17 +625,22 @@ function FileTree({ selectedId, onSelect }) {
   );
 }
 
+// Four on a phone until the reader asks for the rest; every one from `sm`.
+const PHONE_PREVIEW = 4;
+
 function RepoGrid({ onSelect }) {
+  const [all, setAll] = useState(false);
   return (
-    <ul className="grid grid-cols-2 gap-2.5 p-3 lg:grid-cols-5">
-      {MORE.map((p) => {
+    <>
+    <ul className="grid grid-cols-2 gap-2.5 p-3 sm:grid-cols-3 lg:grid-cols-5">
+      {MORE.map((p, i) => {
         const thumb = thumbOf(p);
         return (
-          <li key={p.id}>
+          <li key={p.id} className={!all && i >= PHONE_PREVIEW ? 'hidden sm:block' : ''}>
             <button
               type="button"
               onClick={() => onSelect(p.id)}
-              className="group flex w-full flex-col overflow-hidden rounded-2xl bg-white/[0.045] text-left shadow-[inset_0_0_0_1px_rgb(253_243_244_/_0.12)] transition-colors hover:bg-white/[0.08] hover:shadow-[inset_0_0_0_1px_rgb(224_122_154_/_0.55)]"
+              className="group flex w-full flex-col overflow-hidden rounded-2xl bg-white/[0.045] text-left shadow-[inset_0_0_0_1px_rgb(239_233_221_/_0.12)] transition-colors hover:bg-white/[0.08] hover:shadow-[inset_0_0_0_1px_rgb(240_80_106_/_0.55)]"
             >
               <span className="relative block aspect-[16/9] w-full overflow-hidden bg-black/25">
                 <span className="absolute inset-0 flex items-center justify-center text-text-dim/45">
@@ -703,6 +668,18 @@ function RepoGrid({ onSelect }) {
         );
       })}
     </ul>
+    {MORE.length > PHONE_PREVIEW && (
+      <button
+        type="button"
+        onClick={() => setAll((v) => !v)}
+        aria-expanded={all}
+        className="flex min-h-11 w-full items-center justify-center gap-1.5 border-t border-white/[0.08] text-[13px] text-accent-body sm:hidden"
+      >
+        {all ? 'Show fewer' : `Show all ${MORE.length}`}
+        <ChevronDown size={14} aria-hidden="true" className={`transition-transform ${all ? 'rotate-180' : ''}`} />
+      </button>
+    )}
+    </>
   );
 }
 
@@ -731,48 +708,39 @@ export default function ProjectBrowser() {
     return () => window.removeEventListener(OPEN_PROJECT_EVENT, onOpen);
   }, [select]);
 
-  const [lead, ...rest] = FEATURED;
-
   return (
-    <section id="projects" className={`relative pb-10 pt-12 sm:pt-16 md:pb-14 md:pt-20 ${SECTION_PAD}`}>
+    <section id="projects" className={`relative ${SECTION_Y} ${SECTION_PAD}`}>
       <div className={FRAME}>
         <SectionHeader
-          index="02"
-          eyebrow="Work"
-          title="Selected work"
-          lead="Two systems built for government organizations in Bahrain, and the projects behind them. Open any card for the demo, the architecture or the code."
+          title="Projects"
+          lead="Two systems built for government organizations in Bahrain, followed by personal and program projects. Each one opens with a demo, screenshots or its architecture."
         />
 
-        <div className="mt-9 grid gap-4 md:grid-cols-2">
-          <Reveal className="md:col-span-2">
-            <FeaturedCard project={lead} onOpen={select} wide />
-          </Reveal>
-          {rest.map((p, i) => (
-            <Reveal key={p.id} delay={0.04 + (i % 2) * 0.05} className="h-full">
-              <FeaturedCard project={p} onOpen={select} />
+        <div className="mt-6 border-b border-bone/15 md:mt-10">
+          {FEATURED.map((p, i) => (
+            <Reveal key={p.id} delay={0.03 * i}>
+              <FeaturedRow project={p} onOpen={select} />
             </Reveal>
           ))}
         </div>
 
-        <Reveal delay={0.05} className="mt-12 block">
+        <Reveal delay={0.05} className="mt-12 block md:mt-20">
           <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
             <div>
-              <h3 className="text-[22px] font-medium tracking-[-0.015em] text-text-primary">Built from scratch</h3>
-              <p className="mt-1 max-w-[60ch] text-[14px] text-text-primary/65">
-                Servers, shells, a ray tracer, games and frameworks, written without the library that would
-                normally do the hard part.
+              <h3 className="display-sm text-[34px] sm:text-[44px]">More projects</h3>
+              <p className="mt-2 max-w-[60ch] text-[15px] text-text-primary/65">
+                A web server, a shell, a ray tracer, games and a front-end framework, each written without the
+                library that usually does the work.
               </p>
             </div>
           </div>
-          <div className="glass-pane overflow-hidden rounded-[26px]">
+          <div className="glass-pane overflow-hidden rounded-none">
             <div className="flex items-center justify-between gap-3 border-b border-white/[0.08] px-3.5 py-2.5">
-              <p className="font-mono text-[10.5px] uppercase tracking-wider text-text-muted">
-                // repositories ({MORE.length})
-              </p>
+              <p className="text-[13px] text-text-muted">{MORE.length} repositories</p>
               <div
                 role="group"
                 aria-label="Repository layout"
-                className="flex items-center gap-0.5 rounded-full bg-white/[0.06] p-0.5 shadow-[inset_0_0_0_1px_rgb(253_243_244_/_0.12)]"
+                className="flex items-center gap-0.5 rounded-none bg-white/[0.06] p-0.5 shadow-[inset_0_0_0_1px_rgb(239_233_221_/_0.12)]"
               >
                 {VIEWS.map(({ id, label, Icon }) => {
                   const on = view === id;
@@ -783,7 +751,7 @@ export default function ProjectBrowser() {
                       onClick={() => setView(id)}
                       aria-pressed={on}
                       title={label}
-                      className={`flex h-8 w-9 items-center justify-center rounded-full transition-colors ${
+                      className={`flex h-8 w-9 items-center justify-center rounded-none transition-colors ${
                         on ? 'bg-white/[0.14] text-text-primary' : 'text-text-muted hover:text-text-primary'
                       }`}
                     >

@@ -12,7 +12,7 @@ export const FOCUS_PILLARS = [
     id: 'fullstack',
     label: 'Full-stack products',
     blurb:
-      'The interface, the API, the data model and the deploy, owned as one piece of work rather than handed across a wall.',
+      'Interface, API, data model and deployment, designed and delivered as one piece of work.',
     proof: [
       { label: 'Bayyan', project: 'bayyan' },
       { label: 'Brain-Book', project: 'brain-book' },
@@ -23,7 +23,7 @@ export const FOCUS_PILLARS = [
     id: 'cloud',
     label: 'Cloud on AWS',
     blurb:
-      'Serverless backends and IoT ingestion on AWS, and moving production systems between AWS and on-premises without losing data.',
+      'Serverless backends and IoT ingestion on AWS, and migrating production systems between AWS and on-premises servers.',
     proof: [
       { label: 'K9 backend', project: 'k9-pavlov' },
       { label: 'RDS → on-prem migration', href: '#experience' },
@@ -34,7 +34,7 @@ export const FOCUS_PILLARS = [
     id: 'ai',
     label: 'Applied AI',
     blurb:
-      'Models put to work inside products for retrieval, detection and anomaly explanations, with the evidence shown to whoever relies on the answer.',
+      'Retrieval, detection and anomaly flagging built into products, with the supporting evidence shown to the user.',
     proof: [
       { label: 'Guidely', project: 'guidely' },
       { label: 'Detecto', project: 'detecto' },
@@ -43,9 +43,9 @@ export const FOCUS_PILLARS = [
   },
   {
     id: 'cs',
-    label: 'Systems from scratch',
+    label: 'Systems programming',
     blurb:
-      'An HTTP server on epoll, a Unix shell, a ray tracer: built without a framework, to know what the frameworks are doing for me.',
+      'An HTTP server on epoll, a Unix shell and a ray tracer, each written without a framework.',
     proof: [
       { label: 'localhost', project: 'localhost' },
       { label: '0-shell', project: '0-shell' },

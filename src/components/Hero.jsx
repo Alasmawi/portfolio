@@ -1,94 +1,88 @@
 import { motion } from 'framer-motion';
 import { Download } from 'lucide-react';
 import { GithubMark, LinkedinMark } from './ui/BrandIcons';
-import HeroTrace from './ui/HeroTrace';
+import pfp from '../assets/pfp-nobg.webp';
 import { CV_URL } from '../data/navLinks';
+import { scrollToSection } from '../lib/scrollToSection';
+import { FRAME, SECTION_PAD } from './ui/SectionHeader';
 
-// The organisations the work was done for, as the hero's closing line. It is
-// the proof under the claim above it, and on a desktop it fills the band under
-// the fold that used to be empty.
-const BUILT_FOR = [
-  { name: 'Ministry of Interior', detail: 'Police K9 Unit' },
-  { name: 'AWS Cloud Innovation Center', detail: 'Bahrain' },
-  { name: 'Bahrain Shura Council', detail: 'Network & Information Security' },
-];
-
+// The cover. A name set as large as the window allows, and a portrait on a
+// block of carmine that the name runs across: the portrait sits in front of
+// the last letters, the way a magazine puts its subject in front of its
+// masthead. That overlap is the one loud thing on the site; everything after
+// it is type on a flat ground.
+//
+// The name is sized in vw so it always spans the frame. Both lines are behind
+// the portrait, and the portrait is sized so only the feet of the last two
+// letters go behind it — the name stays readable.
 export default function Hero() {
-  // svh, not dvh: dvh tracks the URL bar collapsing as you scroll, so the hero
-  // grew under the reader's thumb on the first flick of every visit.
+  const toContact = (e) => {
+    e.preventDefault();
+    scrollToSection('contact');
+  };
+
   return (
-    <section
-      id="hero"
-      className="relative px-5 pb-10 pt-[100px] sm:px-10 sm:pb-14 sm:pt-[124px] md:px-14 lg:pt-[140px]"
-    >
-      <div className="mx-auto grid max-w-6xl items-center gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(400px,480px)] lg:gap-14">
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
+    <section id="hero" className={`relative flex flex-col overflow-clip md:min-h-[620px] lg:min-h-[100svh] ${SECTION_PAD}`}>
+      {/* The carmine block on a wide screen: the right third, full height. On a
+          phone the block is the band the introduction sits on, below. */}
+      <div className="absolute inset-y-0 right-0 hidden w-[34%] bg-carmine md:block" aria-hidden="true" />
+
+      <div className={`${FRAME} relative flex flex-1 flex-col pt-7 md:pt-[76px]`}>
+        <p className="label text-bone md:hidden">alasmawi.dev</p>
+
+        <motion.h1
+          initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.1 }}
-          style={{ textShadow: '0 2px 34px rgba(23,18,26,.75)' }}
+          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          className="display relative z-[1] mt-5 whitespace-nowrap text-[22.4vw] leading-[0.8] md:mt-2 md:text-[min(21vw,340px)]"
         >
-          {/* The status is the pill; the location sits beside it as plain
-              text. Both in one pill made a single unbreakable line, about
-              335px of tracked mono, which ran off the edge of a 360px phone. */}
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-2" style={{ textShadow: 'none' }}>
-            {/* glass-pane, not glass-control: a status readout, not a button. */}
-            <p className="glass-pane inline-flex items-center gap-2.5 rounded-full px-3.5 py-2 font-mono text-[10.5px] uppercase tracking-[0.14em] text-text-primary">
-              <span
-                className="signal-blip h-[7px] w-[7px] rounded-full bg-signal"
-                style={{ boxShadow: '0 0 10px rgba(79,209,197,.9)' }}
-                aria-hidden="true"
-              />
-              Available for work
-            </p>
-            <p className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-text-muted">Manama, Bahrain</p>
-          </div>
+          <span className="block">Abdulla</span>
+          <span className="block">Alasmawi</span>
+        </motion.h1>
 
-          <h1 className="mt-6 text-[46px] font-medium leading-[0.96] tracking-[-0.04em] text-text-primary sm:text-[64px] lg:text-[80px]">
-            Abdulla
-            <br />
-            Alasmawi
-          </h1>
-
-          <p className="mt-6 max-w-[30ch] text-[19px] leading-[1.4] text-text-primary/90 sm:text-[22px]">
-            Software engineer. I build full-stack products and run them on{' '}
-            <span className="text-accent-bright">AWS</span>.
-          </p>
-          <p className="mt-4 max-w-[48ch] text-[15px] leading-relaxed text-text-primary/70 sm:text-base">
-            Most recently the Ministry of Interior K9 Unit’s monitoring platform, built at the AWS
-            Cloud Innovation Center, and a bilingual obligations registry for the Shura Council.
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6, delay: 0.3 }}
+          /* A full-bleed carmine band on a phone, holding the portrait and
+             the introduction. From `md` it is unpositioned, so the portrait
+             inside it anchors to the cover's bottom-right corner instead and
+             sits in front of the name. */
+          className="relative -mx-5 mt-7 bg-carmine px-5 pb-8 pt-6 sm:-mx-8 sm:px-8 md:static md:mx-0 md:mt-auto md:bg-transparent md:px-0 md:pb-10 md:pt-0"
+        >
+          <img
+            src={pfp}
+            alt="Abdulla Alasmawi"
+            /* Black and white on the carmine block, and the photograph's own
+               colour while the pointer is over it. A filter transition, so
+               it composites and never lays out. */
+            className="absolute -right-[13%] bottom-0 z-0 h-[84%] w-auto max-w-none grayscale contrast-[1.08] transition-[filter] duration-500 ease-out hover:grayscale-0 hover:contrast-100 motion-reduce:transition-none sm:right-0 sm:h-[104%] md:z-[2] md:h-[42vw] lg:h-[min(50svh,31vw)]"
+          />
+          <div className="relative z-[1] max-w-[50%] sm:max-w-[46%] md:max-w-[440px]">
+          <p className="text-[16px] leading-[1.35] md:text-[clamp(18px,1.5vw,22px)]">
+            Software engineer working across full-stack development and AWS.
           </p>
 
-          <div
-            className="mt-8 flex flex-wrap items-center gap-2.5 sm:gap-3"
-            style={{ textShadow: 'none' }}
-          >
-            <a href="#contact" className="btn btn-primary min-h-[50px] flex-1 whitespace-nowrap px-5 text-[15px] sm:flex-none sm:px-6">
+          {/* On a phone these sit on the carmine block, so the filled button is
+              ink there and bone on the ink ground from `md`. */}
+          <div className="mt-6 flex flex-col items-start gap-2.5 md:flex-row md:flex-wrap md:items-center">
+            <a href="#contact" onClick={toContact} className="btn border-[1.5px] border-ink bg-ink text-bone md:border-bone md:bg-bone md:text-ink">
               Get in touch
             </a>
-            <a
-              href={CV_URL}
-              download
-              className="btn btn-ghost glass-control min-h-[50px] flex-1 whitespace-nowrap px-4 sm:flex-none sm:px-5"
-            >
-              <span className="flex items-center gap-2">
-                <Download size={16} aria-hidden="true" />
-                Download CV
-              </span>
+            <a href={CV_URL} download className="btn border-[1.5px] border-bone/80 text-bone hover:border-bone">
+              <Download size={16} aria-hidden="true" />
+              Download CV
             </a>
-            <div className="flex w-full gap-2.5 sm:w-auto">
+            <span className="flex gap-2.5">
               <a
                 href="https://github.com/Alasmawi"
                 target="_blank"
                 rel="noreferrer"
                 aria-label="GitHub"
                 title="GitHub"
-                className="btn btn-ghost glass-control min-h-[50px] flex-1 px-0 sm:w-[50px] sm:flex-none"
+                className="btn w-12 border-[1.5px] border-bone/80 px-0 text-bone hover:border-bone"
               >
-                <span className="flex items-center gap-2">
-                  <GithubMark size={17} />
-                  <span className="sm:hidden">GitHub</span>
-                </span>
+                <GithubMark size={17} />
               </a>
               <a
                 href="https://linkedin.com/in/alasmawi"
@@ -96,43 +90,15 @@ export default function Hero() {
                 rel="noreferrer"
                 aria-label="LinkedIn"
                 title="LinkedIn"
-                className="btn btn-ghost glass-control min-h-[50px] flex-1 px-0 sm:w-[50px] sm:flex-none"
+                className="btn w-12 border-[1.5px] border-bone/80 px-0 text-bone hover:border-bone"
               >
-                <span className="flex items-center gap-2">
-                  <LinkedinMark size={16} />
-                  <span className="sm:hidden">LinkedIn</span>
-                </span>
+                <LinkedinMark size={16} />
               </a>
-            </div>
+            </span>
+          </div>
           </div>
         </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.25 }}
-        >
-          <HeroTrace />
-        </motion.div>
       </div>
-
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.7, delay: 0.45 }}
-        className="mx-auto mt-12 max-w-6xl lg:mt-16"
-      >
-        <div className="hr-fade" />
-        <div className="mt-5 grid gap-x-8 gap-y-4 sm:grid-cols-3 lg:grid-cols-[auto_repeat(3,minmax(0,1fr))] lg:items-baseline">
-          <p className="font-mono text-[10.5px] uppercase tracking-[0.16em] text-text-dim sm:col-span-3 lg:col-span-1">Built for</p>
-          {BUILT_FOR.map((o) => (
-            <div key={o.name} className="min-w-0">
-              <p className="text-[14.5px] font-medium leading-snug text-text-primary/90">{o.name}</p>
-              <p className="mt-0.5 font-mono text-[11px] text-text-muted">{o.detail}</p>
-            </div>
-          ))}
-        </div>
-      </motion.div>
     </section>
   );
 }

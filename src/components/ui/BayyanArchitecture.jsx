@@ -57,7 +57,7 @@ export default function BayyanArchitecture() {
           <Arrow wide={wide} />
 
           <div className="relative rounded-2xl border border-dashed border-white/20 px-3 pb-3 pt-5">
-            <span className="absolute -top-2.5 left-3 rounded-full bg-base-bg px-2 font-mono text-[10px] uppercase tracking-[0.14em] text-text-muted">
+            <span className="absolute -top-2.5 left-3 rounded-none bg-base-bg px-2 font-mono text-[10px] uppercase tracking-[0.14em] text-text-muted">
               Linux host · systemd
             </span>
             <div

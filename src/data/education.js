@@ -42,14 +42,14 @@ export const EDUCATION = [
       { value: '2', label: 'phases' },
     ],
     points: [
-      'Project-based on the 01-edu model: no lectures and no written exams. Every project is reviewed by peers and defended in a live audit before it passes.',
-      'Go, algorithms, networking and full-stack web development, studied alongside the degree. Brain-Book was built and audited here.',
+      'Project-based on the 01-edu model, with no lectures or written exams. Each project is peer-reviewed and defended in a live audit before it passes.',
+      'Covers Go, algorithms, networking and full-stack web development. Brain-Book was built and audited in this program.',
     ],
     journey: true,
     // Most of the program's projects are public; the card links out to them.
     github: {
       url: 'https://github.com/Alasmawi',
-      note: 'Most of the projects from the program are public on GitHub, including the ones in Built from scratch above.',
+      note: 'Most projects from the program are public on GitHub, including those listed under More projects.',
     },
   },
 ];
