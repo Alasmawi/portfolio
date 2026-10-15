@@ -24,12 +24,11 @@ export const DOCK_LINKS = [
 // view of the page showed "Work" as current before anyone had scrolled.
 export const SECTION_IDS = ['hero', 'focus', ...LINKS.map((l) => l.id), 'contact'];
 
-// The CV lives in Dropbox, so it can be updated without touching the site:
-// upload a new file with the same name to the same folder, choose Replace, and
-// every "Download CV" button serves the new one. `dl=1` makes Dropbox send it
-// as a download (as Abdulla_Alasmawi_CV.pdf) rather than open its preview page.
+// The CV opens a page on this site (public/cv.html) rather than linking to the
+// file. LinkedIn's in-app browser, and others like it, crash or do nothing on a
+// link that answers with a download; the page starts the download in a normal
+// browser and offers a viewer in an in-app one. The file itself lives in
+// Dropbox and is replaced there, so updating it needs no change here.
 //
-// The old address on this site, /Abdulla_Alasmawi_CV.pdf, redirects here (see
-// vercel.json), so links to it shared before the move get the current CV too.
-export const CV_URL =
-  'https://www.dropbox.com/scl/fi/cysq8ud29lf1rxx32233i/Abdulla_Alasmawi_CV.pdf?rlkey=3lljq72npsgam3t6uzm77qpbf&st=4ducr8qq&dl=1';
+// No `download` attribute on the links: this is a page, not the file.
+export const CV_URL = '/cv';

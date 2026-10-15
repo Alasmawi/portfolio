@@ -6,7 +6,7 @@
   "redirects": [
     {
       "source": "/Abdulla_Alasmawi_CV.pdf",
-      "destination": "https://www.dropbox.com/scl/fi/cysq8ud29lf1rxx32233i/Abdulla_Alasmawi_CV.pdf?rlkey=3lljq72npsgam3t6uzm77qpbf&st=4ducr8qq&dl=1",
+      "destination": "/cv",
       "permanent": false
     },
     {
@@ -21,6 +21,10 @@
     }
   ],
   "rewrites": [
+    {
+      "source": "/cv",
+      "destination": "/cv.html"
+    },
     {
       "source": "/v1",
       "destination": "/v1/index.html"

@@ -69,7 +69,7 @@ export default function Hero() {
             <a href="#contact" onClick={toContact} className="btn border-[1.5px] border-ink bg-ink text-bone md:border-bone md:bg-bone md:text-ink">
               Get in touch
             </a>
-            <a href={CV_URL} download className="btn border-[1.5px] border-bone/80 text-bone hover:border-bone">
+            <a href={CV_URL} className="btn border-[1.5px] border-bone/80 text-bone hover:border-bone">
               <Download size={16} aria-hidden="true" />
               Download CV
             </a>

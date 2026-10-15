@@ -65,7 +65,7 @@ export default function About() {
             <a href="#contact" className="btn btn-primary">
               Get in touch
             </a>
-            <a href={CV_URL} download className="btn btn-ghost glass-control">
+            <a href={CV_URL} className="btn btn-ghost glass-control">
               <Download size={15} aria-hidden="true" />
               Download CV
             </a>

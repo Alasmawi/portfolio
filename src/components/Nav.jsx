@@ -65,7 +65,7 @@ export default function Nav({ active }) {
           </li>
         </ul>
 
-        <a href={CV_URL} download className="flex min-h-9 items-center gap-1.5 border-[1.5px] border-bone/70 px-3 hover:border-bone">
+        <a href={CV_URL} className="flex min-h-9 items-center gap-1.5 border-[1.5px] border-bone/70 px-3 hover:border-bone">
           <Download size={13} aria-hidden="true" />
           CV
         </a>

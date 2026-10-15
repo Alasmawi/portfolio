@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#0e0f12">
+<title>CV · Abdulla Alasmawi</title>
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<!--
+  The CV, by way of a page on this site rather than a direct file link.
+
+  In-app browsers (LinkedIn, Instagram, Facebook and Android WebViews in general)
+  are embedded web views with no download manager: a link that answers with a
+  file to save can crash them or do nothing. So this page decides:
+
+    - a normal browser starts the download straight away, and the page stays as
+      a confirmation with a link to try again;
+    - an in-app browser gets no automatic download. It is offered the CV to
+      read in Dropbox's viewer, which is an ordinary web page, and told how to
+      open this page in the phone's own browser to save the file.
+
+  The CV itself lives in Dropbox; replacing the file there (same name, same
+  folder, Replace) updates both links below.
+-->
+<style>
+  :root { --ink:#0e0f12; --bone:#efe9dd; --carmine:#b0122b; }
+  * { box-sizing:border-box; margin:0; }
+  html, body { height:100%; }
+  body { background:var(--ink); color:var(--bone); font:16px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; display:flex; }
+  main { margin:auto; width:100%; max-width:560px; padding:40px 22px; }
+  .label { font-size:11px; font-weight:600; letter-spacing:.16em; text-transform:uppercase; opacity:.75; }
+  h1 { margin-top:14px; font-size:clamp(40px,11vw,64px); line-height:.9; font-weight:900; text-transform:uppercase; letter-spacing:-.01em; }
+  p { margin-top:18px; font-size:17px; opacity:.9; }
+  .actions { display:flex; flex-wrap:wrap; gap:10px; margin-top:26px; }
+  a.btn { display:inline-flex; align-items:center; min-height:48px; padding:0 20px; font-weight:600; font-size:15px; color:var(--bone); text-decoration:none; border:1.5px solid rgba(239,233,221,.8); }
+  a.btn.primary { background:var(--bone); color:var(--ink); border-color:var(--bone); }
+  a.btn:focus-visible { outline:2px solid var(--bone); outline-offset:2px; }
+  .bar { height:6px; background:var(--carmine); position:fixed; inset:0 0 auto 0; }
+  .back { display:inline-block; margin-top:34px; color:var(--bone); opacity:.75; font-size:14px; }
+  [hidden] { display:none !important; }
+</style>
+</head>
+<body>
+<div class="bar"></div>
+<main>
+  <p class="label">alasmawi.dev</p>
+  <h1>Abdulla<br>Alasmawi · CV</h1>
+
+  <div id="browser">
+    <p>Your download should start in a moment. If it doesn’t, use the button below.</p>
+    <div class="actions">
+      <a class="btn primary" id="download" href="#">Download the PDF</a>
+      <a class="btn" id="view-b" href="#">View it online</a>
+    </div>
+  </div>
+
+  <div id="in-app" hidden>
+    <p>This app’s built-in browser can’t save files, so the CV opens in a viewer instead.</p>
+    <div class="actions">
+      <a class="btn primary" id="view" href="#">View the CV</a>
+    </div>
+    <p>To download the PDF, open this page in your phone’s browser: tap the menu (⋯) and choose “Open in browser”.</p>
+  </div>
+
+  <a class="back" href="/">← Back to alasmawi.dev</a>
+</main>
+<script>
+  // The same file, two ways: dl=1 sends it as a download named
+  // Abdulla_Alasmawi_CV.pdf; dl=0 is Dropbox's own preview page, a web page
+  // any embedded browser can show.
+  var FILE = 'https://www.dropbox.com/scl/fi/cysq8ud29lf1rxx32233i/Abdulla_Alasmawi_CV.pdf?rlkey=3lljq72npsgam3t6uzm77qpbf&st=4ducr8qq';
+  var DOWNLOAD = FILE + '&dl=1';
+  var VIEW = FILE + '&dl=0';
+
+  document.getElementById('download').href = DOWNLOAD;
+  document.getElementById('view').href = VIEW;
+  document.getElementById('view-b').href = VIEW;
+
+  // LinkedIn identifies its in-app browser as LinkedInApp; the others are the
+  // common social apps; "; wv)" marks any Android WebView.
+  var inApp = /LinkedInApp|FBAN|FBAV|Instagram|Line\/|MicroMessenger|Snapchat|TikTok|; wv\)/i.test(navigator.userAgent);
+
+  if (inApp) {
+    document.getElementById('browser').hidden = true;
+    document.getElementById('in-app').hidden = false;
+  } else {
+    // A beat first, so the page is on screen and the reader knows what is
+    // happening before the browser's download prompt appears.
+    setTimeout(function () { window.location.href = DOWNLOAD; }, 700);
+  }
+</script>
+<noscript>
+  <style>#browser .actions a:not(.primary){display:none}</style>
+</noscript>
+</body>
+</html>
