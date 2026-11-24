@@ -119,6 +119,9 @@ export const PROJECTS = [
     summary:
       'One register of everything the security department owns, owes and needs to renew, flagging each renewal before it lapses.',
     proof: ['English + Arabic, RTL', 'Bills read from PDF, traced to source', 'Piloted across 4 teams'],
+    // Shown in the dialog. The screens come from a demo copy, and every amount
+    // is blurred so nobody reads them as the Council's real spend.
+    notice: 'The screens show mock data from a demo copy, not the Council’s records. Amounts are blurred.',
     description:
       'An internal web app that gives the Shura Council’s Networks & Information Security department one register of everything it owns, owes and needs to renew: telecom lines, contracts, licences and subscriptions. Each record’s billing cycle sets its renewal date, and records move from healthy to due soon to critical as that date approaches, with email reminders and monthly, quarterly and yearly summaries going to the people who need them. The provider’s monthly bills are read straight from their PDFs into an approval sheet: a charge for a number the registry doesn’t know is flagged before anything is applied, and every amount links back to the line on the bill it was read from. Fully bilingual with a right-to-left Arabic layout and a dark mode, with attachments in MinIO, PDF and Excel reports through WeasyPrint and ExcelJS, and a native Linux deployment behind nginx and systemd. Piloted across Network Operations, Information Security, Infrastructure and the Service Desk.',
     tags: ['NestJS', 'Prisma', 'React', 'PostgreSQL', 'MinIO', 'nginx'],

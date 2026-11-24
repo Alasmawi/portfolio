@@ -10,6 +10,7 @@ import {
   Folder,
   FolderOpen,
   FolderTree,
+  Info,
   LayoutGrid,
   Lock,
   PlayCircle,
@@ -415,6 +416,13 @@ function ProjectModal({ project, onClose }) {
                 <p className="mt-4 text-[15px] leading-relaxed text-text-primary/85">
                   {project.summary ?? project.description}
                 </p>
+
+                {project.notice && (
+                  <p className="mt-3 flex items-start gap-2 border-l-2 border-accent-body/60 pl-3 text-[13px] leading-relaxed text-text-muted">
+                    <Info size={14} className="mt-[3px] shrink-0" aria-hidden="true" />
+                    <span>{project.notice}</span>
+                  </p>
+                )}
 
                 <div className="mt-4 flex flex-wrap gap-1.5">
                   {project.tags.map((tag) => (
