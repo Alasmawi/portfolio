@@ -6,7 +6,12 @@
   "redirects": [
     {
       "source": "/Abdulla_Alasmawi_CV.pdf",
-      "destination": "/cv",
+      "destination": "/#contact",
+      "permanent": false
+    },
+    {
+      "source": "/cv",
+      "destination": "/#contact",
       "permanent": false
     },
     {
@@ -21,10 +26,6 @@
     }
   ],
   "rewrites": [
-    {
-      "source": "/cv",
-      "destination": "/cv.html"
-    },
     {
       "source": "/v1",
       "destination": "/v1/index.html"

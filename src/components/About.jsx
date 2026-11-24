@@ -1,7 +1,7 @@
-import { Download } from 'lucide-react';
+import { FileText } from 'lucide-react';
 import Reveal from './ui/Reveal';
 import { FRAME, SECTION_PAD, SECTION_Y } from './ui/SectionHeader';
-import { CV_URL } from '../data/navLinks';
+import { CV_REQUEST_URL } from '../data/navLinks';
 
 // The facts a recruiter scans for, as a short list under the prose. Everything
 // here is a fact stated elsewhere on the page.
@@ -65,9 +65,9 @@ export default function About() {
             <a href="#contact" className="btn btn-primary">
               Get in touch
             </a>
-            <a href={CV_URL} className="btn btn-ghost glass-control">
-              <Download size={15} aria-hidden="true" />
-              Download CV
+            <a href={CV_REQUEST_URL} className="btn btn-ghost glass-control">
+              <FileText size={15} aria-hidden="true" />
+              Request CV
             </a>
           </div>
         </Reveal>

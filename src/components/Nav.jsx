@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Download } from 'lucide-react';
-import { CV_URL, LINKS } from '../data/navLinks';
+import { FileText } from 'lucide-react';
+import { CV_REQUEST_URL, LINKS } from '../data/navLinks';
 import { scrollToSection } from '../lib/scrollToSection';
 import { FRAME, SECTION_PAD } from './ui/SectionHeader';
 
@@ -65,8 +65,8 @@ export default function Nav({ active }) {
           </li>
         </ul>
 
-        <a href={CV_URL} className="flex min-h-9 items-center gap-1.5 border-[1.5px] border-bone/70 px-3 hover:border-bone">
-          <Download size={13} aria-hidden="true" />
+        <a href={CV_REQUEST_URL} aria-label="Request my CV by email" className="flex min-h-9 items-center gap-1.5 border-[1.5px] border-bone/70 px-3 hover:border-bone">
+          <FileText size={13} aria-hidden="true" />
           CV
         </a>
       </nav>

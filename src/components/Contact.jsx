@@ -1,11 +1,9 @@
 import { useCallback, useRef, useState } from 'react';
-import { ArrowUpRight, Check, Copy, Download, Loader2, Mail, MapPin, Phone, RotateCcw } from 'lucide-react';
+import { ArrowUpRight, Check, Copy, FileText, Loader2, Mail, MapPin, Phone, RotateCcw } from 'lucide-react';
 import { GithubMark, LinkedinMark } from './ui/BrandIcons';
 import Reveal from './ui/Reveal';
 import { FRAME, SECTION_PAD, SECTION_Y } from './ui/SectionHeader';
-import { CV_URL } from '../data/navLinks';
-
-const EMAIL = 'asmawiabdulla0@gmail.com';
+import { CV_REQUEST_URL, EMAIL } from '../data/navLinks';
 
 // Messages go through Web3Forms, which emails them to the address the access
 // key was created with. The key is public by design — it can only send to that
@@ -155,9 +153,9 @@ export default function Contact() {
                 </li>
               ))}
               <li>
-                <a href={CV_URL} className="flex min-h-11 items-center gap-3 text-[15.5px] hover:underline">
-                  <Download size={16} className="shrink-0" />
-                  Download CV
+                <a href={CV_REQUEST_URL} className="flex min-h-11 items-center gap-3 text-[15.5px] hover:underline">
+                  <FileText size={16} className="shrink-0" />
+                  Request my CV by email
                 </a>
               </li>
               <li className="flex min-h-11 items-center gap-3 text-[15.5px] text-bone/85">

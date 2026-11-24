@@ -1,8 +1,8 @@
 import { motion } from 'framer-motion';
-import { Download } from 'lucide-react';
+import { FileText } from 'lucide-react';
 import { GithubMark, LinkedinMark } from './ui/BrandIcons';
 import pfp from '../assets/pfp-nobg.webp';
-import { CV_URL } from '../data/navLinks';
+import { CV_REQUEST_URL } from '../data/navLinks';
 import { scrollToSection } from '../lib/scrollToSection';
 import { FRAME, SECTION_PAD } from './ui/SectionHeader';
 
@@ -69,9 +69,9 @@ export default function Hero() {
             <a href="#contact" onClick={toContact} className="btn border-[1.5px] border-ink bg-ink text-bone md:border-bone md:bg-bone md:text-ink">
               Get in touch
             </a>
-            <a href={CV_URL} className="btn border-[1.5px] border-bone/80 text-bone hover:border-bone">
-              <Download size={16} aria-hidden="true" />
-              Download CV
+            <a href={CV_REQUEST_URL} className="btn border-[1.5px] border-bone/80 text-bone hover:border-bone">
+              <FileText size={16} aria-hidden="true" />
+              Request CV
             </a>
             <span className="flex gap-2.5">
               <a

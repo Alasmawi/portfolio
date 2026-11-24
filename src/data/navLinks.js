@@ -24,11 +24,12 @@ export const DOCK_LINKS = [
 // view of the page showed "Work" as current before anyone had scrolled.
 export const SECTION_IDS = ['hero', 'focus', ...LINKS.map((l) => l.id), 'contact'];
 
-// The CV opens a page on this site (public/cv.html) rather than linking to the
-// file. LinkedIn's in-app browser, and others like it, crash or do nothing on a
-// link that answers with a download; the page starts the download in a normal
-// browser and offers a viewer in an in-app one. The file itself lives in
-// Dropbox and is replaced there, so updating it needs no change here.
-//
-// No `download` attribute on the links: this is a page, not the file.
-export const CV_URL = '/cv';
+export const EMAIL = 'asmawiabdulla0@gmail.com';
+
+// The CV isn't downloadable from the site. Every CV button opens an email
+// asking for it, so I know who has it and can send the current version.
+// A mailto link also works inside LinkedIn's in-app browser, which crashed
+// on the old direct download.
+const CV_SUBJECT = 'CV request';
+const CV_BODY = 'Hi Abdulla,\n\nCould you send me your CV?\n\nName:\nCompany:\nRole:\n';
+export const CV_REQUEST_URL = `mailto:${EMAIL}?subject=${encodeURIComponent(CV_SUBJECT)}&body=${encodeURIComponent(CV_BODY)}`;
